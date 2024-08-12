@@ -1,8 +1,12 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
+import { toast } from "sonner";
+import { useEquito } from "../../providers/equito-provider";
+import { ChainSelect } from "../../components/chain-select";
 
 export default function Healthcheck() {
 	const [status, setStatus] = useState("isIdle");
@@ -10,8 +14,15 @@ export default function Healthcheck() {
 	const [pingMessage, setPingMessage] = useState();
 	const [pongMessage, setPongMessage] = useState();
 
-	const [fromChain, setFromChain] = useState();
-	const [toChain, setToChain] = useState();
+	const [isClient, setIsClient] = useState(false);
+
+	const { from, to } = useEquito();
+
+	const { address } = useAccount();
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	const {
 		mutateAsync: execute,
@@ -21,18 +32,39 @@ export default function Healthcheck() {
 		error,
 	} = useMutation({
 		mutationFn: async () => {
+			console.log("start execute");
 			try {
 				setPongMessage(undefined);
-			} catch (error) {}
+				if (!from.chain) {
+					throw new Error("no from chain found")
+				}
+			} catch (error) {
+				setStatus("isError");
+				console.error(error);
+			}
 		}
 	})
 
+	const onClickSendPing = () => {
+		toast.promise(execute(), {
+			loading: "Executing transaction...",
+			success: "Transaction successful",
+			error: "Transaction failed",
+		});
+	};
+
 	const sfn = {
 		isIdle: (
-			<button>
+			<button onClick={onClickSendPing}>
 				send ping and receive pong
 			</button>
-		)
+		),
+		isError: (
+			<>
+				<button onClick={onClickSendPing}>Retry</button>
+				<p className="text-destructive text-sm">Ping Pong Error</p>
+			</>
+		),
 	};
 
 	return (
@@ -45,7 +77,9 @@ export default function Healthcheck() {
 					largeScreen: "full",
 				}}
 			/>
+			{isClient && address ? `address: ${address}` : "not connected"}
 			<div>
+				<ChainSelect mode="from" disabled={false} />
 				<label htmlFor="ping">ping</label>
 				<input
 					id="ping"
@@ -57,7 +91,7 @@ export default function Healthcheck() {
 			{sfn[status]}		
 			<div>
 				<div>pong</div>
-				<div>{pongMessage || "no pong message"}</div>
+				<span>{pongMessage ?? "no pong message"}</span>
 			</div>
 		</div>
 	);

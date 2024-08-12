@@ -5,7 +5,8 @@ import { Inter } from "next/font/google";
 import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { wagmiConfig } from "./wagmi";
+import { wagmiConfig } from "../utils/wagmi";
+import { EquitoProvider } from "../providers/equito-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -35,7 +36,9 @@ export default function RootLayout({
 								borderRadius: "small",
 							})}
 						>
-							{children}
+							<EquitoProvider>	
+								{children}
+							</EquitoProvider>
 						</RainbowKitProvider>
 					</QueryClientProvider>
 				</WagmiProvider>

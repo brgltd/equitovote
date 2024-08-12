@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@equito-sdk/client": "^0.1.4",
     "@equito-sdk/evm": "^0.1.4",
     "@rainbow-me/rainbowkit": "^2.1.4",
     "@tanstack/react-query": "^5.51.23",
