@@ -8,7 +8,8 @@ type UseRouterArgs = {
 export const useRouter = ({ chainSelector }: UseRouterArgs) =>
   useQuery({
     queryKey: ["routerContract", chainSelector],
-    queryFn: async () =>
-      await (await getEquitoClient()).getRouter(chainSelector || 0),
+	queryFn: async () => {
+		return await (await getEquitoClient()).getRouter(chainSelector || 0);
+	},
     enabled: !!chainSelector,
   });

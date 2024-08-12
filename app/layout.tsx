@@ -7,6 +7,7 @@ import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { wagmiConfig } from "../utils/wagmi";
 import { EquitoProvider } from "../providers/equito-provider";
+import { PingPongProvider } from "../providers/ping-pong-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -37,7 +38,9 @@ export default function RootLayout({
 							})}
 						>
 							<EquitoProvider>	
-								{children}
+								<PingPongProvider>
+									{children}
+								</PingPongProvider>
 							</EquitoProvider>
 						</RainbowKitProvider>
 					</QueryClientProvider>
