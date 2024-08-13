@@ -9,6 +9,7 @@ import { formatUnits } from "viem";
 import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
 import { ChainSelect } from "../../components/chain-select";
+import { ProgressLoader } from "../../components/progress-loader";
 
 export default function Healthcheck() {
 	const { 
@@ -49,6 +50,10 @@ export default function Healthcheck() {
 				if (!to.chain) {
 					throw new Error("no to chain found")
 				}
+				if (!pongFee.fee == undefined) {
+					throw new Error("No pong fee found")
+				}
+				setStatus("isSendingPing");
 			} catch (error) {
 				setStatus("isError");
 				console.error(error);
@@ -74,6 +79,14 @@ export default function Healthcheck() {
 			<>
 				<button onClick={onClickSendPing}>Retry</button>
 				<p className="text-destructive text-sm">Ping Pong Error</p>
+			</>
+		),
+		isApprovingSentPing: (
+			<>
+				<ProgressLoader dir="from" />
+				<p className="text-muted-foreground text-sm">
+					Approving sent ping message...
+				</p>
 			</>
 		),
 	};
