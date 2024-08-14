@@ -10,7 +10,11 @@ import {
 } from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { toast } from "sonner";
-import { formatUnits } from "viem";
+import { 
+	formatUnits,
+	parseEventLogs,
+} from "viem";
+import { routerAbi } from "@equito-sdk/evm";
 import { config } from "../../utils/wagmi";
 import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
@@ -58,15 +62,16 @@ export default function Healthcheck() {
 				functionName: "sendPing",
 				value: pingFee.fee,
 				chainId: from.chain.definition.id,
-				args: [BigInt(to.chain.chainSelector, pingMessage)],
+				args: [BigInt(to.chain.chainSelector), pingMessage],
 			});
-			return waitForTransactionRecepit(config,
+			return waitForTransactionReceipt(config, {
 				hash,
 				chainId: from.chain.definition.id,
-			);
+			});
 		} catch (error) {
-			setStatus(errro);
+			setStatus("error");
 			console.error(error);
+			return null;
 		}
 	}
 
@@ -88,8 +93,24 @@ export default function Healthcheck() {
 				if (!pongFee.fee == undefined) {
 					throw new Error("No pong fee found")
 				}
+
 				setStatus("isSendingPing");
-				const sendPingReceppt = await sendPing();
+				const sendPingReceipt = await sendPing();
+				if (sendPingReceipt) {
+					const sentPingMessage = parseEventLogs({
+					  abi: routerAbi,
+					  logs: sendPingReceipt.logs,
+					}).flatMap(({ eventName, args }) =>
+					  eventName === "MessageSendRequested" ? [args] : []
+					)[0];
+
+					console.log("sendPingMessage");
+					console.log(sendPingMessage);
+
+					if (!sentPingMessage) {
+						throw new Error("MessageSendRequest event not found");
+					}
+				}
 			} catch (error) {
 				setStatus("isError");
 				console.error(error);
