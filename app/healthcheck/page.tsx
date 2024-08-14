@@ -8,22 +8,32 @@ import {
 	useSwitchChain,
 	useWriteContract,
 } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { waitForTransactionReceipt, getBlock } from "@wagmi/core";
 import { toast } from "sonner";
 import { 
 	formatUnits,
 	parseEventLogs,
 } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
+import { generateHash } from "@equito-sdk/viem";
 import { config } from "../../utils/wagmi";
 import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
+import { useApprove } from "../../hooks/use-approve";
 import { ChainSelect } from "../../components/chain-select";
 import { ProgressLoader } from "../../components/progress-loader";
 import { pingPongAbi } from "../../abis/ping-pong.abi";
 
 export default function Healthcheck() {
 	const [isClient, setIsClient] = useState(false);
+
+	const {
+		writeContractAsync,
+	} = useWriteContract();
+
+	const { switchChainAsync } = useSwitchChain();
+
+	const { from, to } = useEquito();
 
 	const { 
 		pingMessage,
@@ -38,13 +48,7 @@ export default function Healthcheck() {
 
 	const { address } = useAccount();
 
-	const {
-		writeContractAsync,
-	} = useWriteContract();
-
-	const { switchChainAsync } = useSwitchChain();
-
-	const { from, to } = useEquito();
+	const approve = useApprove();
 
 	const nativeCurrencyFrom = from?.chain?.definition?.nativeCurrency.symbol; 
 	const nativeCurrencyTo = to?.chain?.definition?.nativeCurrency.symbol; 
@@ -96,21 +100,31 @@ export default function Healthcheck() {
 
 				setStatus("isSendingPing");
 				const sendPingReceipt = await sendPing();
-				if (sendPingReceipt) {
-					const sentPingMessage = parseEventLogs({
-					  abi: routerAbi,
-					  logs: sendPingReceipt.logs,
-					}).flatMap(({ eventName, args }) =>
-					  eventName === "MessageSendRequested" ? [args] : []
-					)[0];
-
-					console.log("sendPingMessage");
-					console.log(sendPingMessage);
-
-					if (!sentPingMessage) {
-						throw new Error("MessageSendRequest event not found");
-					}
+				if (!sendPingReceipt) {
+					throw new Error("Send ping receipt invalid");
 				}
+				const sentPingMessage = parseEventLogs({
+				  abi: routerAbi,
+				  logs: sendPingReceipt.logs,
+				}).flatMap(({ eventName, args }) =>
+				  eventName === "MessageSendRequested" ? [args] : []
+				)[0];
+				if (!sentPingMessage) {
+					throw new Error("MessageSendRequest event not found");
+				}
+
+				const { timestamp: sentPingTimestamp } = await getBlock(config, {
+					chainId: from.chain.definition.id,
+					blockNumber: sendPingReceipt.blockNumber
+				});
+				setStatus("isApprovingSentPing");
+				const { proof: sentPingProof } = await approve.execute({
+					messageHash: generateHash(sentPingMessage.message),
+					fromTimestamp: Number(sentPingTimestamp) * 1000,
+					chainSelector: from.chain.chainSelector,
+				});
+
+				setStatus("isDeliveringPingAndSendingPong");
 			} catch (error) {
 				setStatus("isError");
 				console.error(error);
@@ -143,6 +157,14 @@ export default function Healthcheck() {
 				<ProgressLoader dir="from" />
 				<p className="text-muted-foreground text-sm">
 					Approving sent ping message...
+				</p>
+			</>
+		),
+		isDeliveringPingAndSendingPong: (
+			<>
+				<ProgressLoader dir="from" />
+				<p className="text-muted-foreground text-sm">
+					Delivery sent ping and sending pong
 				</p>
 			</>
 		),
