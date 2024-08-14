@@ -63,7 +63,7 @@ export default function Healthcheck() {
 			return waitForTransactionRecepit(config,
 				hash,
 				chainId: from.chain.definition.id,
-			});
+			);
 		} catch (error) {
 			setStatus(errro);
 			console.error(error);
