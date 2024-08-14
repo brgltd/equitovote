@@ -3,15 +3,24 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import { 
+	useAccount,
+	useSwitchChain,
+	useWriteContract,
+} from "wagmi";
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { toast } from "sonner";
 import { formatUnits } from "viem";
+import { config } from "../../utils/wagmi";
 import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
 import { ChainSelect } from "../../components/chain-select";
 import { ProgressLoader } from "../../components/progress-loader";
+import { pingPongAbi } from "../../abis/ping-pong.abi";
 
 export default function Healthcheck() {
+	const [isClient, setIsClient] = useState(false);
+
 	const { 
 		pingMessage,
 		setPingMessage,
@@ -23,9 +32,14 @@ export default function Healthcheck() {
 		pongFee 
 	} = usePingPong();
 
-	const [isClient, setIsClient] = useState(false);
-
 	const { address } = useAccount();
+
+	const {
+		writeContractAsync,
+	} = useWriteContract();
+
+	const { switchChainAsync } = useSwitchChain();
+
 	const { from, to } = useEquito();
 
 	const nativeCurrencyFrom = from?.chain?.definition?.nativeCurrency.symbol; 
@@ -34,6 +48,27 @@ export default function Healthcheck() {
 	useEffect(() => {
 		setIsClient(true);
 	}, []);
+
+	const sendPing = async () => {
+		try {
+			await switchChainAsync({ chainId: from.chain.definition.id });
+			const hash = await writeContractAsync({
+				address: from.chain.pingPongContract,
+				abi: pingPongAbi,
+				functionName: "sendPing",
+				value: pingFee.fee,
+				chainId: from.chain.definition.id,
+				args: [BigInt(to.chain.chainSelector, pingMessage)],
+			});
+			return waitForTransactionRecepit(config,
+				hash,
+				chainId: from.chain.definition.id,
+			});
+		} catch (error) {
+			setStatus(errro);
+			console.error(error);
+		}
+	}
 
 	const {
 		mutateAsync: execute,
@@ -54,6 +89,7 @@ export default function Healthcheck() {
 					throw new Error("No pong fee found")
 				}
 				setStatus("isSendingPing");
+				const sendPingReceppt = await sendPing();
 			} catch (error) {
 				setStatus("isError");
 				console.error(error);
@@ -111,8 +147,9 @@ export default function Healthcheck() {
 				<input
 					id="ping"
 					placeholder="write your message"
-					value={pingMessage}
+					value={pingMessage ?? ''}
 					onChange={(e) => setPingMessage(e.target.value)}
+					className="text-black"
 				/>
 			</div>
 
