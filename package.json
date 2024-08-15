@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@equito-sdk/client": "^0.1.4",
+    "@equito-sdk/core": "^0.1.4",
     "@equito-sdk/evm": "^0.1.4",
     "@equito-sdk/viem": "^0.1.4",
     "@rainbow-me/rainbowkit": "^2.1.4",

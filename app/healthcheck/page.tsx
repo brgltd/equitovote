@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { 
 	formatUnits,
 	parseEventLogs,
+	decodeAbiParameters,
+	parseAbiParameters,
 } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
@@ -20,6 +22,7 @@ import { config } from "../../utils/wagmi";
 import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
 import { useApprove } from "../../hooks/use-approve";
+import { useDeliver } from "../../hooks/use-deliver";
 import { ChainSelect } from "../../components/chain-select";
 import { ProgressLoader } from "../../components/progress-loader";
 import { pingPongAbi } from "../../abis/ping-pong.abi";
@@ -32,6 +35,8 @@ export default function Healthcheck() {
 	} = useWriteContract();
 
 	const { switchChainAsync } = useSwitchChain();
+
+	const { address } = useAccount();
 
 	const { from, to } = useEquito();
 
@@ -46,9 +51,10 @@ export default function Healthcheck() {
 		pongFee 
 	} = usePingPong();
 
-	const { address } = useAccount();
-
 	const approve = useApprove();
+
+	const deliverPingAndSendPong = useDeliver({ equito: to });
+	const deliverPong = useDeliver({ equito: from });
 
 	const nativeCurrencyFrom = from?.chain?.definition?.nativeCurrency.symbol; 
 	const nativeCurrencyTo = to?.chain?.definition?.nativeCurrency.symbol; 
@@ -113,11 +119,14 @@ export default function Healthcheck() {
 					throw new Error("MessageSendRequest event not found");
 				}
 
+				// Seems to be stale around here for few secs even after last 
+				// tx is confirmed.
+
+				setStatus("isApprovingSentPing");
 				const { timestamp: sentPingTimestamp } = await getBlock(config, {
 					chainId: from.chain.definition.id,
 					blockNumber: sendPingReceipt.blockNumber
 				});
-				setStatus("isApprovingSentPing");
 				const { proof: sentPingProof } = await approve.execute({
 					messageHash: generateHash(sentPingMessage.message),
 					fromTimestamp: Number(sentPingTimestamp) * 1000,
@@ -125,6 +134,29 @@ export default function Healthcheck() {
 				});
 
 				setStatus("isDeliveringPingAndSendingPong");
+				const deliverPingAndSendPongReceipt =
+					await deliverPingAndSendPong.execute(
+						sentPingProof,
+						sentPingMessage.message,
+						sentPingMessage.messageData,
+						pongFee.fee
+					);
+				const sentPongMessage = parseEventLogs({
+				  abi: routerAbi,
+				  logs: deliverPingAndSendPongReceipt.logs,
+				}).flatMap(({ eventName, args }) =>
+				  eventName === "MessageSendRequested" ? [args] : []
+				)[0];
+				if (!sentPongMessage) {
+					throw new Error("MessageSendRequested event not found");
+				}
+				const [, pong] = decodeAbiParameters(
+					parseAbiParameters("string, string"),
+					sentPingMessage.messageData
+				);
+
+				setStatus("isCompleted");
+				setPongMessage(pong);
 			} catch (error) {
 				setStatus("isError");
 				console.error(error);
@@ -152,6 +184,12 @@ export default function Healthcheck() {
 				<p className="text-destructive text-sm">Ping Pong Error</p>
 			</>
 		),
+		isSendingPing: (
+			<>
+				<ProgressLoader dir="from" />
+				<p className="text-muted-foreground text-sm">Sending ping...</p>
+			</>
+		),
 		isApprovingSentPing: (
 			<>
 				<ProgressLoader dir="from" />
@@ -166,6 +204,14 @@ export default function Healthcheck() {
 				<p className="text-muted-foreground text-sm">
 					Delivery sent ping and sending pong
 				</p>
+			</>
+		),
+		isCompleted: (
+			<>
+				<span>Completed...</span>
+				<button onClick={onClickSendPing}>
+					Try again
+				</button>
 			</>
 		),
 	};

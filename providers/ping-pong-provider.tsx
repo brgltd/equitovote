@@ -18,7 +18,8 @@ export type PingStatus =
   | "isApprovingSentPing"
   | "isDeliveringPingAndSendingPong"
   | "isApprovingSentPong"
-  | "isDeliveringPong";
+  | "isDeliveringPong"
+  | "isCompleted";
 
 type PingPongState = {
   pingMessage?: string;
