@@ -8,8 +8,8 @@ import {TransferHelper} from "./TransferHelper.sol";
 contract EquitoSwap  is EquitoApp {
 	struct TokenAmount {
 		bytes token;
-		uint256 amount;
 		bytes recipient; 
+		uint256 amount;
 	}
 
     /// @dev The address used to represent the native token.
@@ -30,6 +30,10 @@ contract EquitoSwap  is EquitoApp {
 	/// @param _router The address of the equito router contract.
 	constructor(address _router) EquitoApp(_router) {}
 
+	// @notice Plain native token transfers to this contract.
+	receive() external payable {}
+
+	/// @notice Bridge the native token to a destination chain. 
 	function bridgeNative(
 		uint256 destinationChainSelector,
 		uint256 sourceAmount
@@ -77,5 +81,13 @@ contract EquitoSwap  is EquitoApp {
 			TransferHelper.safeTransferETH(recipient, tokenAmount.amount);
 		}
 	}
+
+	/// @notice Deposit the native token into this contract via an external function.
+	function depositNative() external payable returns (uint256) {
+		return msg.value;
+	}
+
+	/// @notice Recover the chain's native token stuck in this contract.
+	function recoverNative() external {}
 }
 
