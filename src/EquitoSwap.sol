@@ -2,18 +2,27 @@
 pragma solidity ^0.8.23;
 
 import {EquitoApp} from "equito/src/EquitoApp.sol";
-import {bytes64, EquitoMessage, EquitoMessageLibrary} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {TransferHelper} from "./TransferHelper.sol";
 
 contract EquitoSwap  is EquitoApp {
 	struct TokenAmount {
-		address token;
+		bytes token;
 		uint256 amount;
-		address recipient;
+		bytes recipient; 
 	}
 
     /// @dev The address used to represent the native token.
     address internal constant NATIVE_TOKEN =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+	event BridgeNativeRequested(
+		bytes32 indexed messageHash,
+		uint256 indexed destinationChainSelector,
+		uint256 sourceAmount,
+		uint256 destinationAmount,
+		bytes recipient
+	);
 
 	error InsufficientValueSent();
 
@@ -24,17 +33,20 @@ contract EquitoSwap  is EquitoApp {
 	function bridgeNative(
 		uint256 destinationChainSelector,
 		uint256 sourceAmount
-	) external payable {
+	) external payable returns (bytes32) {
 		if (sourceAmount > msg.value) {
 			revert InsufficientValueSent();
 		}
 		uint256 fee = msg.value - sourceAmount;
 		uint256 destinationAmount = sourceAmount - fee;
 
+		bytes memory destinationToken = abi.encodePacked(NATIVE_TOKEN);
+		bytes memory recipient = abi.encodePacked(msg.sender);
+
 		TokenAmount memory tokenAmount = TokenAmount({
-			token: NATIVE_TOKEN,
+			token: destinationToken,
 			amount: destinationAmount,
-			recipient: msg.sender
+			recipient: recipient
 		});
 
 		bytes32 messageHash = router.sendMessage{value: fee}(
@@ -42,6 +54,28 @@ contract EquitoSwap  is EquitoApp {
 			destinationChainSelector,
 			abi.encode(tokenAmount)
 		);
+
+		emit BridgeNativeRequested(
+			messageHash,
+			destinationChainSelector,
+			sourceAmount,
+			destinationAmount,
+			recipient
+		);
+
+		return messageHash;
+	}
+
+	function _receiveMessageFromPeer(
+		EquitoMessage calldata message,
+		bytes calldata messageData
+	) internal override {
+		TokenAmount memory tokenAmount = abi.decode(messageData, (TokenAmount));
+		address recipient = abi.decode(tokenAmount.recipient, (address));
+		address token = abi.decode(tokenAmount.token, (address));
+		if (token == NATIVE_TOKEN) {
+			TransferHelper.safeTransferETH(recipient, tokenAmount.amount);
+		}
 	}
 }
 
