@@ -82,6 +82,7 @@ contract EquitoSwap  is EquitoApp {
 		return messageHash;
 	}
 
+	/// #notice Bridge ERC20 tokens to destination chain.
 	function bridgeERC20(
 		uint256 destinationChainSelector,
 		address sourceToken,
@@ -121,6 +122,7 @@ contract EquitoSwap  is EquitoApp {
 		return messageHash;
 	}
 		
+	/// @notice Receive message on destination chain.
 	function _receiveMessageFromPeer(
 		EquitoMessage calldata message,
 		bytes calldata messageData
