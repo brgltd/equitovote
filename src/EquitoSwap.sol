@@ -24,6 +24,14 @@ contract EquitoSwap  is EquitoApp {
 		bytes recipient
 	);
 
+	event BridgeERC20Requested(
+		bytes32 indexed messageHash,
+		uint256 indexed destinationChainSelector,
+		uint256 sourceAmount,
+		address sourceToken,
+		bytes recipient
+	);
+
 	error InsufficientValueSent();
 
 	/// @notice Inittializes the contract with the router contract.
@@ -70,6 +78,45 @@ contract EquitoSwap  is EquitoApp {
 		return messageHash;
 	}
 
+	function bridgeERC20(
+		uint256 destinationChainSelector,
+		uint256 sourceAmount,
+		address sourceToken
+	) external payable returns (bytes32) {
+		TransferHelper.safeTransferFrom(
+			sourceToken,
+			msg.sender,
+			address(this),
+			sourceAmount
+		);
+		uint256 fee = msg.value;
+
+		bytes memory destinationToken = abi.encodePacked(sourceToken);
+		bytes memory recipient = abi.encodePacked(msg.sender);
+
+		TokenAmount memory tokenAmount = TokenAmount({
+			token: destinationToken,
+			amount: sourceAmount,
+			recipient: recipient
+		});
+
+		bytes32 messageHash = router.sendMessage{value: fee}(
+			peers[destinationChainSelector],
+			destinationChainSelector,
+			abi.encode(tokenAmount)
+		);
+
+		emit BridgeERC20Requested(
+			messageHash,
+			destinationChainSelector,
+			sourceAmount,
+			sourceToken,
+			recipient
+		);
+
+		return messageHash;
+	}
+		
 	function _receiveMessageFromPeer(
 		EquitoMessage calldata message,
 		bytes calldata messageData
@@ -79,6 +126,8 @@ contract EquitoSwap  is EquitoApp {
 		address token = abi.decode(tokenAmount.token, (address));
 		if (token == NATIVE_TOKEN) {
 			TransferHelper.safeTransferETH(recipient, tokenAmount.amount);
+		} else {
+			TransferHelper.safeTransfer(token, recipient, tokenAmount.amount);
 		}
 	}
 
@@ -89,5 +138,10 @@ contract EquitoSwap  is EquitoApp {
 
 	/// @notice Recover the chain's native token stuck in this contract.
 	function recoverNative() external {}
+
+	/// @notice Just poke the contract.
+	function poke() external pure returns (uint256) {
+		return 42;
+	}
 }
 
