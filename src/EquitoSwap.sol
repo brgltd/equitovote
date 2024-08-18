@@ -5,6 +5,10 @@ import {EquitoApp} from "equito/src/EquitoApp.sol";
 import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
 import {TransferHelper} from "./TransferHelper.sol";
 
+interface IERC20 {
+	function balanceOf(address holder) external view returns (uint256);
+}
+
 contract EquitoSwap  is EquitoApp {
 	struct TokenAmount {
 		bytes token;
@@ -132,12 +136,25 @@ contract EquitoSwap  is EquitoApp {
 	}
 
 	/// @notice Deposit the native token into this contract via an external function.
+	// @return The amount of native token sent.
 	function depositNative() external payable returns (uint256) {
 		return msg.value;
 	}
 
 	/// @notice Recover the chain's native token stuck in this contract.
-	function recoverNative() external {}
+	// This contract is not supposed to hold funds.
+	function recoverNative() external onlyOwner {
+		TransferHelper.safeTransferETH(msg.sender, address(this).balance);
+	}
+
+	/// @notice Recover ERC20 tokens stuck in this contract.
+	function recoverERC20(address token) external onlyOwner {
+		TransferHelper.safeTransfer(
+			msg.sender, 
+			token, 
+			IERC20(token).balanceOf(address(this))
+		);
+	}
 
 	/// @notice Just poke the contract.
 	function poke() external pure returns (uint256) {
