@@ -27,8 +27,8 @@ contract EquitoSwap  is EquitoApp {
 	event BridgeERC20Requested(
 		bytes32 indexed messageHash,
 		uint256 indexed destinationChainSelector,
-		uint256 sourceAmount,
 		address sourceToken,
+		uint256 sourceAmount,
 		bytes recipient
 	);
 
@@ -80,8 +80,8 @@ contract EquitoSwap  is EquitoApp {
 
 	function bridgeERC20(
 		uint256 destinationChainSelector,
-		uint256 sourceAmount,
-		address sourceToken
+		address sourceToken,
+		uint256 sourceAmount
 	) external payable returns (bytes32) {
 		TransferHelper.safeTransferFrom(
 			sourceToken,
@@ -109,8 +109,8 @@ contract EquitoSwap  is EquitoApp {
 		emit BridgeERC20Requested(
 			messageHash,
 			destinationChainSelector,
-			sourceAmount,
 			sourceToken,
+			sourceAmount,
 			recipient
 		);
 
