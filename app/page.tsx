@@ -26,12 +26,13 @@ export default function Page() {
 
 	const { address } = useAccount();
 
-	/* const { config } = usePrepareContractWrite({ */
-	/* 	address: Config.Link_EthereumSepolia, */
-	/* 	abi: erc20Abi, */
-	/* 	functionName: "approve", */
-	/* 	args: [spenderAddress, '1000000000000000000'], */
-	/* }); */
+	const { config } = usePrepareContractWrite({
+		address: Config.Link_EthereumSepolia,
+		abi: erc20Abi,
+		functionName: "approve",
+		args: [address, '1000000000000000000'],
+	});
+	const { write } = useContractWrite(config)
 
 	useEffect(() => {
 		setIsClient(true);
