@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSwitchChain } from "wagmi";
+import { 
+	useSwitchChain,
+	useContractWrite,
+	usePrepareContractWrite
+} from "wagmi";
+import { prepareContractWrite } from "viem";
 import { chains } from "../utils/chains";
 
 // TODO: replace with chain select.
@@ -18,6 +23,7 @@ export default function Page() {
 			await switchChainAsync({ chainId: ethereumChain.definition.id });
 
 			// ERC20 approve EquitoSwap to use funds from msg.sender.
+
 		} catch (error) {
 			// TODO: show a toast with the error
 			console.error(error);

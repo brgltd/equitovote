@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 
 import {EquitoSwap} from "../src/EquitoSwap.sol";
-import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses";
+import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses.sol";
 
 contract DeployEquitoSwap is Script {
 	function run() external {
