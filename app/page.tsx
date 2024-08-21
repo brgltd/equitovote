@@ -16,6 +16,8 @@ export default function Page() {
 	const onClickSwap = async () => {
 		try {
 			await switchChainAsync({ chainId: ethereumChain.definition.id });
+
+			// ERC20 approve EquitoSwap to use funds from msg.sender.
 		} catch (error) {
 			// TODO: show a toast with the error
 			console.error(error);
