@@ -28,13 +28,6 @@ export default function Page() {
 
   const { address: userAddress } = useAccount();
 
-  // const { config } = usePrepareContractWrite({
-  // 	address: Config.Link_EthereumSepolia,
-  // 	abi: erc20Abi,
-  // 	functionName: "approve",
-  // 	args: [address, '1000000000000000000'],
-  // });
-
   const { writeContractAsync } = useWriteContract();
 
   useEffect(() => {
@@ -46,7 +39,8 @@ export default function Page() {
       address: Config.Link_EthereumSepolia,
       abi: erc20Abi,
       functionName: "approve",
-      args: [userAddress, "1000000000000000000"],
+      // approve 25 link
+      args: [Config.EquitoSwap_EthereumSepolia_V1, "25000000000000000000"],
     });
     await waitForTransactionReceipt(config, { hash });
   };
@@ -73,7 +67,7 @@ export default function Page() {
           largeScreen: "full",
         }}
       />
-      {isClient && address ? `address: ${address}` : "not connected"}
+      {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
       <br />
 
       {/* assume ether from ethereum to arbitrum */}
@@ -85,7 +79,9 @@ export default function Page() {
         onChange={(e) => setInputAmount(e.target.value)}
       />
       <br />
-      <button className="block">send</button>
+      <button className="block" onClick={onClickSwap}>
+        send
+      </button>
     </>
   );
 }
