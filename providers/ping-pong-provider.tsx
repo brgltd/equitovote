@@ -44,8 +44,8 @@ export const PingPongProvider = ({ children }: PropsWithChildren<object>) => {
   const [status, setStatus] = useState<PingPongState["status"]>("isIdle");
 
   const { from, to } = useEquito();
-  const pongFee = usePingPongFee({ equito: to });
   const pingFee = usePingPongFee({ equito: from });
+  const pongFee = usePingPongFee({ equito: to });
 
   const value = useMemo(
     () => ({

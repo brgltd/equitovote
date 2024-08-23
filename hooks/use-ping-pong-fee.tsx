@@ -17,7 +17,6 @@ export const usePingPongFee = ({
     address: routerAddress,
     abi: routerAbi,
     functionName: "getFee",
-	// replace pingPongContract for testing
     args: [chain?.pingPongContract || NATIVE_ADDRESS],
     query: {
       enabled: !!chain && !!routerAddress,

@@ -8,12 +8,15 @@ import {
   useWriteContract,
   useAccount,
 } from "wagmi";
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { chains } from "../utils/chains";
 import { Config } from "../config";
-import { config } from "@/utils/wagmi";
+import { config } from "../utils/wagmi";
 import erc20Abi from "../abis/erc20.json";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
+
+const equitoSwapAbi = equitoSwap.abi;
 
 // TODO: replace with chain select.
 const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
@@ -45,12 +48,30 @@ export default function Page() {
     await waitForTransactionReceipt(config, { hash });
   };
 
+  const bridgeEquitoSwap = async () => {
+	const hash = await writeContractAsync({
+		address: Config.EquitoSwap_EthereumSepolia_V1,
+		abi: equitoSwapAbi,
+		functionName: "bridgeERC20",
+		args: [
+			arbitrumChain.chainSelector, // destinationChainSelector
+			Config.Link_EthereumSepolia, // sourceToken
+			"1000000000000000000", // sourceAmount
+		],
+		value: 0,
+	});
+	await waitForTransactionReceipt(config, { hash });
+  };
+
   const onClickSwap = async () => {
     try {
       await switchChainAsync({ chainId: ethereumChain.definition.id });
 
       // ERC20 approve EquitoSwap to use funds from msg.sender.
-      await approveLink();
+	  // TODO: only call if equitoSwap allowance does not cover input
+      /* await approveLink(); */
+
+	  await bridgeEquitoSwap();
     } catch (error) {
       // TODO: show a toast with the error
       console.error(error);
