@@ -3,16 +3,18 @@
 import { useState, useEffect } from "react";
 import {
   useSwitchChain,
-  // useContractWrite,
-  // usePrepareContractWrite,
   useWriteContract,
+  useReadContract,
   useAccount,
 } from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { formatUnits } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { routerAbi } from "@equito-sdk/evm";
 import { chains } from "../utils/chains";
-import { Config } from "../config";
 import { config } from "../utils/wagmi";
+import { useRouter } from "../hooks/use-router";
+import { Config } from "../config";
 import erc20Abi from "../abis/erc20.json";
 import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
 
@@ -32,6 +34,20 @@ export default function Page() {
   const { address: userAddress } = useAccount();
 
   const { writeContractAsync } = useWriteContract();
+
+  const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
+  const fromRouterAddress = fromRouter.data;
+
+  const { data: fromFee } = useReadContract({
+  	address: fromRouterAddress,
+	abi: routerAbi,
+	functionName: "getFee",
+	args: [Config.EquitoSwap_EthereumSepolia_V1],
+	query: { enabled: !!fromRouterAddress },
+	chainId: ethereumChain.definition.id,
+  });
+
+  const parsedFromFee = fromFee ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${ethereumChain.definition.nativeCurrency.symbol}`: "unavailable";
 
   useEffect(() => {
     setIsClient(true);
@@ -58,7 +74,7 @@ export default function Page() {
 			Config.Link_EthereumSepolia, // sourceToken
 			"1000000000000000000", // sourceAmount
 		],
-		value: 0,
+		value: fromFee || 0,
 	});
 	await waitForTransactionReceipt(config, { hash });
   };
@@ -92,6 +108,7 @@ export default function Page() {
       <br />
 
       {/* assume ether from ethereum to arbitrum */}
+	  <div>from fee: {parsedFromFee}</div>
       <label htmlFor="input-token">enter input amount</label>
       <input
         className="text-black"

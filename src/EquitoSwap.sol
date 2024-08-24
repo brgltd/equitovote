@@ -9,7 +9,7 @@ interface IERC20 {
 	function balanceOf(address holder) external view returns (uint256);
 }
 
-contract EquitoSwap  is EquitoApp {
+contract EquitoSwap is EquitoApp {
 	struct TokenAmount {
 		bytes token;
 		bytes recipient; 
@@ -82,7 +82,7 @@ contract EquitoSwap  is EquitoApp {
 		return messageHash;
 	}
 
-	/// #notice Bridge ERC20 tokens to destination chain.
+	/// @notice Bridge ERC20 tokens to destination chain.
 	function bridgeERC20(
 		uint256 destinationChainSelector,
 		address sourceToken,
@@ -137,12 +137,6 @@ contract EquitoSwap  is EquitoApp {
 		}
 	}
 
-	/// @notice Deposit the native token into this contract via an external function.
-	// @return The amount of native token sent.
-	function depositNative() external payable returns (uint256) {
-		return msg.value;
-	}
-
 	/// @notice Recover the chain's native token stuck in this contract.
 	// This contract is not supposed to hold funds.
 	function recoverNative() external onlyOwner {
@@ -156,11 +150,6 @@ contract EquitoSwap  is EquitoApp {
 			token, 
 			IERC20(token).balanceOf(address(this))
 		);
-	}
-
-	/// @notice Just poke the contract.
-	function poke() external pure returns (uint256) {
-		return 42;
 	}
 }
 
