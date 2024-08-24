@@ -7,13 +7,15 @@ import {
   useReadContract,
   useAccount,
 } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { formatUnits } from "viem";
+import { waitForTransactionReceipt, getBlock } from "@wagmi/core";
+import { formatUnits, parseEventLogs } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
+import { generateHash } from "@equito-sdk/viem";
 import { chains } from "../utils/chains";
 import { config } from "../utils/wagmi";
 import { useRouter } from "../hooks/use-router";
+import { useApprove } from "../hooks/use-approve";
 import { Config } from "../config";
 import erc20Abi from "../abis/erc20.json";
 import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
@@ -38,16 +40,22 @@ export default function Page() {
   const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
   const fromRouterAddress = fromRouter.data;
 
+  const approve = useApprove();
+
   const { data: fromFee } = useReadContract({
-  	address: fromRouterAddress,
-	abi: routerAbi,
-	functionName: "getFee",
-	args: [Config.EquitoSwap_EthereumSepolia_V1],
-	query: { enabled: !!fromRouterAddress },
-	chainId: ethereumChain.definition.id,
+    address: fromRouterAddress,
+    abi: routerAbi,
+    functionName: "getFee",
+    args: [Config.EquitoSwap_EthereumSepolia_V1],
+    query: { enabled: !!fromRouterAddress },
+    chainId: ethereumChain.definition.id,
   });
 
-  const parsedFromFee = fromFee ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${ethereumChain.definition.nativeCurrency.symbol}`: "unavailable";
+  const parsedFromFee = fromFee
+    ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
+        ethereumChain.definition.nativeCurrency.symbol
+      }`
+    : "unavailable";
 
   useEffect(() => {
     setIsClient(true);
@@ -64,19 +72,23 @@ export default function Page() {
     await waitForTransactionReceipt(config, { hash });
   };
 
-  const bridgeEquitoSwap = async () => {
-	const hash = await writeContractAsync({
-		address: Config.EquitoSwap_EthereumSepolia_V1,
-		abi: equitoSwapAbi,
-		functionName: "bridgeERC20",
-		args: [
-			arbitrumChain.chainSelector, // destinationChainSelector
-			Config.Link_EthereumSepolia, // sourceToken
-			"1000000000000000000", // sourceAmount
-		],
-		value: fromFee || 0,
-	});
-	await waitForTransactionReceipt(config, { hash });
+  const bridgeToken = async () => {
+    const hash = await writeContractAsync({
+      address: Config.EquitoSwap_EthereumSepolia_V1,
+      abi: equitoSwapAbi,
+      functionName: "bridgeERC20",
+      args: [
+        BigInt(arbitrumChain.chainSelector), // destinationChainSelector
+        Config.Link_EthereumSepolia, // sourceToken
+        "0100000000000000000", // sourceAmount, 0.1 link
+      ],
+      value: fromFee || 0,
+      chainId: ethereumChain?.definition.id,
+    });
+    return waitForTransactionReceipt(config, {
+      hash,
+      chainId: ethereumChain?.definition.id,
+    });
   };
 
   const onClickSwap = async () => {
@@ -84,10 +96,45 @@ export default function Page() {
       await switchChainAsync({ chainId: ethereumChain.definition.id });
 
       // ERC20 approve EquitoSwap to use funds from msg.sender.
-	  // TODO: only call if equitoSwap allowance does not cover input
+      // TODO: only call if equitoSwap allowance does not cover input
       /* await approveLink(); */
 
-	  await bridgeEquitoSwap();
+      const bridgeTokenReceipt = await bridgeToken();
+
+      if (!bridgeTokenReceipt) {
+        throw new Error("Bridge token invalid receipt");
+      }
+
+      const logs = parseEventLogs({
+        abi: routerAbi,
+        logs: bridgeTokenReceipt.logs,
+      });
+
+      console.log("logs");
+      console.log(logs);
+
+      const bridgeTokenMessage = parseEventLogs({
+        abi: routerAbi,
+        logs: bridgeTokenReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : []
+      )[0];
+
+      console.log("bridgeTokenMessage");
+      console.log(bridgeTokenMessage);
+
+      const { timestamp: bridgeTokenTimestamp } = await getBlock(config, {
+        chainId: ethereumChain.definition.id,
+        blockNumber: bridgeTokenReceipt.blockNumber,
+      });
+
+      const { proof: bridgeTokenProof } = await approve.execute({
+        messageHash: generateHash(bridgeTokenMessage.message),
+        fromTimestamp: Number(bridgeTokenMessage) * 1000,
+        chainSelector: ethereumChain.chainSelector,
+      });
+
+      // TODO: need to call deliverAndExecuteMessage
     } catch (error) {
       // TODO: show a toast with the error
       console.error(error);
@@ -108,7 +155,7 @@ export default function Page() {
       <br />
 
       {/* assume ether from ethereum to arbitrum */}
-	  <div>from fee: {parsedFromFee}</div>
+      <div>from fee: {parsedFromFee}</div>
       <label htmlFor="input-token">enter input amount</label>
       <input
         className="text-black"

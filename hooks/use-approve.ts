@@ -30,7 +30,10 @@ export const useApprove = () => {
           listenTimeout: 100,
         });
 
-        setTxLink(`${baseExplorerUrl}?hash=${messageHash}`);
+        const txLink = `${baseExplorerUrl}?hash=${messageHash}`;
+        console.log("txLink");
+        console.log(txLink);
+        setTxLink(txLink);
 
         return { proof, timestamp };
       } catch (error) {
@@ -58,4 +61,3 @@ export const useApprove = () => {
 
   return { txLink, execute, ...rest };
 };
-
