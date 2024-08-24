@@ -38,7 +38,9 @@ export default function Page() {
   const { writeContractAsync } = useWriteContract();
 
   const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
+	const toRouter = useRouter ({ chainSelector: arbitrumChain.chainSelector });
   const fromRouterAddress = fromRouter.data;
+	const toRouterAddress = toRouter.data;
 
   const approve = useApprove();
 
@@ -51,9 +53,24 @@ export default function Page() {
     chainId: ethereumChain.definition.id,
   });
 
+  const { data: toFee } = useReadContract({
+    address: toRouterAddress,
+    abi: routerAbi,
+    functionName: "getFee",
+    args: [Config.EquitoSwap_ArbitrumSepolia_V1],
+    query: { enabled: !!toRouterAddress },
+    chainId: arbitrumChain.definition.id,
+  });
+
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
         ethereumChain.definition.nativeCurrency.symbol
+      }`
+    : "unavailable";
+
+  const parsedToFee = fromFee
+    ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
+        arbitrumChain.definition.nativeCurrency.symbol
       }`
     : "unavailable";
 
@@ -90,6 +107,21 @@ export default function Page() {
       chainId: ethereumChain?.definition.id,
     });
   };
+
+	const deliverAndExecuteMessage = async (proof, message, messageData) => {
+		const hash = await writeContractAsync({
+			address: toRouterAddress,
+			abi: routerAbi,
+			functionName: "deliverAndExecuteMessage",
+			value: toFee,
+			args: [message, messageData, BigInt(0), proof],
+			chainId: arbitrumChain.definition.id,
+		});
+		return waitForTransactionReceipt(config, {
+			hash,
+			chainId: arbitrumChain.definition.id
+		});
+	}
 
   const onClickSwap = async () => {
     try {
@@ -134,7 +166,30 @@ export default function Page() {
         chainSelector: ethereumChain.chainSelector,
       });
 
-      // TODO: need to call deliverAndExecuteMessage
+			console.log("bridgeTokenProof");
+			console.log(bridgeTokenProof);
+
+			// Go to the `to` chain
+      await switchChainAsync({ chainId: ethereumChain.definition.id });
+
+			const executionReceipt = await deliverAndExecuteMessage(
+				bridgeTokenProof, 
+				bridgeTokenMessage.message,
+				bridgeTokenMessage.messageData
+			);
+
+			console.log("executionReceipt")
+			console.log(executionReceipt)
+
+			const executionMessage = parseEventLogs({
+				abi: routerAbi,
+				logs: executionReceipt.logs,
+			}).flatMap(({ eventName, args }) =>
+				eventName === "MessageSendRequested" ? [args] : []
+			)[0];
+
+			console.log("executionMessage");
+			console.log(executionMessage);
     } catch (error) {
       // TODO: show a toast with the error
       console.error(error);
@@ -155,7 +210,8 @@ export default function Page() {
       <br />
 
       {/* assume ether from ethereum to arbitrum */}
-      <div>from fee: {parsedFromFee}</div>
+      <div>ethereum from fee: {parsedFromFee}</div>
+      <div>arbitrum to fee: {parsedToFee}</div>
       <label htmlFor="input-token">enter input amount</label>
       <input
         className="text-black"
