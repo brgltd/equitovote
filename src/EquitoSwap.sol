@@ -151,5 +151,10 @@ contract EquitoSwap is EquitoApp {
 			IERC20(token).balanceOf(address(this))
 		);
 	}
+
+	/// @notice Just poke the contract.
+	function poke() external pure returns (uint256) {
+		return 42;
+	}
 }
 

@@ -19,6 +19,7 @@ import { useApprove } from "../hooks/use-approve";
 import { Config } from "../config";
 import erc20Abi from "../abis/erc20.json";
 import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
+import { pingPongAbi } from "../abis/ping-pong.abi";
 
 const equitoSwapAbi = equitoSwap.abi;
 
@@ -63,6 +64,48 @@ export default function Page() {
     query: { enabled: !!toRouterAddress },
     chainId: arbitrumChain.definition.id,
   });
+
+  const { data: peers } = useReadContract({
+  	address: Config.EquitoSwap_EthereumSepolia_V1,
+		abi: equitoSwapAbi,
+		functionName: "peers",
+		args: [1],
+		chainId: ethereumChain.definition.id,
+  });
+
+  const { data: peersFromPing } = useReadContract({
+  	address: "0x2BA6E972739670dA840F1393F321f524D24DA079",
+		abi: pingPongAbi,
+		functionName: "peers",
+		chainId: ethereumChain.definition.id,
+  });
+
+  const { data: pokeValue } = useReadContract({
+  	address: Config.EquitoSwap_EthereumSepolia_V1,
+		abi: equitoSwapAbi,
+		functionName: "poke",
+		chainId: ethereumChain.definition.id,
+  });
+
+  const { data: totalSupply } = useReadContract({
+  	address: Config.Link_EthereumSepolia,
+		abi: erc20Abi,
+		functionName: "totalSupply",
+		/* query: { enabled: !!toRouterAddress }, */
+		chainId: ethereumChain.definition.id,
+  });
+
+  console.log("totalSupply");
+  console.log(totalSupply);
+
+  console.log("pokeValue");
+  console.log(pokeValue);
+
+  console.log("peers");
+  console.log(peers);
+
+  console.log("peersFromPing");
+  console.log(peersFromPing);
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
