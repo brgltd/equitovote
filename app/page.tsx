@@ -73,19 +73,19 @@ export default function Page() {
 		chainId: ethereumChain.definition.id,
   });
 
-  const { data: peersFromPing } = useReadContract({
-  	address: "0x2BA6E972739670dA840F1393F321f524D24DA079",
-		abi: pingPongAbi,
+  const { data: arbitrumPeers } = useReadContract({
+  	address: Config.EquitoSwap_ArbitrumSepolia_V1,
+		abi: equitoSwapAbi,
 		functionName: "peers",
-		args: [1004],
-		chainId: ethereumChain.definition.id,
+		args: [1001],
+		chainId: arbitrumChain.definition.id,
   });
 
-  /* console.log("peers"); */
-  /* console.log(peers); */
+  console.log("ethereum peers");
+  console.log(peers);
 
-  /* console.log("peersFromPing"); */
-  /* console.log(peersFromPing); */
+	console.log("arbitrum peers");
+	console.log(arbitrumPeers);
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
@@ -194,12 +194,10 @@ export default function Page() {
       console.log("resultTimestamp");
       console.log(resultTimestamp);
 
-      // something wrong here
-      // on healthcheck, at this point txlink already has valid stuff
-      // but here it's still empty
-
       // Go to the `to` chain
       await switchChainAsync({ chainId: arbitrumChain.definition.id });
+
+			// txLink is correct, but crashing here now
 
       const executionReceipt = await deliverAndExecuteMessage(
         bridgeTokenProof,
