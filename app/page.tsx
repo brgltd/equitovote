@@ -26,6 +26,8 @@ const equitoSwapAbi = equitoSwap.abi;
 const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
 const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
+enum ExecutionStatus {}
+
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
 
@@ -38,9 +40,9 @@ export default function Page() {
   const { writeContractAsync } = useWriteContract();
 
   const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
-	const toRouter = useRouter ({ chainSelector: arbitrumChain.chainSelector });
+  const toRouter = useRouter({ chainSelector: arbitrumChain.chainSelector });
   const fromRouterAddress = fromRouter.data;
-	const toRouterAddress = toRouter.data;
+  const toRouterAddress = toRouter.data;
 
   const approve = useApprove();
 
@@ -64,13 +66,13 @@ export default function Page() {
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
-        ethereumChain.definition.nativeCurrency.symbol
+        ethereumChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const parsedToFee = fromFee
+  const parsedToFee = toFee
     ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
-        arbitrumChain.definition.nativeCurrency.symbol
+        arbitrumChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
@@ -108,20 +110,20 @@ export default function Page() {
     });
   };
 
-	const deliverAndExecuteMessage = async (proof, message, messageData) => {
-		const hash = await writeContractAsync({
-			address: toRouterAddress,
-			abi: routerAbi,
-			functionName: "deliverAndExecuteMessage",
-			value: toFee,
-			args: [message, messageData, BigInt(0), proof],
-			chainId: arbitrumChain.definition.id,
-		});
-		return waitForTransactionReceipt(config, {
-			hash,
-			chainId: arbitrumChain.definition.id
-		});
-	}
+  const deliverAndExecuteMessage = async (proof, message, messageData) => {
+    const hash = await writeContractAsync({
+      address: toRouterAddress,
+      abi: routerAbi,
+      functionName: "deliverAndExecuteMessage",
+      value: toFee,
+      args: [message, messageData, BigInt(0), proof],
+      chainId: arbitrumChain.definition.id,
+    });
+    return waitForTransactionReceipt(config, {
+      hash,
+      chainId: arbitrumChain.definition.id,
+    });
+  };
 
   const onClickSwap = async () => {
     try {
@@ -132,10 +134,6 @@ export default function Page() {
       /* await approveLink(); */
 
       const bridgeTokenReceipt = await bridgeToken();
-
-      if (!bridgeTokenReceipt) {
-        throw new Error("Bridge token invalid receipt");
-      }
 
       const logs = parseEventLogs({
         abi: routerAbi,
@@ -160,36 +158,44 @@ export default function Page() {
         blockNumber: bridgeTokenReceipt.blockNumber,
       });
 
-      const { proof: bridgeTokenProof } = await approve.execute({
-        messageHash: generateHash(bridgeTokenMessage.message),
-        fromTimestamp: Number(bridgeTokenMessage) * 1000,
-        chainSelector: ethereumChain.chainSelector,
-      });
+      const { proof: bridgeTokenProof, timestamp: resultTimestamp } =
+        await approve.execute({
+          messageHash: generateHash(bridgeTokenMessage.message),
+          fromTimestamp: Number(bridgeTokenTimestamp) * 1000,
+          chainSelector: ethereumChain.chainSelector,
+        });
 
-			console.log("bridgeTokenProof");
-			console.log(bridgeTokenProof);
+      console.log("bridgeTokenProof");
+      console.log(bridgeTokenProof);
 
-			// Go to the `to` chain
-      await switchChainAsync({ chainId: ethereumChain.definition.id });
+      console.log("resultTimestamp");
+      console.log(resultTimestamp);
 
-			const executionReceipt = await deliverAndExecuteMessage(
-				bridgeTokenProof, 
-				bridgeTokenMessage.message,
-				bridgeTokenMessage.messageData
-			);
+      // something wrong here
+      // on healthcheck, at this point txlink already has valid stuff
+      // but here it's still empty
 
-			console.log("executionReceipt")
-			console.log(executionReceipt)
+      // Go to the `to` chain
+      await switchChainAsync({ chainId: arbitrumChain.definition.id });
 
-			const executionMessage = parseEventLogs({
-				abi: routerAbi,
-				logs: executionReceipt.logs,
-			}).flatMap(({ eventName, args }) =>
-				eventName === "MessageSendRequested" ? [args] : []
-			)[0];
+      const executionReceipt = await deliverAndExecuteMessage(
+        bridgeTokenProof,
+        bridgeTokenMessage.message,
+        bridgeTokenMessage.messageData
+      );
 
-			console.log("executionMessage");
-			console.log(executionMessage);
+      console.log("executionReceipt");
+      console.log(executionReceipt);
+
+      const executionMessage = parseEventLogs({
+        abi: routerAbi,
+        logs: executionReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : []
+      )[0];
+
+      console.log("executionMessage");
+      console.log(executionMessage);
     } catch (error) {
       // TODO: show a toast with the error
       console.error(error);

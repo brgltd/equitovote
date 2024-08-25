@@ -16,7 +16,7 @@ contract DeployEquitoSwap is Script {
 		EquitoSwap equitoSwap = new EquitoSwap(
 			RouterTestnetAddresses.ETHEREUM_SEPOLIA
 		);
-		console.log("deployed EquitoSwap", address(equitoSwap));
+		console.log("deployed EquitoSwap to ethereum sepolia", address(equitoSwap));
 
 		vm.stopBroadcast();
 	}

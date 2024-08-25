@@ -119,8 +119,7 @@ export default function Healthcheck() {
 					throw new Error("MessageSendRequest event not found");
 				}
 
-				// Seems to be stale around here for few secs even after last 
-				// tx is confirmed.
+				// Seems to be stale here for a few secs.
 
 				setStatus("isApprovingSentPing");
 				const { timestamp: sentPingTimestamp } = await getBlock(config, {
