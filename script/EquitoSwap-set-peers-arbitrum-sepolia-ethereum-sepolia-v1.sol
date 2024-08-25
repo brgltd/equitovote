@@ -4,12 +4,12 @@ pragma solidity ^0.8.23;
 import "forge-std/Script.sol";
 
 import {EquitoSwap} from "../src/EquitoSwap.sol";
-import {EquitoMessageLibrary} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {EquitoMessageLibrary, bytes64} from "equito/src/libraries/EquitoMessageLibrary.sol";
 
 contract SetPeers is Script {
-	address public constant ethereumSepoliaAddress = 0x27eEb830986B44eC05e78912Ee9A0CB9820211bb;
+	address payable public constant ethereumSepoliaAddress = payable(0x27eEb830986B44eC05e78912Ee9A0CB9820211bb);
 
-	address public constant arbitrumSepoliaAddress = 0x496667E89C15409e9a1E7e0f2D15DcDFac430300;
+	address payable public constant arbitrumSepoliaAddress = payable(0x496667E89C15409e9a1E7e0f2D15DcDFac430300);
 
 	function run() external {
 		EquitoSwap equitoSwap = EquitoSwap(arbitrumSepoliaAddress);

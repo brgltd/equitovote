@@ -41,4 +41,6 @@ next-env.d.ts
 # cache
 cache/
 
+# broadcast
+broadcast/
 
