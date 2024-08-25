@@ -16,10 +16,10 @@ import { chains } from "../utils/chains";
 import { config } from "../utils/wagmi";
 import { useRouter } from "../hooks/use-router";
 import { useApprove } from "../hooks/use-approve";
+import { useDeliver } from "../hooks/use-deliver";
 import { Config } from "../config";
 import erc20Abi from "../abis/erc20.json";
 import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
-import { pingPongAbi } from "../abis/ping-pong.abi";
 
 const equitoSwapAbi = equitoSwap.abi;
 
@@ -27,7 +27,7 @@ const equitoSwapAbi = equitoSwap.abi;
 const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
 const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
-enum ExecutionStatus {}
+enum Status {}
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -81,11 +81,16 @@ export default function Page() {
 		chainId: arbitrumChain.definition.id,
   });
 
-  console.log("ethereum peers");
-  console.log(peers);
+	const deliverSwap = useDeliver({ equito:{
+		chain: arbitrumChain,
+		router: toRouter,
+	}});
 
-	console.log("arbitrum peers");
-	console.log(arbitrumPeers);
+  /* console.log("ethereum peers"); */
+  /* console.log(peers); */
+
+	/* console.log("arbitrum peers"); */
+	/* console.log(arbitrumPeers); */
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
@@ -199,11 +204,18 @@ export default function Page() {
 
 			// txLink is correct, but crashing here now
 
-      const executionReceipt = await deliverAndExecuteMessage(
-        bridgeTokenProof,
-        bridgeTokenMessage.message,
-        bridgeTokenMessage.messageData
-      );
+      /* const executionReceipt = await deliverAndExecuteMessage( */
+      /*   bridgeTokenProof, */
+      /*   bridgeTokenMessage.message, */
+      /*   bridgeTokenMessage.messageData */
+      /* ); */
+
+			const executionReceipt = await deliverSwap.execute(
+				bridgeTokenProof,
+				bridgeTokenMessage.message,
+				bridgeTokenMessage.messageData,
+				toFee,
+			);
 
       console.log("executionReceipt");
       console.log(executionReceipt);

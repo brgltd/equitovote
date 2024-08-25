@@ -63,6 +63,7 @@ export const useDeliver = ({ equito: { chain, router } }: UseDeliverArgs) => {
           functionName: "deliverAndExecuteMessage",
           ...(fee !== undefined && { value: fee }),
           args: [message, messageData, BigInt(0), proof],
+					/* args: [message, messageData, BigInt(0), "0xb6675"], */
           chainId,
         });
 
