@@ -69,7 +69,7 @@ export default function Page() {
   	address: Config.EquitoSwap_EthereumSepolia_V1,
 		abi: equitoSwapAbi,
 		functionName: "peers",
-		args: [1],
+		args: [1004],
 		chainId: ethereumChain.definition.id,
   });
 
@@ -77,35 +77,15 @@ export default function Page() {
   	address: "0x2BA6E972739670dA840F1393F321f524D24DA079",
 		abi: pingPongAbi,
 		functionName: "peers",
+		args: [1004],
 		chainId: ethereumChain.definition.id,
   });
 
-  const { data: pokeValue } = useReadContract({
-  	address: Config.EquitoSwap_EthereumSepolia_V1,
-		abi: equitoSwapAbi,
-		functionName: "poke",
-		chainId: ethereumChain.definition.id,
-  });
+  /* console.log("peers"); */
+  /* console.log(peers); */
 
-  const { data: totalSupply } = useReadContract({
-  	address: Config.Link_EthereumSepolia,
-		abi: erc20Abi,
-		functionName: "totalSupply",
-		/* query: { enabled: !!toRouterAddress }, */
-		chainId: ethereumChain.definition.id,
-  });
-
-  console.log("totalSupply");
-  console.log(totalSupply);
-
-  console.log("pokeValue");
-  console.log(pokeValue);
-
-  console.log("peers");
-  console.log(peers);
-
-  console.log("peersFromPing");
-  console.log(peersFromPing);
+  /* console.log("peersFromPing"); */
+  /* console.log(peersFromPing); */
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${

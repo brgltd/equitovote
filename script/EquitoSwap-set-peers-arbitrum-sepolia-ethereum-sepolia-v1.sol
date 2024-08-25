@@ -15,8 +15,8 @@ contract SetPeers is Script {
 		EquitoSwap equitoSwap = EquitoSwap(arbitrumSepoliaAddress);
 
 		uint256[] memory chainSelectors = new uint256[](2);
-		chainSelectors[0] = 4; // Arbitrum
-		chainSelectors[1] = 1; // Ethereum
+		chainSelectors[0] = 1004; // Arbitrum
+		chainSelectors[1] = 1001; // Ethereum
 
 		bytes64[] memory addresses = new bytes64[](2);
 		addresses[0] = EquitoMessageLibrary.addressToBytes64(address(arbitrumSepoliaAddress));
