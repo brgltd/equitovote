@@ -17,7 +17,7 @@ import { config } from "../utils/wagmi";
 import { useRouter } from "../hooks/use-router";
 import { useApprove } from "../hooks/use-approve";
 import { useDeliver } from "../hooks/use-deliver";
-import { Config } from "../config";
+import { Addresses } from "../addresses";
 import erc20Abi from "../abis/erc20.json";
 import equitoSwap from "../out/EquitoSwap.sol/EquitoSwap.json";
 
@@ -51,7 +51,7 @@ export default function Page() {
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Config.EquitoSwap_EthereumSepolia_V1],
+    args: [Addresses.EquitoSwap_EthereumSepolia_V1],
     query: { enabled: !!fromRouterAddress },
     chainId: ethereumChain.definition.id,
   });
@@ -60,37 +60,39 @@ export default function Page() {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Config.EquitoSwap_ArbitrumSepolia_V1],
+    args: [Addresses.EquitoSwap_ArbitrumSepolia_V1],
     query: { enabled: !!toRouterAddress },
     chainId: arbitrumChain.definition.id,
   });
 
   const { data: peers } = useReadContract({
-  	address: Config.EquitoSwap_EthereumSepolia_V1,
-		abi: equitoSwapAbi,
-		functionName: "peers",
-		args: [1004],
-		chainId: ethereumChain.definition.id,
+    address: Addresses.EquitoSwap_EthereumSepolia_V1,
+    abi: equitoSwapAbi,
+    functionName: "peers",
+    args: [1004],
+    chainId: ethereumChain.definition.id,
   });
 
   const { data: arbitrumPeers } = useReadContract({
-  	address: Config.EquitoSwap_ArbitrumSepolia_V1,
-		abi: equitoSwapAbi,
-		functionName: "peers",
-		args: [1001],
-		chainId: arbitrumChain.definition.id,
+    address: Addresses.EquitoSwap_ArbitrumSepolia_V1,
+    abi: equitoSwapAbi,
+    functionName: "peers",
+    args: [1001],
+    chainId: arbitrumChain.definition.id,
   });
 
-	const deliverSwap = useDeliver({ equito:{
-		chain: arbitrumChain,
-		router: toRouter,
-	}});
+  const deliverSwap = useDeliver({
+    equito: {
+      chain: arbitrumChain,
+      router: toRouter,
+    },
+  });
 
   /* console.log("ethereum peers"); */
   /* console.log(peers); */
 
-	/* console.log("arbitrum peers"); */
-	/* console.log(arbitrumPeers); */
+  /* console.log("arbitrum peers"); */
+  /* console.log(arbitrumPeers); */
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
@@ -110,23 +112,23 @@ export default function Page() {
 
   const approveLink = async () => {
     const hash = await writeContractAsync({
-      address: Config.Link_EthereumSepolia,
+      address: Addresses.Link_EthereumSepolia,
       abi: erc20Abi,
       functionName: "approve",
       // approve 25 link
-      args: [Config.EquitoSwap_EthereumSepolia_V1, "25000000000000000000"],
+      args: [Addresses.EquitoSwap_EthereumSepolia_V1, "25000000000000000000"],
     });
     await waitForTransactionReceipt(config, { hash });
   };
 
   const bridgeToken = async () => {
     const hash = await writeContractAsync({
-      address: Config.EquitoSwap_EthereumSepolia_V1,
+      address: Addresses.EquitoSwap_EthereumSepolia_V1,
       abi: equitoSwapAbi,
       functionName: "bridgeERC20",
       args: [
         BigInt(arbitrumChain.chainSelector), // destinationChainSelector
-        Config.Link_EthereumSepolia, // sourceToken
+        Addresses.Link_EthereumSepolia, // sourceToken
         "0100000000000000000", // sourceAmount, 0.1 link
       ],
       value: fromFee || 0,
@@ -202,7 +204,7 @@ export default function Page() {
       // Go to the `to` chain
       await switchChainAsync({ chainId: arbitrumChain.definition.id });
 
-			// txLink is correct, but crashing here now
+      // txLink is correct, but crashing here now
 
       /* const executionReceipt = await deliverAndExecuteMessage( */
       /*   bridgeTokenProof, */
@@ -210,12 +212,12 @@ export default function Page() {
       /*   bridgeTokenMessage.messageData */
       /* ); */
 
-			const executionReceipt = await deliverSwap.execute(
-				bridgeTokenProof,
-				bridgeTokenMessage.message,
-				bridgeTokenMessage.messageData,
-				toFee,
-			);
+      const executionReceipt = await deliverSwap.execute(
+        bridgeTokenProof,
+        bridgeTokenMessage.message,
+        bridgeTokenMessage.messageData,
+        toFee
+      );
 
       console.log("executionReceipt");
       console.log(executionReceipt);

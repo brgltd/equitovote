@@ -7,58 +7,33 @@ import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.
 /// @title Healtcheck
 /// @notice Simple contract to check systems are up-and-running.
 contract Healthcheck is EquitoApp {
-	event PingSent(
-		uint256 indexed destinationChainSelector,
-		bytes32 messageHash
-	);
+	event MessageSent(uint256 indexed destinationChainSelector, bytes32 messageHash);
 
-	event PongSent(
-		uint256 indexed sourceChainSelector,
-		bytes32 messageHash
-	);
-
-	event PingReceived(
-		uint256 indexed sourceChainSelector,
-		bytes32 messageHash
-	);
+	event MessageReceived(uint256 indexed sourceChainSelector, string message);
 
 	constructor(address _router) EquitoApp(_router) {}
 	
-	function sendPing(
+	function sendMessage(
 		uint256 destinationChainSelector,
 		string calldata message
 	) external payable {
-		bytes memory data = abi.encode("ping", message);
-		bytes64 memory receiver = peers[destinationChainSelector];
+		bytes64 receiver = peers[destinationChainSelector];
+		bytes memory messageData = abi.encode(message);
 		bytes32 messageHash = router.sendMessage{value: msg.value}(
 			receiver,
 			destinationChainSelector,
-			data
+			messageData
 		);
-		emit PingSent(destinationChainSelector, messageHash);
+		emit MessageSent(destinationChainSelector, messageHash);
 	}
 
 	function _receiveMessageFromPeer(
 		EquitoMessage calldata message,
 		bytes calldata messageData
 	) internal override {
-		(string memory messageType, string memory payload) = abi.decode(
-			messageData,
-			(string, string)
-		);
-		if (keccak256(bytes(messageType)) == keccak256(bytes("ping"))) {
-			emit PingReceived(
-				message.sourceChainSelector,
-				keccak256(abi.encode(message))
-			);
-			bytes memory data = abi.encode("pong", payload);
-			bytes32 messageHash = router.sendMessage{value: msg.value}(
-				peers[message.sourceChainSelector],
-				message.sourceChainSelector,
-				data
-			);
-			emit PongSent(message.sourceChainSelector, messageHash);
-		}
+		string memory message = abi.decode(messageData, string);
+		// string in the event? does that work?
+		emit MessageReceived(message.sourceChainSelector, message);
 	}
+  }
 }
-

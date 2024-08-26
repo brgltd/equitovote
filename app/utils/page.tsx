@@ -1,23 +1,14 @@
-import {
-	useWriteContract
-} from "wagmi";
-import Config from "../../config";
+import { useWriteContract } from "wagmi";
+import Config from "../../addresses";
 
 export default function UtilsPage() {
-	const { writeContactAsync } = useWriteContract();
+  const { writeContactAsync } = useWriteContract();
 
-	const sendToken = async () => {
-		/* const hash = await writeContractAsync({ */
-		/* 	address: Config.EquitoSwap_ArbitrumSepolia_V1, */
-		/* }); */
-	};
+  const sendToken = async () => {
+    /* const hash = await writeContractAsync({ */
+    /* 	address: Config.EquitoSwap_ArbitrumSepolia_V1, */
+    /* }); */
+  };
 
-	return (
-		<button
-			onClick={sendToken}
-		>
-			send token
-		</button>
-	);
+  return <button onClick={sendToken}>send token</button>;
 }
-
