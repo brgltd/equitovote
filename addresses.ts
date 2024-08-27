@@ -4,7 +4,7 @@ export const Addresses = {
   EquitoSwap_ArbitrumSepolia_V1: "0x496667E89C15409e9a1E7e0f2D15DcDFac430300",
 
   // Deployed contracts of Healthcheck
-  Healthcheck_EthereumSepolia_V1: "",
+  Healthcheck_EthereumSepolia_V1: "0xDb8a55b811DEBBe5cd28a1db7E78f0fE5d282862",
   Healthcheck_ArbitrumSepolia_V1: "",
 
   // Deployed contracts of EquitoVote
