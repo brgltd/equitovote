@@ -2,10 +2,15 @@
 pragma solidity ^0.8.23;
 
 import {EquitoApp} from "equito/src/EquitoApp.sol";
-import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {
+	bytes64, 
+	EquitoMessage
+} from "equito/src/libraries/EquitoMessageLibrary.sol";
 
 contract EquitoVote is EquitoApp {
-	struct Election {
+	// --- types ----
+
+	struct Proposal {
 		uint256 startTimestamp;
 		uint256 endTimestamp;
 		uint256 numVotesYes;
@@ -24,18 +29,26 @@ contract EquitoVote is EquitoApp {
 		Abstain
 	} 
 
-	Election[] private elections;
+	// --- state variables ---
+
+	bytes32[] private proposalIds;
+
+	mapping(bytes32 id => Proposal) private proposals;
+
+	// --- init function ---
 
 	constructor(address _router) EquitoApp(_router) {}
 
-	function createElection(
+	// --- external mutative functions ---
+
+	function createProposal(
 		uint256 endTimestamp,
 		address erc20,
 		string calldata title,
 		string calldata description
 	) external payable {
 		bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
-		Election memory newElection = Election({
+		Proposal memory newProposal = Proposal({
 			startTimestamp: block.timestamp,
 			endTimestamp: endTimestamp,
 			numVotesYes: 0,
@@ -47,28 +60,51 @@ contract EquitoVote is EquitoApp {
 			description: description,
 			id: id
 		});
-		elections.push(newElection);
+		proposalIds.push(id);
+		proposals[id] = newProposal;
 	}
 
-	function voteForElection(
+	function voteOnProposal(
 		bytes32 id, 
 		uint256 numVotes, 
 		VoteOption voteOption
 	) external payable {
 		// assume no delegation now for simplicity
-		// probably need a mapping to reference that id
+		if (voteOption == VoteOption.Yes) {
+			proposals[id].numVotesYes += numVotes;
+		} else if (voteOption == VoteOption.No) {
+			proposals[id].numVotesNo += numVotes;
+		} else {
+			proposals[id].numVotesAbstain += numVotes;
+		}
 	}
 
-	function deleteElection(bytes32 id) external onlyOwner {}
+	function deleteProposal(bytes32 id) external onlyOwner {}
 
-	function getElectionsLength() external view returns (uint256) {
-		return elections.length;
+	// --- external view functions ---
+
+	function getProposalsLength() external view returns (uint256) {
+		return proposalIds.length;
 	}
 
-	function getElectionsSlice(
+	// @notice Build up the array of proposals and return it using the index params
+	// @param endIndex The end index, non inclusive
+	function getProposalsSlice(
 		uint256 startIndex,
 		uint256 endIndex
-	) external view returns (Election[] memory) {
-		// Build up the array using the indexes
-	}
+	) external view returns (Proposal[] memory) {
+		Proposal[] memory slicedProposals = new Proposal[](endIndex - startIndex);
+		for (uint256 i = startIndex; i < endIndex; ++i) {
+			slicedProposals[i] = proposals[proposalIds[i]];
+		}
+		return slicedProposals;
+	};
+
+	// --- internal mutative functions ---
+
+	// function _receiveMessageFromPeer(
+	// 	EquitoMessage calldata message,
+	// 	bytes calldata messageData
+	// ) internal override {}
 }
+

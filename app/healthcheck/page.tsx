@@ -12,13 +12,13 @@ import { formatUnits, parseEventLogs } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { chains } from "../utils/chains";
-import { config } from "../utils/wagmi";
-import { useRouter } from "../hooks/use-router";
-import { useApprove } from "../hooks/use-approve";
-import { useDeliver } from "../hooks/use-deliver";
-import { Addresses } from "../config";
-import healthcheckContract from "../out/Healthcheck.sol/Healthcheck.json";
+import { chains } from "../../utils/chains";
+import { config } from "../../utils/wagmi";
+import { useRouter } from "../../hooks/use-router";
+import { useApprove } from "../../hooks/use-approve";
+import { useDeliver } from "../../hooks/use-deliver";
+import { Addresses } from "../../addresses";
+import healthcheckContract from "../../out/Healthcheck.sol/Healthcheck.json";
 
 const healthcheckAbi = healthcheckContract.abi;
 
