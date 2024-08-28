@@ -87,18 +87,20 @@ contract EquitoVote is EquitoApp {
 		return proposalIds.length;
 	}
 
-	// @notice Build up the array of proposals and return it using the index params
-	// @param endIndex The end index, non inclusive
+	/// @notice Build up the array of proposals and return it using the index params
+	/// @param startIndex The start index, inclusive
+	/// @param endIndex The end index, non inclusive
+	/// @return An array with proposal data
 	function getProposalsSlice(
 		uint256 startIndex,
 		uint256 endIndex
 	) external view returns (Proposal[] memory) {
 		Proposal[] memory slicedProposals = new Proposal[](endIndex - startIndex);
-		for (uint256 i = startIndex; i < endIndex; ++i) {
+		for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
 			slicedProposals[i] = proposals[proposalIds[i]];
 		}
 		return slicedProposals;
-	};
+	}
 
 	// --- internal mutative functions ---
 
@@ -106,5 +108,17 @@ contract EquitoVote is EquitoApp {
 	// 	EquitoMessage calldata message,
 	// 	bytes calldata messageData
 	// ) internal override {}
+
+	// --- internal pure functions ---
+
+	/// @notice Unchecked increment to sae gas. Should be used primarily on
+	///			for loops that don't change the value of i.
+	/// @param i The value to be incremented
+	/// @return The incremeneted value
+	function uncheckedInc(uint256 i) internal pure returns (uint256) {
+		unchecked {
+			return ++i;
+		}
+	}
 }
 
