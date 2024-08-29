@@ -10,6 +10,17 @@ import {
 contract EquitoVote is EquitoApp {
 	// --- types ----
 
+	enum VoteOption {
+		Yes,
+		No,
+		Abstain
+	} 
+
+	enum OperationType {
+		CreateProposal,
+		VoteOnProposal
+	}
+
 	struct Proposal {
 		uint256 startTimestamp;
 		uint256 endTimestamp;
@@ -22,12 +33,6 @@ contract EquitoVote is EquitoApp {
 		string description;
 		bytes32 id;
 	}
-
-	enum VoteOption {
-		Yes,
-		No,
-		Abstain
-	} 
 
 	// --- state variables ---
 
@@ -46,12 +51,14 @@ contract EquitoVote is EquitoApp {
 	// --- external mutative functions ---
 
 	function createProposal(
+		uint256 destinationChainSelector,
 		uint256 endTimestamp,
 		address erc20,
 		string calldata title,
 		string calldata description
 	) external payable {
 		bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
+
 		Proposal memory newProposal = Proposal({
 			startTimestamp: block.timestamp,
 			endTimestamp: endTimestamp,
@@ -64,19 +71,44 @@ contract EquitoVote is EquitoApp {
 			description: description,
 			id: id
 		});
-		proposalIds.push(id);
-		proposals[id] = newProposal;
+
+		bytes64 memory receiver = peers[destinationChainSelector];
+
+		bytes memory messageData = abi.encode(
+			OperationType.CreateProposal,
+			bytes32(0),
+			0,
+			VoteOption.Abstain,
+			newProposal 
+		);
+
+		bytes32 messageHash = router.sendMessage{value: msg.value}(
+			receiver,
+			destinationChainSelector,
+			messageData
+		);
 	}
 
 	function voteOnProposal(
-		bytes32 id, 
+		uint256 destinationChainSelector,
+		bytes32 proposalId, 
 		uint256 numVotes, 
-		VoteOption voteOption,
-		uint256 destinationChainSelector
+		VoteOption voteOption
 	) external payable {
 		// TODO: add either locking or delegation+snapshot(erc20votes)
+
 		bytes64 memory receiver = peers[destinationChainSelector];
-		bytes memory messageData = abi.encode(numVotes, voteOption);
+
+		Proposal memory emptyNewProposal;
+
+		bytes memory messageData = abi.encode(
+			OperationType.VoteOnProposal,
+			proposalId,
+			numVotes,
+			voteOption,
+			emptyNewProposal 
+		);
+
 		bytes32 messageHash = router.sendMessage{value: msg.value}(
 			receiver,
 			destinationChainSelector,
@@ -85,7 +117,7 @@ contract EquitoVote is EquitoApp {
 	}
 
 	// TODO: complete deleteProposal
-	function deleteProposal(bytes32 id) external onlyOwner {}
+	function deleteProposal(bytes32 proposalId) external onlyOwner {}
 
 	// --- external view functions ---
 
@@ -110,31 +142,57 @@ contract EquitoVote is EquitoApp {
 
 	// --- internal mutative functions ---
 
-	/// @notice Receve the message with the votes data
+	/// @notice Receve the cross chain message on the destination chain.
 	function _receiveMessageFromPeer(
 		EquitoMessage calldata message,
 		bytes calldata messageData
 	) internal override {
-		(uint256 numVotes, VoteOption voteOption) = abi.decode(
+		(
+			OperationType operationType,
+			bytes32 proposalId,
+			uint256 numVotes, 
+			VoteOption voteOption,
+			Proposal memory newProposal
+		) = abi.decode(
 			messageData,
-			(uint256, VoteOption)
+			(OperationType, bytes32, uint256, VoteOption, Proposal)
 		);
-		if (voteOption == VoteOption.Yes) {
-			proposals[id].numVotesYes += numVotes;
-		} else if (voteOption == VoteOption.No) {
-			proposals[id].numVotesNo += numVotes;
-		} else {
-			proposals[id].numVotesAbstain += numVotes;
+		if (operationType == OperationType.CreateProposal) {
+			_createProposal(newProposal);
+		} else if (operationType == OperationType.VoteOnProposal) {
+			_voteOnProposal(proposalId, numVotes, voteOption);
 		}
 	}
 
-	// --- internal pure functions ---
+	// --- private mutative functions ---
+
+	function _createProposal(Proposal memory newProposal) private {
+		bytes32 proposalId = newProposal.id;
+		proposalIds.push(proposalId);
+		proposals[proposalId] = newProposal;
+	}
+
+	function _voteOnProposal(
+		bytes32 proposalId, 
+		uint256 numVotes, 
+		VoteOption voteOption
+	) private {
+		if (voteOption == VoteOption.Yes) {
+			proposals[proposalId].numVotesYes += numVotes;
+		} else if (voteOption == VoteOption.No) {
+			proposals[proposalId].numVotesNo += numVotes;
+		} else if (voteOption == VoteOption.Abstain) {
+			proposals[proposalId].numVotesAbstain += numVotes;
+		}
+	}
+
+	// --- private pure functions ---
 
 	/// @notice Unchecked increment to save gas. Should be used primarily on
 	///			`for` loops that don't change the value of `i`.
 	/// @param i The value to be incremented.
 	/// @return The incremeneted value.
-	function uncheckedInc(uint256 i) internal pure returns (uint256) {
+	function uncheckedInc(uint256 i) private pure returns (uint256) {
 		unchecked {
 			return ++i;
 		}
