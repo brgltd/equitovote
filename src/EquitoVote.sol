@@ -219,5 +219,10 @@ contract EquitoVote is EquitoApp {
 			return ++i;
 		}
 	}
-}
 
+	// --- used for diamond testing --- 
+
+	function add(uint256 n1, uint256 n2) external pure returns (uint256) {
+		return n1 + n2;
+	}
+}
