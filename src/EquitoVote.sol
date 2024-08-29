@@ -35,6 +35,10 @@ contract EquitoVote is EquitoApp {
 
 	mapping(bytes32 id => Proposal) private proposals;
 
+	// --- events ---
+
+	// TODO: add the events
+
 	// --- init function ---
 
 	constructor(address _router) EquitoApp(_router) {}
@@ -67,18 +71,20 @@ contract EquitoVote is EquitoApp {
 	function voteOnProposal(
 		bytes32 id, 
 		uint256 numVotes, 
-		VoteOption voteOption
+		VoteOption voteOption,
+		uint256 destinationChainSelector
 	) external payable {
-		// assume no delegation now for simplicity
-		if (voteOption == VoteOption.Yes) {
-			proposals[id].numVotesYes += numVotes;
-		} else if (voteOption == VoteOption.No) {
-			proposals[id].numVotesNo += numVotes;
-		} else {
-			proposals[id].numVotesAbstain += numVotes;
-		}
+		// TODO: add either locking or delegation+snapshot(erc20votes)
+		bytes64 memory receiver = peers[destinationChainSelector];
+		bytes memory messageData = abi.encode(numVotes, voteOption);
+		bytes32 messageHash = router.sendMessage{value: msg.value}(
+			receiver,
+			destinationChainSelector,
+			messageData
+		);
 	}
 
+	// TODO: complete deleteProposal
 	function deleteProposal(bytes32 id) external onlyOwner {}
 
 	// --- external view functions ---
@@ -87,10 +93,10 @@ contract EquitoVote is EquitoApp {
 		return proposalIds.length;
 	}
 
-	/// @notice Build up the array of proposals and return it using the index params
-	/// @param startIndex The start index, inclusive
-	/// @param endIndex The end index, non inclusive
-	/// @return An array with proposal data
+	/// @notice Build up an array of proposals and return it using the index params.
+	/// @param startIndex The start index, inclusive.
+	/// @param endIndex The end index, non inclusive.
+	/// @return An array with proposal data.
 	function getProposalsSlice(
 		uint256 startIndex,
 		uint256 endIndex
@@ -104,17 +110,30 @@ contract EquitoVote is EquitoApp {
 
 	// --- internal mutative functions ---
 
-	// function _receiveMessageFromPeer(
-	// 	EquitoMessage calldata message,
-	// 	bytes calldata messageData
-	// ) internal override {}
+	/// @notice Receve the message with the votes data
+	function _receiveMessageFromPeer(
+		EquitoMessage calldata message,
+		bytes calldata messageData
+	) internal override {
+		(uint256 numVotes, VoteOption voteOption) = abi.decode(
+			messageData,
+			(uint256, VoteOption)
+		);
+		if (voteOption == VoteOption.Yes) {
+			proposals[id].numVotesYes += numVotes;
+		} else if (voteOption == VoteOption.No) {
+			proposals[id].numVotesNo += numVotes;
+		} else {
+			proposals[id].numVotesAbstain += numVotes;
+		}
+	}
 
 	// --- internal pure functions ---
 
-	/// @notice Unchecked increment to sae gas. Should be used primarily on
-	///			for loops that don't change the value of i.
-	/// @param i The value to be incremented
-	/// @return The incremeneted value
+	/// @notice Unchecked increment to save gas. Should be used primarily on
+	///			`for` loops that don't change the value of `i`.
+	/// @param i The value to be incremented.
+	/// @return The incremeneted value.
 	function uncheckedInc(uint256 i) internal pure returns (uint256) {
 		unchecked {
 			return ++i;
