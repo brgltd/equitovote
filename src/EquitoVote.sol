@@ -36,13 +36,29 @@ contract EquitoVote is EquitoApp {
 
 	// --- state variables ---
 
-	bytes32[] private proposalIds;
+	bytes32[] public proposalIds;
 
-	mapping(bytes32 id => Proposal) private proposals;
+	mapping(bytes32 id => Proposal) public proposals;
 
 	// --- events ---
 
-	// TODO: add the events
+	event CreateProposalMessageSent(
+		uint256 indexed destinationChainSelector,
+		bytes32 messageHash
+	);
+
+	event VoteOnProposalMessageSent(
+		uint256 indexed destinationChainSelector,
+		bytes32 messageHash
+	);
+
+	event CreateProposalMessageReceived(bytes32 proposalId);
+
+	event VoteOnProposalMessageReceived(
+		bytes32 indexed proposalId,
+		uint256 numVotes,
+		VoteOption voteOption
+	);
 
 	// --- init function ---
 
@@ -87,6 +103,8 @@ contract EquitoVote is EquitoApp {
 			destinationChainSelector,
 			messageData
 		);
+
+		emit CreateProposalMessageSent(destinationChainSelector, messageHash);
 	}
 
 	function voteOnProposal(
@@ -114,6 +132,8 @@ contract EquitoVote is EquitoApp {
 			destinationChainSelector,
 			messageData
 		);
+
+		emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
 	}
 
 	// TODO: complete deleteProposal
@@ -144,7 +164,7 @@ contract EquitoVote is EquitoApp {
 
 	/// @notice Receve the cross chain message on the destination chain.
 	function _receiveMessageFromPeer(
-		EquitoMessage calldata message,
+		EquitoMessage calldata /* message */,
 		bytes calldata messageData
 	) internal override {
 		(
@@ -159,8 +179,10 @@ contract EquitoVote is EquitoApp {
 		);
 		if (operationType == OperationType.CreateProposal) {
 			_createProposal(newProposal);
+			emit CreateProposalMessageReceived(newProposal.id);
 		} else if (operationType == OperationType.VoteOnProposal) {
 			_voteOnProposal(proposalId, numVotes, voteOption);
+			emit VoteOnProposalMessageReceived(proposalId, numVotes, voteOption);
 		}
 	}
 
