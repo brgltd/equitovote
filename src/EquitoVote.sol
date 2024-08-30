@@ -6,15 +6,40 @@ import {
 	bytes64, 
 	EquitoMessage
 } from "equito/src/libraries/EquitoMessageLibrary.sol";
-import {
-	LibAppStorage,
-	AppStorage,
-	VoteOption,
-	OperationType,
-	Proposal
-} from "./LibAppStorage.sol";
 
 contract EquitoVote is EquitoApp {
+	// --- types ----
+
+	enum VoteOption {
+		Yes,
+		No,
+		Abstain
+	} 
+
+	enum OperationType {
+		CreateProposal,
+		VoteOnProposal
+	}
+
+	struct Proposal {
+		uint256 startTimestamp;
+		uint256 endTimestamp;
+		uint256 numVotesYes;
+		uint256 numVotesNo;
+		uint256 numVotesAbstain;
+		address erc20;
+		address creator;
+		string title;
+		string description;
+		bytes32 id;
+	}
+
+	// --- state variables ---
+
+	bytes32[] public proposalIds;
+
+	mapping(bytes32 id => Proposal) public proposals;
+
 	// --- events ---
 
 	event CreateProposalMessageSent(
@@ -117,8 +142,7 @@ contract EquitoVote is EquitoApp {
 	// --- external view functions ---
 
 	function getProposalsLength() external view returns (uint256) {
-        AppStorage storage store = LibAppStorage.appStorage();
-		return store.proposalIds.length;
+		return proposalIds.length;
 	}
 
 	/// @notice Build up an array of proposals and return it using the index params.
@@ -129,11 +153,9 @@ contract EquitoVote is EquitoApp {
 		uint256 startIndex,
 		uint256 endIndex
 	) external view returns (Proposal[] memory) {
-        AppStorage storage store = LibAppStorage.appStorage();
 		Proposal[] memory slicedProposals = new Proposal[](endIndex - startIndex);
-		bytes32[] memory proposalIds = store.proposalIds;
 		for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
-			slicedProposals[i] = store.proposals[proposalIds[i]];
+			slicedProposals[i] = proposals[proposalIds[i]];
 		}
 		return slicedProposals;
 	}
@@ -167,10 +189,9 @@ contract EquitoVote is EquitoApp {
 	// --- private mutative functions ---
 
 	function _createProposal(Proposal memory newProposal) private {
-        AppStorage storage store = LibAppStorage.appStorage();
 		bytes32 proposalId = newProposal.id;
-		store.proposalIds.push(proposalId);
-		store.proposals[proposalId] = newProposal;
+		proposalIds.push(proposalId);
+		proposals[proposalId] = newProposal;
 	}
 
 	function _voteOnProposal(
@@ -178,13 +199,12 @@ contract EquitoVote is EquitoApp {
 		uint256 numVotes, 
 		VoteOption voteOption
 	) private {
-        AppStorage storage store = LibAppStorage.appStorage();
 		if (voteOption == VoteOption.Yes) {
-			store.proposals[proposalId].numVotesYes += numVotes;
+			proposals[proposalId].numVotesYes += numVotes;
 		} else if (voteOption == VoteOption.No) {
-			store.proposals[proposalId].numVotesNo += numVotes;
+			proposals[proposalId].numVotesNo += numVotes;
 		} else if (voteOption == VoteOption.Abstain) {
-			store.proposals[proposalId].numVotesAbstain += numVotes;
+			proposals[proposalId].numVotesAbstain += numVotes;
 		}
 	}
 
