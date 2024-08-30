@@ -75,9 +75,18 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
 
+    error ProposalInvalid(bytes32 proposalId);
+
+    error CallFailed(address destination);
+
     // --- init function ---
 
     constructor(address _router) EquitoApp(_router) {}
+
+    // --- receive function ---
+
+    /// @notice Plain native token transfers to this contract.
+    receive() external payable {}
 
     // --- external mutative user functions ---
 
@@ -150,6 +159,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     function unlockTokens(bytes32 proposalId) external nonReentrant {
         Proposal memory proposal = proposals[proposalId];
+        if (proposal.id == bytes32(0)) {
+            revert ProposalInvalid(proposalId);
+        }
         if (block.timestamp <= proposal.endTimestamp) {
             revert ProposalNotFinished(proposalId, proposal.endTimestamp);
         }
@@ -210,6 +222,13 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             proposalIds[proposalIndex] = proposalIds[proposalIdsLength - 1];
         }
         proposalIds.pop();
+    }
+
+    function transferFee(address destination) external onlyOwner {
+        (bool success, ) = destination.call{value: address(this).balance}("");
+        if (!success) {
+            revert CallFailed(destination);
+        }
     }
 
     // --- public view user functions ---
