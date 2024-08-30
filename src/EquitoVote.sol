@@ -133,9 +133,6 @@ contract EquitoVote is EquitoApp {
 		Proposal[] memory slicedProposals = new Proposal[](endIndex - startIndex);
 		bytes32[] memory proposalIds = store.proposalIds;
 		for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
-			// TODO: could we cache store.proposals?
-			// It's a mapping so it's not straightforward.
-			// Note since this function is external view this should be a big issue.
 			slicedProposals[i] = store.proposals[proposalIds[i]];
 		}
 		return slicedProposals;
