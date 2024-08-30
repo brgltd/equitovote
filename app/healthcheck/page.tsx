@@ -161,7 +161,7 @@ export default function Page() {
         abi: routerAbi,
         logs: sendMessageReceipt.logs,
       }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : []
+        eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
       console.log("sendMessageResult");
@@ -198,7 +198,7 @@ export default function Page() {
         sendMessageProof,
         sendMessageResult.message,
         sendMessageResult.messageData,
-        toFee
+        toFee,
       );
 
       console.log("executionReceipt");
@@ -208,7 +208,7 @@ export default function Page() {
         abi: routerAbi,
         logs: executionReceipt.logs,
       }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : []
+        eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
       console.log("executionMessage");

@@ -2,254 +2,269 @@
 pragma solidity ^0.8.23;
 
 import {EquitoApp} from "equito/src/EquitoApp.sol";
-import {
-	bytes64, 
-	EquitoMessage
-} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
 
 contract EquitoVote is EquitoApp {
-	// --- types ----
+    // --- types ----
 
-	enum VoteOption {
-		Yes,
-		No,
-		Abstain
-	} 
+    enum VoteOption {
+        Yes,
+        No,
+        Abstain
+    }
 
-	enum OperationType {
-		CreateProposal,
-		VoteOnProposal
-	}
+    enum OperationType {
+        CreateProposal,
+        VoteOnProposal
+    }
 
-	struct Proposal {
-		uint256 startTimestamp;
-		uint256 endTimestamp;
-		uint256 numVotesYes;
-		uint256 numVotesNo;
-		uint256 numVotesAbstain;
-		address erc20;
-		address creator;
-		string title;
-		string description;
-		bytes32 id;
-	}
+    struct Proposal {
+        uint256 startTimestamp;
+        uint256 endTimestamp;
+        uint256 numVotesYes;
+        uint256 numVotesNo;
+        uint256 numVotesAbstain;
+        address erc20;
+        address creator;
+        string title;
+        string description;
+        bytes32 id;
+    }
 
-	// --- state variables ---
+    // --- state variables ---
 
-	bytes32[] public proposalIds;
+    bytes32[] public proposalIds;
 
-	mapping(bytes32 id => Proposal) public proposals;
+    mapping(bytes32 id => Proposal) public proposals;
 
-	// --- events ---
+    // --- events ---
 
-	event CreateProposalMessageSent(
-		uint256 indexed destinationChainSelector,
-		bytes32 messageHash
-	);
+    event CreateProposalMessageSent(
+        uint256 indexed destinationChainSelector,
+        bytes32 messageHash
+    );
 
-	event VoteOnProposalMessageSent(
-		uint256 indexed destinationChainSelector,
-		bytes32 messageHash
-	);
+    event VoteOnProposalMessageSent(
+        uint256 indexed destinationChainSelector,
+        bytes32 messageHash
+    );
 
-	event CreateProposalMessageReceived(bytes32 proposalId);
+    event CreateProposalMessageReceived(bytes32 proposalId);
 
-	event VoteOnProposalMessageReceived(
-		bytes32 indexed proposalId,
-		uint256 numVotes,
-		VoteOption voteOption
-	);
+    event VoteOnProposalMessageReceived(
+        bytes32 indexed proposalId,
+        uint256 numVotes,
+        VoteOption voteOption
+    );
 
-	// --- init function ---
+    // --- init function ---
 
-	constructor(address _router) EquitoApp(_router) {}
+    constructor(address _router) EquitoApp(_router) {}
 
-	// --- external mutative functions ---
+    // --- external mutative functions ---
 
-	function createProposal(
-		uint256 destinationChainSelector,
-		uint256 endTimestamp,
-		address erc20,
-		string calldata title,
-		string calldata description
-	) external payable {
-		bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
+    function createProposal(
+        uint256 destinationChainSelector,
+        uint256 endTimestamp,
+        address erc20,
+        string calldata title,
+        string calldata description
+    ) external payable {
+        bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
 
-		Proposal memory newProposal = Proposal({
-			startTimestamp: block.timestamp,
-			endTimestamp: endTimestamp,
-			numVotesYes: 0,
-			numVotesNo: 0,
-			numVotesAbstain: 0,
-			erc20: erc20,	
-			creator: msg.sender,
-			title: title,
-			description: description,
-			id: id
-		});
+        Proposal memory newProposal = Proposal({
+            startTimestamp: block.timestamp,
+            endTimestamp: endTimestamp,
+            numVotesYes: 0,
+            numVotesNo: 0,
+            numVotesAbstain: 0,
+            erc20: erc20,
+            creator: msg.sender,
+            title: title,
+            description: description,
+            id: id
+        });
 
-		bytes64 memory receiver = peers[destinationChainSelector];
+        bytes64 memory receiver = peers[destinationChainSelector];
 
-		bytes memory messageData = abi.encode(
-			OperationType.CreateProposal,
-			bytes32(0),
-			0,
-			VoteOption.Abstain,
-			newProposal 
-		);
+        bytes memory messageData = abi.encode(
+            OperationType.CreateProposal,
+            bytes32(0),
+            0,
+            VoteOption.Abstain,
+            newProposal
+        );
 
-		bytes32 messageHash = router.sendMessage{value: msg.value}(
-			receiver,
-			destinationChainSelector,
-			messageData
-		);
+        bytes32 messageHash = router.sendMessage{value: msg.value}(
+            receiver,
+            destinationChainSelector,
+            messageData
+        );
 
-		emit CreateProposalMessageSent(destinationChainSelector, messageHash);
-	}
+        emit CreateProposalMessageSent(destinationChainSelector, messageHash);
+    }
 
-	function voteOnProposal(
-		uint256 destinationChainSelector,
-		bytes32 proposalId, 
-		uint256 numVotes, 
-		VoteOption voteOption
-	) external payable {
-		// TODO: add either locking or delegation+snapshot(erc20votes)
+    function voteOnProposal(
+        uint256 destinationChainSelector,
+        bytes32 proposalId,
+        uint256 numVotes,
+        VoteOption voteOption
+    ) external payable {
+        // TODO: add either locking or delegation+snapshot(erc20votes)
 
-		bytes64 memory receiver = peers[destinationChainSelector];
+        bytes64 memory receiver = peers[destinationChainSelector];
 
-		Proposal memory emptyNewProposal;
+        Proposal memory emptyNewProposal;
 
-		bytes memory messageData = abi.encode(
-			OperationType.VoteOnProposal,
-			proposalId,
-			numVotes,
-			voteOption,
-			emptyNewProposal 
-		);
+        bytes memory messageData = abi.encode(
+            OperationType.VoteOnProposal,
+            proposalId,
+            numVotes,
+            voteOption,
+            emptyNewProposal
+        );
 
-		bytes32 messageHash = router.sendMessage{value: msg.value}(
-			receiver,
-			destinationChainSelector,
-			messageData
-		);
+        bytes32 messageHash = router.sendMessage{value: msg.value}(
+            receiver,
+            destinationChainSelector,
+            messageData
+        );
 
-		emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
-	}
+        emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
+    }
 
-	function deleteProposalById(bytes32 proposalId) external onlyOwner {
-		Proposal memory emptyProposal;
-		proposals[proposalId] = emptyProposal;
+    function deleteProposalById(bytes32 proposalId) external onlyOwner {
+        Proposal memory emptyProposal;
+        proposals[proposalId] = emptyProposal;
 
-		uint256 proposalIdIndex;
-		uint256 proposalIdsLength = getProposalIdsLength();
-		bytes32[] memory proposalIdsCopy = proposalIds;
-		for (uint256 i = 0; i < proposalIdsLength; uncheckedInc(i)) {
-			if (proposalId == proposalIdsCopy[i]) {
-				proposalIdIndex = i;
-				break;
-			}
-		}
-		_deleteProposalByIndex(proposalIdIndex, proposalIdsLength, proposalIdsCopy);
-	}
+        uint256 proposalIdIndex;
+        uint256 proposalIdsLength = getProposalIdsLength();
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        for (uint256 i = 0; i < proposalIdsLength; uncheckedInc(i)) {
+            if (proposalId == proposalIdsCopy[i]) {
+                proposalIdIndex = i;
+                break;
+            }
+        }
+        _deleteProposalByIndex(
+            proposalIdIndex,
+            proposalIdsLength,
+            proposalIdsCopy
+        );
+    }
 
-	function deleteProposalByIndex(uint256 proposalIndex) external onlyOwner {
-		bytes32[] memory proposalIdsCopy = proposalIds;
-		_deleteProposalByIndex(proposalIndex, getProposalIdsLength(), proposalIdsCopy);
-	}
+    function deleteProposalByIndex(uint256 proposalIndex) external onlyOwner {
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        _deleteProposalByIndex(
+            proposalIndex,
+            getProposalIdsLength(),
+            proposalIdsCopy
+        );
+    }
 
-	// --- external view functions ---
+    // --- external view functions ---
 
-	function getProposalIdsLength() public view returns (uint256) {
-		return proposalIds.length;
-	}
+    function getProposalIdsLength() public view returns (uint256) {
+        return proposalIds.length;
+    }
 
-	/// @notice Build up an array of proposals and return it using the index params.
-	/// @param startIndex The start index, inclusive.
-	/// @param endIndex The end index, non inclusive.
-	/// @return An array with proposal data.
-	function getProposalsSlice(
-		uint256 startIndex,
-		uint256 endIndex
-	) external view returns (Proposal[] memory) {
-		Proposal[] memory slicedProposals = new Proposal[](endIndex - startIndex);
-		for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
-			slicedProposals[i] = proposals[proposalIds[i]];
-		}
-		return slicedProposals;
-	}
+    /// @notice Build up an array of proposals and return it using the index params.
+    /// @param startIndex The start index, inclusive.
+    /// @param endIndex The end index, non inclusive.
+    /// @return An array with proposal data.
+    function getProposalsSlice(
+        uint256 startIndex,
+        uint256 endIndex
+    ) external view returns (Proposal[] memory) {
+        Proposal[] memory slicedProposals = new Proposal[](
+            endIndex - startIndex
+        );
+        for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
+            slicedProposals[i] = proposals[proposalIds[i]];
+        }
+        return slicedProposals;
+    }
 
-	// --- internal mutative functions ---
+    // --- internal mutative functions ---
 
-	/// @notice Receve the cross chain message on the destination chain.
-	function _receiveMessageFromPeer(
-		EquitoMessage calldata /* message */,
-		bytes calldata messageData
-	) internal override {
-		(
-			OperationType operationType,
-			bytes32 proposalId,
-			uint256 numVotes, 
-			VoteOption voteOption,
-			Proposal memory newProposal
-		) = abi.decode(
-			messageData,
-			(OperationType, bytes32, uint256, VoteOption, Proposal)
-		);
-		if (operationType == OperationType.CreateProposal) {
-			_createProposal(newProposal);
-			emit CreateProposalMessageReceived(newProposal.id);
-		} else if (operationType == OperationType.VoteOnProposal) {
-			_voteOnProposal(proposalId, numVotes, voteOption);
-			emit VoteOnProposalMessageReceived(proposalId, numVotes, voteOption);
-		}
-	}
+    /// @notice Receve the cross chain message on the destination chain.
+    function _receiveMessageFromPeer(
+        EquitoMessage calldata /* message */,
+        bytes calldata messageData
+    ) internal override {
+        (
+            OperationType operationType,
+            bytes32 proposalId,
+            uint256 numVotes,
+            VoteOption voteOption,
+            Proposal memory newProposal
+        ) = abi.decode(
+                messageData,
+                (OperationType, bytes32, uint256, VoteOption, Proposal)
+            );
+        if (operationType == OperationType.CreateProposal) {
+            _createProposal(newProposal);
+            emit CreateProposalMessageReceived(newProposal.id);
+        } else if (operationType == OperationType.VoteOnProposal) {
+            _voteOnProposal(proposalId, numVotes, voteOption);
+            emit VoteOnProposalMessageReceived(
+                proposalId,
+                numVotes,
+                voteOption
+            );
+        }
+    }
 
-	// --- private mutative functions ---
+    // --- private mutative functions ---
 
-	function _createProposal(Proposal memory newProposal) private {
-		bytes32 proposalId = newProposal.id;
-		proposalIds.push(proposalId);
-		proposals[proposalId] = newProposal;
-	}
+    function _createProposal(Proposal memory newProposal) private {
+        bytes32 proposalId = newProposal.id;
+        proposalIds.push(proposalId);
+        proposals[proposalId] = newProposal;
+    }
 
-	function _voteOnProposal(
-		bytes32 proposalId, 
-		uint256 numVotes, 
-		VoteOption voteOption
-	) private {
-		if (voteOption == VoteOption.Yes) {
-			proposals[proposalId].numVotesYes += numVotes;
-		} else if (voteOption == VoteOption.No) {
-			proposals[proposalId].numVotesNo += numVotes;
-		} else if (voteOption == VoteOption.Abstain) {
-			proposals[proposalId].numVotesAbstain += numVotes;
-		}
-	}
+    function _voteOnProposal(
+        bytes32 proposalId,
+        uint256 numVotes,
+        VoteOption voteOption
+    ) private {
+        if (voteOption == VoteOption.Yes) {
+            proposals[proposalId].numVotesYes += numVotes;
+        } else if (voteOption == VoteOption.No) {
+            proposals[proposalId].numVotesNo += numVotes;
+        } else if (voteOption == VoteOption.Abstain) {
+            proposals[proposalId].numVotesAbstain += numVotes;
+        }
+    }
 
-	function _deleteProposalByIndex(
-		uint256 proposalIndex, 
-		uint256 proposalIdsLength, 
-		bytes32[] memory proposalIdsCopy
-	) private {
-		if (proposalIndex == proposalIdsLength) {
-			proposalIds.pop();
-		} else {
-			for (uint256 i = proposalIndex; i < proposalIdsLength - 1; uncheckedInc(i)) {
-				proposalIds[i] = proposalIdsCopy[i + 1];
-			}
-			proposalIds.pop();
-		}
-	}
+    function _deleteProposalByIndex(
+        uint256 proposalIndex,
+        uint256 proposalIdsLength,
+        bytes32[] memory proposalIdsCopy
+    ) private {
+        if (proposalIndex == proposalIdsLength) {
+            proposalIds.pop();
+        } else {
+            for (
+                uint256 i = proposalIndex;
+                i < proposalIdsLength - 1;
+                uncheckedInc(i)
+            ) {
+                proposalIds[i] = proposalIdsCopy[i + 1];
+            }
+            proposalIds.pop();
+        }
+    }
 
-	// --- private pure functions ---
+    // --- private pure functions ---
 
-	/// @notice Unchecked increment to save gas. Should be used primarily on
-	///			`for` loops that don't change the value of `i`.
-	/// @param i The value to be incremented.
-	/// @return The incremeneted value.
-	function uncheckedInc(uint256 i) private pure returns (uint256) {
-		unchecked {
-			return ++i;
-		}
-	}
+    /// @notice Unchecked increment to save gas. Should be used primarily on
+    ///			`for` loops that don't change the value of `i`.
+    /// @param i The value to be incremented.
+    /// @return The incremeneted value.
+    function uncheckedInc(uint256 i) private pure returns (uint256) {
+        unchecked {
+            return ++i;
+        }
+    }
 }
