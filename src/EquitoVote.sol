@@ -155,6 +155,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
     }
 
+    /// @dev If there are too many proposals, this function can run out of gas.
+    ///      In that case, call `deleteProposalByIndexOptimized` which will
+    ///      run more efficiently but it will not maintain the array order.
     function deleteProposalById(bytes32 proposalId) external onlyOwner {
         Proposal memory emptyProposal;
         proposals[proposalId] = emptyProposal;
@@ -175,6 +178,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
     }
 
+    /// @dev If there are too many proposals, this function can run out of gas.
+    ///      In that case, call `deleteProposalByIndexOptimized` which will
+    ///      run more efficiently but it will not maintain the array order.
     function deleteProposalByIndex(uint256 proposalIndex) external onlyOwner {
         bytes32[] memory proposalIdsCopy = proposalIds;
         _deleteProposalByIndex(
@@ -182,6 +188,19 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             getProposalIdsLength(),
             proposalIdsCopy
         );
+    }
+
+    function deleteProposalByIndexOptimized(
+        uint256 proposalIndex
+    ) external onlyOwner {
+        bytes32 proposalIdToDelete = proposalIds[proposalIndex];
+        Proposal memory emptyProposal;
+        proposals[proposalIdToDelete] = emptyProposal;
+        uint256 proposalIdsLength = getProposalIdsLength();
+        if (proposalIndex != proposalIdsLength - 1) {
+            proposalIds[proposalIndex] = proposalIds[proposalIdsLength - 1];
+        }
+        proposalIds.pop();
     }
 
     // --- public view functions ---
@@ -264,9 +283,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256 proposalIdsLength,
         bytes32[] memory proposalIdsCopy
     ) private {
-        if (proposalIndex == proposalIdsLength) {
-            proposalIds.pop();
-        } else {
+        if (proposalIndex != proposalIdsLength - 1) {
             for (
                 uint256 i = proposalIndex;
                 i < proposalIdsLength - 1;
@@ -274,8 +291,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             ) {
                 proposalIds[i] = proposalIdsCopy[i + 1];
             }
-            proposalIds.pop();
         }
+        proposalIds.pop();
     }
 
     // --- private pure functions ---
