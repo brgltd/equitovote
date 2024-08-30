@@ -124,7 +124,7 @@ contract EquitoSwap is EquitoApp {
 		
 	/// @notice Receive message on destination chain.
 	function _receiveMessageFromPeer(
-		EquitoMessage calldata message,
+		EquitoMessage calldata /* message */,
 		bytes calldata messageData
 	) internal override {
 		TokenAmount memory tokenAmount = abi.decode(messageData, (TokenAmount));
