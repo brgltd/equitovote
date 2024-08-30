@@ -36,6 +36,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
+    uint256 public protocolFee = 0.01e18;
+
     bytes32[] public proposalIds;
 
     mapping(bytes32 id => Proposal) public proposals;
@@ -67,6 +69,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         VoteOption voteOption
     );
 
+    event ProtocolFeeUpdated(uint256 newProtocolFee);
+
     // --- errors ---
 
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
@@ -75,7 +79,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     constructor(address _router) EquitoApp(_router) {}
 
-    // --- external mutative functions ---
+    // --- external mutative user functions ---
 
     function createProposal(
         uint256 destinationChainSelector,
@@ -109,11 +113,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             newProposal
         );
 
-        bytes32 messageHash = router.sendMessage{value: msg.value}(
-            receiver,
-            destinationChainSelector,
-            messageData
-        );
+        bytes32 messageHash = router.sendMessage{
+            value: msg.value - protocolFee
+        }(receiver, destinationChainSelector, messageData);
 
         emit CreateProposalMessageSent(destinationChainSelector, messageHash);
     }
@@ -153,6 +155,13 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         }
         uint256 amount = balances[msg.sender][proposalId];
         IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
+    }
+
+    // --- external mutative admin functions ---
+
+    function setProtocolFee(uint256 newProtocolFee) external onlyOwner {
+        protocolFee = newProtocolFee;
+        emit ProtocolFeeUpdated(newProtocolFee);
     }
 
     /// @dev If there are too many proposals, this function can run out of gas.
@@ -203,7 +212,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         proposalIds.pop();
     }
 
-    // --- public view functions ---
+    // --- public view user functions ---
 
     function getProposalIdsLength() public view returns (uint256) {
         return proposalIds.length;
