@@ -3,8 +3,11 @@ pragma solidity ^0.8.23;
 
 import {EquitoApp} from "equito/src/EquitoApp.sol";
 import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract EquitoVote is EquitoApp {
+contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- types ----
 
     enum VoteOption {
@@ -37,6 +40,13 @@ contract EquitoVote is EquitoApp {
 
     mapping(bytes32 id => Proposal) public proposals;
 
+    mapping(address user => mapping(bytes32 proposalId => uint256 amount))
+        public balances;
+
+    // --- extensions ---
+
+    using SafeERC20 for IERC20;
+
     // --- events ---
 
     event CreateProposalMessageSent(
@@ -57,6 +67,10 @@ contract EquitoVote is EquitoApp {
         VoteOption voteOption
     );
 
+    // --- errors ---
+
+    error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
+
     // --- init function ---
 
     constructor(address _router) EquitoApp(_router) {}
@@ -69,7 +83,7 @@ contract EquitoVote is EquitoApp {
         address erc20,
         string calldata title,
         string calldata description
-    ) external payable {
+    ) external payable nonReentrant {
         bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
 
         Proposal memory newProposal = Proposal({
@@ -108,14 +122,14 @@ contract EquitoVote is EquitoApp {
         uint256 destinationChainSelector,
         bytes32 proposalId,
         uint256 numVotes,
-        VoteOption voteOption
-    ) external payable {
-        // TODO: add either locking or delegation+snapshot(erc20votes)
+        VoteOption voteOption,
+        address token
+    ) external payable nonReentrant {
+        balances[msg.sender][proposalId] += numVotes;
+        IERC20(token).safeTransferFrom(msg.sender, address(this), numVotes);
 
         bytes64 memory receiver = peers[destinationChainSelector];
-
         Proposal memory emptyNewProposal;
-
         bytes memory messageData = abi.encode(
             OperationType.VoteOnProposal,
             proposalId,
@@ -123,7 +137,6 @@ contract EquitoVote is EquitoApp {
             voteOption,
             emptyNewProposal
         );
-
         bytes32 messageHash = router.sendMessage{value: msg.value}(
             receiver,
             destinationChainSelector,
@@ -131,6 +144,15 @@ contract EquitoVote is EquitoApp {
         );
 
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
+    }
+
+    function unlockTokens(bytes32 proposalId) external nonReentrant {
+        Proposal memory proposal = proposals[proposalId];
+        if (block.timestamp <= proposal.endTimestamp) {
+            revert ProposalNotFinished(proposalId, proposal.endTimestamp);
+        }
+        uint256 amount = balances[msg.sender][proposalId];
+        IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
     }
 
     function deleteProposalById(bytes32 proposalId) external onlyOwner {
@@ -162,7 +184,7 @@ contract EquitoVote is EquitoApp {
         );
     }
 
-    // --- external view functions ---
+    // --- public view functions ---
 
     function getProposalIdsLength() public view returns (uint256) {
         return proposalIds.length;
