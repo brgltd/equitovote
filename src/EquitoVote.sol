@@ -136,13 +136,10 @@ contract EquitoVote is EquitoApp {
 		emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
 	}
 
-	function deleteProposal(bytes32 proposalId) external onlyOwner {
+	function deleteProposalById(bytes32 proposalId) external onlyOwner {
 		Proposal memory emptyProposal;
 		proposals[proposalId] = emptyProposal;
 
-		// Find where `proposalId` is in `proposalIds`
-		// If it's the last index, pop
-		// If it's not the last index, replace with it and then pop
 		uint256 proposalIdIndex;
 		uint256 proposalIdsLength = getProposalIdsLength();
 		bytes32[] memory proposalIdsCopy = proposalIds;
@@ -152,13 +149,12 @@ contract EquitoVote is EquitoApp {
 				break;
 			}
 		}
+		_deleteProposalByIndex(proposalIdIndex, proposalIdsLength, proposalIdsCopy);
+	}
 
-		if (proposalIdIndex == proposalIdsLength - 1) {
-			proposalIds.pop();
-		} else {
-			proposalIds[proposalIdIndex] = proposalIds[proposalIdsLength - 1];
-			proposalIds.pop();
-		}
+	function deleteProposalByIndex(uint256 proposalIndex) external onlyOwner {
+		bytes32[] memory proposalIdsCopy = proposalIds;
+		_deleteProposalByIndex(proposalIndex, getProposalIdsLength(), proposalIdsCopy);
 	}
 
 	// --- external view functions ---
@@ -230,6 +226,21 @@ contract EquitoVote is EquitoApp {
 		}
 	}
 
+	function _deleteProposalByIndex(
+		uint256 proposalIndex, 
+		uint256 proposalIdsLength, 
+		bytes32[] memory proposalIdsCopy
+	) private {
+		if (proposalIndex == proposalIdsLength) {
+			proposalIds.pop();
+		} else {
+			for (uint256 i = proposalIndex; i < proposalIdsLength - 1; uncheckedInc(i)) {
+				proposalIds[i] = proposalIdsCopy[i + 1];
+			}
+			proposalIds.pop();
+		}
+	}
+
 	// --- private pure functions ---
 
 	/// @notice Unchecked increment to save gas. Should be used primarily on
@@ -240,11 +251,5 @@ contract EquitoVote is EquitoApp {
 		unchecked {
 			return ++i;
 		}
-	}
-
-	// --- used for diamond testing --- 
-
-	function add(uint256 n1, uint256 n2) external pure returns (uint256) {
-		return n1 + n2;
 	}
 }
