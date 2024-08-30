@@ -136,12 +136,34 @@ contract EquitoVote is EquitoApp {
 		emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
 	}
 
-	// TODO: complete deleteProposal
-	function deleteProposal(bytes32 proposalId) external onlyOwner {}
+	function deleteProposal(bytes32 proposalId) external onlyOwner {
+		Proposal memory emptyProposal;
+		proposals[proposalId] = emptyProposal;
+
+		// Find where `proposalId` is in `proposalIds`
+		// If it's the last index, pop
+		// If it's not the last index, replace with it and then pop
+		uint256 proposalIdIndex;
+		uint256 proposalIdsLength = getProposalIdsLength();
+		bytes32[] memory proposalIdsCopy = proposalIds;
+		for (uint256 i = 0; i < proposalIdsLength; uncheckedInc(i)) {
+			if (proposalId == proposalIdsCopy[i]) {
+				proposalIdIndex = i;
+				break;
+			}
+		}
+
+		if (proposalIdIndex == proposalIdsLength - 1) {
+			proposalIds.pop();
+		} else {
+			proposalIds[proposalIdIndex] = proposalIds[proposalIdsLength - 1];
+			proposalIds.pop();
+		}
+	}
 
 	// --- external view functions ---
 
-	function getProposalsLength() external view returns (uint256) {
+	function getProposalIdsLength() public view returns (uint256) {
 		return proposalIds.length;
 	}
 
