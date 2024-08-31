@@ -8,8 +8,8 @@ export const Addresses = {
   Healthcheck_ArbitrumSepolia_V1: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4",
 
   // Deployed contracts of EquitoVote
-  EquitoVote_EthereumSepolia_V1: "",
-  EquitoVote_ArbitrumSepolia_V1: "",
+  EquitoVote_EthereumSepolia_V1: "0x123" as `0x${string}`,
+  EquitoVote_ArbitrumSepolia_V1: "" as `0x${string}`,
 
   // Chainlink token
   Link_EthereumSepolia: "0x779877A7B0D9E8603169DdbD7836e478b4624789",

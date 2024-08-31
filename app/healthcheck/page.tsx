@@ -25,8 +25,6 @@ const healthcheckAbi = healthcheckContract.abi;
 const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
 const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
-// enum Status {}
-
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
 
