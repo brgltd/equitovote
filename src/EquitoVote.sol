@@ -157,6 +157,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
     }
 
+    /// @dev Can only unlock all at once
     function unlockTokens(bytes32 proposalId) external nonReentrant {
         Proposal memory proposal = proposals[proposalId];
         if (proposal.id == bytes32(0)) {
@@ -166,6 +167,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             revert ProposalNotFinished(proposalId, proposal.endTimestamp);
         }
         uint256 amount = balances[msg.sender][proposalId];
+        balances[msg.sender][proposalId] = 0;
         IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
     }
 
