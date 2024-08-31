@@ -180,10 +180,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     ///      In that case, call `deleteProposalByIndexOptimized` which will
     ///      run more efficiently but it will not maintain the array order.
     function deleteProposalById(bytes32 proposalId) external onlyOwner {
-        Proposal memory emptyProposal;
-        proposals[proposalId] = emptyProposal;
+        _deleteProposalFromMapping(proposalId);
 
-        uint256 proposalIdIndex;
+        uint256 proposalIdIndex = 0;
         uint256 proposalIdsLength = getProposalIdsLength();
         bytes32[] memory proposalIdsCopy = proposalIds;
         for (uint256 i = 0; i < proposalIdsLength; uncheckedInc(i)) {
@@ -192,7 +191,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
                 break;
             }
         }
-        _deleteProposalByIndex(
+        _deleteProposalFromListByIndex(
             proposalIdIndex,
             proposalIdsLength,
             proposalIdsCopy
@@ -204,7 +203,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     ///      run more efficiently but it will not maintain the array order.
     function deleteProposalByIndex(uint256 proposalIndex) external onlyOwner {
         bytes32[] memory proposalIdsCopy = proposalIds;
-        _deleteProposalByIndex(
+        bytes32 proposalIdToDelete = proposalIdsCopy[proposalIndex];
+        _deleteProposalFromMapping(proposalIdToDelete);
+        _deleteProposalFromListByIndex(
             proposalIndex,
             getProposalIdsLength(),
             proposalIdsCopy
@@ -214,12 +215,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     function deleteProposalByIndexOptimized(
         uint256 proposalIndex
     ) external onlyOwner {
-        bytes32 proposalIdToDelete = proposalIds[proposalIndex];
-        Proposal memory emptyProposal;
-        proposals[proposalIdToDelete] = emptyProposal;
-        uint256 proposalIdsLength = getProposalIdsLength();
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        bytes32 proposalIdToDelete = proposalIdsCopy[proposalIndex];
+        _deleteProposalFromMapping(proposalIdToDelete);
+        uint256 proposalIdsLength = proposalIdsCopy.length;
         if (proposalIndex != proposalIdsLength - 1) {
-            proposalIds[proposalIndex] = proposalIds[proposalIdsLength - 1];
+            proposalIds[proposalIndex] = proposalIdsCopy[proposalIdsLength - 1];
         }
         proposalIds.pop();
     }
@@ -306,7 +307,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         }
     }
 
-    function _deleteProposalByIndex(
+    function _deleteProposalFromMapping(bytes32 proposalIdToDelete) private {
+        Proposal memory emptyProposal;
+        proposals[proposalIdToDelete] = emptyProposal;
+    }
+
+    function _deleteProposalFromListByIndex(
         uint256 proposalIndex,
         uint256 proposalIdsLength,
         bytes32[] memory proposalIdsCopy
