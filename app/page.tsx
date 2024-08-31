@@ -22,6 +22,8 @@ const defaultFormData = {
   durationHours: "",
 };
 
+function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {}
+
 export default function HomePage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
 
@@ -30,6 +32,10 @@ export default function HomePage() {
   useEffect(() => {
     proposalTitleRef.current?.focus();
   }, []);
+
+  const onClickCreateProposal = async () => {
+    const createProposalArgs = buildCreateProposalArgs(formData);
+  };
 
   return (
     <div>
@@ -71,7 +77,7 @@ export default function HomePage() {
         />
       </div>
 
-      <button>Create Proposal</button>
+      <button onClick={onClickCreateProposal}>Create Proposal</button>
     </div>
   );
 }

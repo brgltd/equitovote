@@ -112,8 +112,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             id: id
         });
 
-        bytes64 memory receiver = peers[destinationChainSelector];
-
         bytes memory messageData = abi.encode(
             OperationType.CreateProposal,
             bytes32(0),
@@ -124,7 +122,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
         bytes32 messageHash = router.sendMessage{
             value: msg.value - protocolFee
-        }(receiver, destinationChainSelector, messageData);
+        }(
+            peers[destinationChainSelector],
+            destinationChainSelector,
+            messageData
+        );
 
         emit CreateProposalMessageSent(destinationChainSelector, messageHash);
     }
