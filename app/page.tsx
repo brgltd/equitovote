@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { addHours } from "date-fns";
+
+const ARBITRUM_CHAIN_SELECTOR = 1004;
 
 interface FormData {
   title: string;
@@ -22,7 +25,20 @@ const defaultFormData = {
   durationHours: "",
 };
 
-function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {}
+function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
+  console.log(new Date());
+  const endTimestamp = Math.floor(
+    addHours(new Date(), Number(formData.durationHours)).getTime() / 1000,
+  );
+  console.log(endTimestamp);
+  return {
+    destinationChainSelector: ARBITRUM_CHAIN_SELECTOR,
+    endTimestamp: 0,
+    erc20: "",
+    title: formData.title,
+    description: formData.description,
+  };
+}
 
 export default function HomePage() {
   const [formData, setFormData] = useState<FormData>(defaultFormData);
