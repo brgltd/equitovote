@@ -2,13 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { addHours } from "date-fns";
-import { useAccount, useSwitchChain, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useSwitchChain,
+  useWriteContract,
+} from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Addresses } from "@/addresses";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { chains } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
+import { routerAbi } from "@equito-sdk/evm";
+import { useRouter } from "@/hooks/use-router";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -70,6 +77,13 @@ export default function HomePage() {
 
   const { address: userAddress } = useAccount();
 
+  // @ts-ignore
+  const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
+  // @ts-ignore
+  const toRouter = useRouter({ chainSelector: arbitrumChain.chainSelector });
+  const fromRouterAddress = fromRouter.data;
+  const toRouterAddress = toRouter.data;
+
   useEffect(() => {
     proposalTitleRef.current?.focus();
   }, []);
@@ -77,6 +91,24 @@ export default function HomePage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const { data: fromFee } = useReadContract({
+    address: fromRouterAddress,
+    abi: routerAbi,
+    functionName: "getFee",
+    args: [Addresses.EquitoVote_EthereumSepolia_V1],
+    query: { enabled: !!fromRouterAddress },
+    chainId: ethereumChain?.definition.id,
+  });
+
+  const { data: toFee } = useReadContract({
+    address: toRouterAddress,
+    abi: routerAbi,
+    functionName: "getFee",
+    args: [Addresses.EquitoVote_ArbitrumSepolia_V1],
+    query: { enabled: !!toRouterAddress },
+    chainId: arbitrumChain?.definition.id,
+  });
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
