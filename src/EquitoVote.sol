@@ -36,7 +36,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
-    uint256 public protocolFee = 0.01e18;
+    uint256 public protocolFee = 0.0001e18;
 
     bytes32[] public proposalIds;
 

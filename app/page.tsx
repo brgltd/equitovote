@@ -132,7 +132,7 @@ export default function HomePage() {
     : "unavailable";
 
   const formattedCreateProposalFee = createProposalFee
-    ? `${Number(formatUnits(createProposalFee as bigint, 18)).toFixed(2)} ${
+    ? `${Number(formatUnits(createProposalFee as bigint, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
@@ -144,6 +144,11 @@ export default function HomePage() {
     args: [0, 4],
     chainId: destinationChain.definition.id,
   });
+
+  const totalCreateProposalFee =
+    fromFee && createProposalFee
+      ? fromFee + (createProposalFee as bigint)
+      : BigInt(0);
 
   useEffect(() => {
     proposalTitleRef.current?.focus();
@@ -159,8 +164,7 @@ export default function HomePage() {
       abi: equitoVoteAbi,
       functionName: "createProposal",
       args: Object.values(buildCreateProposalArgs(formData)),
-      // TODO: add equito fee + equitoVote fee
-      value: BigInt(0),
+      value: totalCreateProposalFee,
       chainId: sourceChain?.definition.id,
     });
     return waitForTransactionReceipt(config, {
@@ -230,7 +234,6 @@ export default function HomePage() {
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
     } catch (error) {
-      // TODO: show a toast with the error
       console.log(error);
     }
   };
@@ -307,7 +310,6 @@ export default function HomePage() {
 
       {statusRenderer[status]}
 
-      {/* TODO: possibly should show these two as a sum */}
       {/* Equito messaging fee */}
       <div>source chain fee: {formattedSourceChainFee}</div>
       <div>destination chain fee: {formattedDestinationChainFee}</div>
