@@ -140,6 +140,14 @@ export default function HomePage() {
       }`
     : "unavailable";
 
+  const { data: proposals, error: proposalsError } = useReadContract({
+    address: Addresses.EquitoVote_ArbitrumSepolia_V1,
+    abi: equitoVoteAbi,
+    functionName: "getProposalsSlice",
+    args: [0, 4],
+    chainId: destinationChain.definition.id,
+  });
+
   useEffect(() => {
     proposalTitleRef.current?.focus();
   }, []);
@@ -224,12 +232,9 @@ export default function HomePage() {
       }).flatMap(({ eventName, args }) =>
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
-
-      console.log("executionMessage");
-      console.log(executionMessage);
     } catch (error) {
       // TODO: show a toast with the error
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -319,6 +324,7 @@ export default function HomePage() {
       <hr />
 
       <div>list of proposals section</div>
+      <div>{JSON.stringify(proposals, null, 4) || "Empty"}</div>
 
       <hr />
     </div>
