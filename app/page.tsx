@@ -107,7 +107,7 @@ export default function HomePage() {
     chainId: arbitrumChain?.definition.id,
   });
 
-  const { data: equitoVoteFee } = useReadContract({
+  const { data: createProposalFee } = useReadContract({
     // TODO: replace this with EquitoVote address
     address: Addresses.Healthcheck_EthereumSepolia_V1,
     // TODO: replace this with EquitoVote abi
@@ -117,7 +117,7 @@ export default function HomePage() {
   });
 
   // TODO: will nee to parseUnits when calling the real thing
-  const normaliedEquitoVoteFee = equitoVoteFee || 0.01;
+  const parsedCreateProposalFee = (createProposalFee as any) || 0.01;
 
   // TODO: get units for the native coin in the deployed `from`
   const sourceChainCoinSymbol =
@@ -160,6 +160,7 @@ export default function HomePage() {
   };
 
   const onClickCreateProposal = async () => {
+    setStatus(Status.IsCreatingProposal);
     // @ts-ignore
     await switchChainAsync({ chainId: ethereumChain.definition.id });
     const createProposalReceipt = await createProposal();
@@ -183,8 +184,6 @@ export default function HomePage() {
         }}
       />
       {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
-
-      <div>Create Proposal</div>
 
       <div>
         <label htmlFor="title">title</label>
@@ -241,8 +240,8 @@ export default function HomePage() {
 
       {/* Creating a proposal fee */}
       <div>
-        EquitoVote fee: x {sourceChainCoinSymbol} (fee is only charged on
-        proposal creation)
+        EquitoVote fee: {parsedCreateProposalFee} {sourceChainCoinSymbol} (fee
+        is only charged on proposal creation)
       </div>
     </div>
   );
