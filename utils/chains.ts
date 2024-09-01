@@ -18,6 +18,7 @@ import {
   scrollSepolia,
 } from "wagmi/chains";
 import { Address, type Chain as Definition } from "viem";
+import { AddressesPerChain } from "@/addresses";
 
 const seiEvmAtlantic: Definition = {
   id: 1328,
@@ -64,22 +65,26 @@ const oasisEmeraldTestnet: Definition = {
   },
 };
 
+export const ethereumChain = {
+  chainSelector: 1001,
+  name: "Ethereum Sepolia",
+  img: 1027,
+  definition: sepolia,
+  pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
+  equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteActive,
+};
+
 export const arbitrumChain = {
   chainSelector: 1004,
   name: "Arbitrum Sepolia",
   img: 11841,
   definition: arbitrumSepolia,
   pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
+  equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
 };
 
 export const chains: Chain[] = [
-  {
-    chainSelector: 1001,
-    name: "Ethereum Sepolia",
-    img: 1027,
-    definition: sepolia,
-    pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079",
-  },
+  ethereumChain,
   {
     chainSelector: 1002,
     name: "BNB Smart Chain Testnet",
@@ -215,6 +220,7 @@ export type Chain = {
   img: number;
   definition: Definition;
   pingPongContract: Address;
+  equitoVoteContract?: Address;
 };
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";

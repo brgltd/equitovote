@@ -11,10 +11,17 @@ export const Addresses = {
   Healthcheck_ArbitrumSepolia_V1:
     "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
 
-  // Deployed contracts of EquitoVote
-  EquitoVote_EthereumSepolia_V1: "" as Address,
-  EquitoVote_ArbitrumSepolia_V1: "" as Address,
-
   // Chainlink token
   Link_EthereumSepolia: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+};
+
+export const AddressesPerChain = {
+  EthereumSepolia: {
+    EquitoVoteV1: "0x403A16CF04124FE6154e009c69a4e58A5B42F0fa" as Address,
+    EquitoVoteActive: "0x403A16CF04124FE6154e009c69a4e58A5B42F0fa" as Address,
+  },
+  ArbitrumSepolia: {
+    EquitoVoteV1: "0x8e5eC33684DC8eE00A4Df0E8b58d279c9A9bdb3E" as Address,
+    EquitoVoteActive: "0x8e5eC33684DC8eE00A4Df0E8b58d279c9A9bdb3E" as Address,
+  },
 };

@@ -12,19 +12,16 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { useRouter } from "@/hooks/use-router";
-import { formatUnits, parseEventLogs } from "viem";
-import { Addresses } from "@/addresses";
+import { Address, formatUnits, parseEventLogs } from "viem";
 import { arbitrumChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
-import healthcheckContract from "@/out/Healthcheck.sol/Healthcheck.json";
 import { ChainSelect } from "@/components/chain-select";
 import { useApprove } from "@/hooks/use-approve";
 import { generateHash } from "@equito-sdk/viem";
 import { useDeliver } from "@/hooks/use-deliver";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
-const healthcheckAbi = healthcheckContract.abi;
 
 const destinationChain = arbitrumChain;
 
@@ -85,7 +82,7 @@ export default function HomePage() {
   const fromRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
   const fromRouterAddress = fromRouter?.data;
   const toRouter = useRouter({ chainSelector: destinationChain.chainSelector });
-  const toRouterAddress = toRouter.data;
+  const toRouterAddress = toRouter?.data;
 
   const approve = useApprove();
 
@@ -100,7 +97,7 @@ export default function HomePage() {
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.Healthcheck_EthereumSepolia_V1],
+    args: [sourceChain?.equitoVoteContract as Address],
     query: { enabled: !!fromRouterAddress },
     chainId: sourceChain?.definition.id,
   });
@@ -109,39 +106,39 @@ export default function HomePage() {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.Healthcheck_ArbitrumSepolia_V1],
+    args: [destinationChain.equitoVoteContract as Address],
     query: { enabled: !!toRouterAddress },
     chainId: destinationChain.definition.id,
   });
 
   const { data: createProposalFee } = useReadContract({
-    // TODO: replace this with EquitoVote address
-    address: Addresses.Healthcheck_EthereumSepolia_V1,
-    // TODO: replace this with EquitoVote abi
-    abi: healthcheckAbi,
-    functionName: "propocolFee",
+    address: sourceChain?.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "protocolFee",
+    query: { enabled: !!fromRouterAddress },
     chainId: sourceChain?.definition.id,
   });
 
-  // TODO: will nee to parseUnits when calling the real thing
-  const parsedCreateProposalFee = (createProposalFee as any) || 0.01;
-
-  const sourceChainCoinSymbol = sourceChain?.definition?.nativeCurrency?.symbol;
-
-  const parsedFromFee = fromFee
+  const formattedSourceChainFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const parsedToFee = toFee
+  const formattedDestinationChainFee = toFee
     ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
         destinationChain.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const { data: proposals, error: proposalsError } = useReadContract({
-    address: Addresses.EquitoVote_ArbitrumSepolia_V1,
+  const formattedCreateProposalFee = createProposalFee
+    ? `${Number(formatUnits(createProposalFee as bigint, 18)).toFixed(2)} ${
+        sourceChain?.definition?.nativeCurrency?.symbol
+      }`
+    : "unavailable";
+
+  const { data: proposals } = useReadContract({
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
     args: [0, 4],
@@ -158,7 +155,7 @@ export default function HomePage() {
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
-      address: Addresses.EquitoVote_EthereumSepolia_V1,
+      address: sourceChain.equitoVoteContract as Address,
       abi: equitoVoteAbi,
       functionName: "createProposal",
       args: Object.values(buildCreateProposalArgs(formData)),
@@ -312,13 +309,13 @@ export default function HomePage() {
 
       {/* TODO: possibly should show these two as a sum */}
       {/* Equito messaging fee */}
-      <div>source chain fee: {parsedFromFee}</div>
-      <div>destination chain fee: {parsedToFee}</div>
+      <div>source chain fee: {formattedSourceChainFee}</div>
+      <div>destination chain fee: {formattedDestinationChainFee}</div>
 
       {/* Creating a proposal fee */}
       <div>
-        EquitoVote fee: {parsedCreateProposalFee} {sourceChainCoinSymbol} (fee
-        is only charged on proposal creation)
+        EquitoVote fee: {formattedCreateProposalFee} (fee is only charged on
+        proposal creation)
       </div>
 
       <hr />
