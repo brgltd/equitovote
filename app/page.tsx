@@ -10,14 +10,17 @@ import {
 } from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Addresses } from "@/addresses";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
-import { chains } from "@/utils/chains";
-import { config } from "@/utils/wagmi";
 import { routerAbi } from "@equito-sdk/evm";
 import { useRouter } from "@/hooks/use-router";
+import { formatUnits } from "viem";
+import { Addresses } from "@/addresses";
+import { chains } from "@/utils/chains";
+import { config } from "@/utils/wagmi";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import healthcheckContract from "@/out/Healthcheck.sol/Healthcheck.json";
 
 const equitoVoteAbi = equitoVote.abi;
+const healthcheckAbi = healthcheckContract.abi;
 
 const ARBITRUM_CHAIN_SELECTOR = 1004;
 
@@ -81,22 +84,16 @@ export default function HomePage() {
   const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
   // @ts-ignore
   const toRouter = useRouter({ chainSelector: arbitrumChain.chainSelector });
+
   const fromRouterAddress = fromRouter.data;
+
   const toRouterAddress = toRouter.data;
-
-  useEffect(() => {
-    proposalTitleRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const { data: fromFee } = useReadContract({
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoVote_EthereumSepolia_V1],
+    args: [Addresses.Healthcheck_EthereumSepolia_V1],
     query: { enabled: !!fromRouterAddress },
     chainId: ethereumChain?.definition.id,
   });
@@ -105,10 +102,46 @@ export default function HomePage() {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoVote_ArbitrumSepolia_V1],
+    args: [Addresses.Healthcheck_ArbitrumSepolia_V1],
     query: { enabled: !!toRouterAddress },
     chainId: arbitrumChain?.definition.id,
   });
+
+  const { data: equitoVoteFee } = useReadContract({
+    // TODO: replace this with EquitoVote address
+    address: Addresses.Healthcheck_EthereumSepolia_V1,
+    // TODO: replace this with EquitoVote abi
+    abi: healthcheckAbi,
+    functionName: "propocolFee",
+    chainId: ethereumChain?.definition.id,
+  });
+
+  // TODO: will nee to parseUnits when calling the real thing
+  const normaliedEquitoVoteFee = equitoVoteFee || 0.01;
+
+  // TODO: get units for the native coin in the deployed `from`
+  const sourceChainCoinSymbol =
+    ethereumChain?.definition?.nativeCurrency?.symbol;
+
+  const parsedFromFee = fromFee
+    ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
+        ethereumChain?.definition?.nativeCurrency?.symbol
+      }`
+    : "unavailable";
+
+  const parsedToFee = toFee
+    ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
+        arbitrumChain?.definition?.nativeCurrency?.symbol
+      }`
+    : "unavailable";
+
+  useEffect(() => {
+    proposalTitleRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
@@ -200,6 +233,17 @@ export default function HomePage() {
       </div>
 
       {statusRenderer[status]}
+
+      {/* TODO: possibly should show these two as a sum */}
+      {/* Equito messaging fee */}
+      <div>ethereum from fee: {parsedFromFee}</div>
+      <div>arbitrum to fee: {parsedToFee}</div>
+
+      {/* Creating a proposal fee */}
+      <div>
+        EquitoVote fee: x {sourceChainCoinSymbol} (fee is only charged on
+        proposal creation)
+      </div>
     </div>
   );
 }
