@@ -26,6 +26,8 @@ import { useDeliver } from "@/hooks/use-deliver";
 const equitoVoteAbi = equitoVote.abi;
 const healthcheckAbi = healthcheckContract.abi;
 
+const destinationChain = arbitrumChain;
+
 enum Status {
   IsStart = "IS_START",
   IsCreatingProposal = "IS_CREATING_PROPOSAL",
@@ -58,7 +60,7 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
     addHours(new Date(), Number(formData.durationHours)).getTime() / 1000,
   );
   return {
-    destinationChainSelector: arbitrumChain.chainSelector,
+    destinationChainSelector: destinationChain.chainSelector,
     endTimestamp: endTimestamp,
     erc20: formData.token,
     title: formData.title,
@@ -82,14 +84,14 @@ export default function HomePage() {
 
   const fromRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
   const fromRouterAddress = fromRouter?.data;
-  const toRouter = useRouter({ chainSelector: arbitrumChain.chainSelector });
+  const toRouter = useRouter({ chainSelector: destinationChain.chainSelector });
   const toRouterAddress = toRouter.data;
 
   const approve = useApprove();
 
   const deliverMessage = useDeliver({
     equito: {
-      chain: arbitrumChain,
+      chain: destinationChain,
       router: toRouter,
     },
   });
@@ -109,7 +111,7 @@ export default function HomePage() {
     functionName: "getFee",
     args: [Addresses.Healthcheck_ArbitrumSepolia_V1],
     query: { enabled: !!toRouterAddress },
-    chainId: arbitrumChain?.definition.id,
+    chainId: destinationChain.definition.id,
   });
 
   const { data: createProposalFee } = useReadContract({
@@ -134,7 +136,7 @@ export default function HomePage() {
 
   const parsedToFee = toFee
     ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
-        arbitrumChain?.definition?.nativeCurrency?.symbol
+        destinationChain.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
@@ -313,6 +315,10 @@ export default function HomePage() {
         EquitoVote fee: {parsedCreateProposalFee} {sourceChainCoinSymbol} (fee
         is only charged on proposal creation)
       </div>
+
+      <hr />
+
+      <div>list of proposals section</div>
 
       <hr />
     </div>
