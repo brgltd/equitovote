@@ -64,6 +64,14 @@ const oasisEmeraldTestnet: Definition = {
   },
 };
 
+export const arbitrumChain = {
+  chainSelector: 1004,
+  name: "Arbitrum Sepolia",
+  img: 11841,
+  definition: arbitrumSepolia,
+  pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
+};
+
 export const chains: Chain[] = [
   {
     chainSelector: 1001,
@@ -86,13 +94,7 @@ export const chains: Chain[] = [
     definition: polygonAmoy,
     pingPongContract: "0x79c440ABA2bB23D44fEB21bF1Cc6a37E0657E7Fd",
   },
-  {
-    chainSelector: 1004,
-    name: "Arbitrum Sepolia",
-    img: 11841,
-    definition: arbitrumSepolia,
-    pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9",
-  },
+  arbitrumChain,
   {
     chainSelector: 1005,
     name: "Avalanche Fuji",

@@ -27,8 +27,6 @@ const equitoSwapAbi = equitoSwap.abi;
 const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
 const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
-enum Status {}
-
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
 
@@ -177,7 +175,7 @@ export default function Page() {
         abi: routerAbi,
         logs: bridgeTokenReceipt.logs,
       }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : []
+        eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
       console.log("bridgeTokenMessage");
@@ -216,7 +214,7 @@ export default function Page() {
         bridgeTokenProof,
         bridgeTokenMessage.message,
         bridgeTokenMessage.messageData,
-        toFee
+        toFee,
       );
 
       console.log("executionReceipt");
@@ -226,7 +224,7 @@ export default function Page() {
         abi: routerAbi,
         logs: executionReceipt.logs,
       }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : []
+        eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
       console.log("executionMessage");

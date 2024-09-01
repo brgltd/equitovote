@@ -19,7 +19,7 @@ import { useEquito } from "../../providers/equito-provider";
 import { usePingPong } from "../../providers/ping-pong-provider";
 import { useApprove } from "../../hooks/use-approve";
 import { useDeliver } from "../../hooks/use-deliver";
-import { ChainSelect } from "../../components/chain-select";
+import { ChainSelect } from "../../components/chain-select-from-to";
 import { ProgressLoader } from "../../components/progress-loader";
 import { pingPongAbi } from "../../abis/ping-pong.abi";
 
@@ -107,7 +107,7 @@ export default function Healthcheck() {
           abi: routerAbi,
           logs: sendPingReceipt.logs,
         }).flatMap(({ eventName, args }) =>
-          eventName === "MessageSendRequested" ? [args] : []
+          eventName === "MessageSendRequested" ? [args] : [],
         )[0];
         if (!sentPingMessage) {
           throw new Error("MessageSendRequest event not found");
@@ -132,20 +132,20 @@ export default function Healthcheck() {
             sentPingProof,
             sentPingMessage.message,
             sentPingMessage.messageData,
-            pongFee.fee
+            pongFee.fee,
           );
         const sentPongMessage = parseEventLogs({
           abi: routerAbi,
           logs: deliverPingAndSendPongReceipt.logs,
         }).flatMap(({ eventName, args }) =>
-          eventName === "MessageSendRequested" ? [args] : []
+          eventName === "MessageSendRequested" ? [args] : [],
         )[0];
         if (!sentPongMessage) {
           throw new Error("MessageSendRequested event not found");
         }
         const [, pong] = decodeAbiParameters(
           parseAbiParameters("string, string"),
-          sentPingMessage.messageData
+          sentPingMessage.messageData,
         );
 
         setStatus("isCompleted");
@@ -224,7 +224,7 @@ export default function Healthcheck() {
           from fee:{" "}
           {pingFee?.fee
             ? `${Number(formatUnits(pingFee?.fee, 18)).toFixed(
-                8
+                8,
               )} ${nativeCurrencyFrom}`
             : "unavailable"}
         </div>
@@ -248,7 +248,7 @@ export default function Healthcheck() {
           to fee:{" "}
           {pongFee?.fee
             ? `${Number(formatUnits(pongFee?.fee, 18)).toFixed(
-                8
+                8,
               )} ${nativeCurrencyTo}`
             : "unavailable"}
         </div>

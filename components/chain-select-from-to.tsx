@@ -2,25 +2,31 @@
 
 import { useState } from "react";
 import { useSwitchChain } from "wagmi";
-import { Chain, chains } from "../utils/chains";
+import { useEquito } from "../providers/equito-provider";
+import { chains } from "../utils/chains";
 import { toast } from "sonner";
 
-export function ChainSelect({ setSourceChain }: any) {
+export function ChainSelect({ mode, disabled }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { chain, setChain } = useEquito()[mode];
 
   const { switchChainAsync } = useSwitchChain();
 
-  const onClickSelectChain = async (chain: Chain) => {
+  const onClickSelectChain = async (chain) => {
     setIsOpen(false);
-    try {
-      await switchChainAsync({ chainId: chain.definition.id });
-      setSourceChain(chain);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message.split("\n")[0]
-          : "Failed to switch chain";
-      toast.error(message);
+    if (mode === "from") {
+      try {
+        await switchChainAsync({ chainId: chain.definition.id });
+        setChain(chain);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message.split("\n")[0]
+            : "Failed to switch chain";
+        toast.error(message);
+      }
+    } else {
+      setChain(chain);
     }
   };
 

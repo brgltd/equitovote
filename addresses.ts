@@ -1,4 +1,4 @@
-type Address = `0x${string}`;
+import { Address } from "viem";
 
 export const Addresses = {
   // Deployed contracts of EquitoSwap

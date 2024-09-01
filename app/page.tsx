@@ -8,24 +8,23 @@ import {
   useSwitchChain,
   useWriteContract,
 } from "wagmi";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { useRouter } from "@/hooks/use-router";
-import { formatUnits } from "viem";
+import { formatUnits, parseEventLogs } from "viem";
 import { Addresses } from "@/addresses";
-import { chains } from "@/utils/chains";
+import { arbitrumChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import healthcheckContract from "@/out/Healthcheck.sol/Healthcheck.json";
+import { ChainSelect } from "@/components/chain-select";
+import { useApprove } from "@/hooks/use-approve";
+import { generateHash } from "@equito-sdk/viem";
+import { useDeliver } from "@/hooks/use-deliver";
 
 const equitoVoteAbi = equitoVote.abi;
 const healthcheckAbi = healthcheckContract.abi;
-
-const ARBITRUM_CHAIN_SELECTOR = 1004;
-
-const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
-const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
 enum Status {
   IsStart = "IS_START",
@@ -59,7 +58,7 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
     addHours(new Date(), Number(formData.durationHours)).getTime() / 1000,
   );
   return {
-    destinationChainSelector: ARBITRUM_CHAIN_SELECTOR,
+    destinationChainSelector: arbitrumChain.chainSelector,
     endTimestamp: endTimestamp,
     erc20: formData.token,
     title: formData.title,
@@ -71,6 +70,7 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
+  const [sourceChain, setSourceChain] = useState<Chain>(null!);
 
   const proposalTitleRef = useRef<HTMLInputElement>(null);
 
@@ -80,14 +80,19 @@ export default function HomePage() {
 
   const { address: userAddress } = useAccount();
 
-  // @ts-ignore
-  const fromRouter = useRouter({ chainSelector: ethereumChain.chainSelector });
-  // @ts-ignore
+  const fromRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
+  const fromRouterAddress = fromRouter?.data;
   const toRouter = useRouter({ chainSelector: arbitrumChain.chainSelector });
-
-  const fromRouterAddress = fromRouter.data;
-
   const toRouterAddress = toRouter.data;
+
+  const approve = useApprove();
+
+  const deliverMessage = useDeliver({
+    equito: {
+      chain: arbitrumChain,
+      router: toRouter,
+    },
+  });
 
   const { data: fromFee } = useReadContract({
     address: fromRouterAddress,
@@ -95,7 +100,7 @@ export default function HomePage() {
     functionName: "getFee",
     args: [Addresses.Healthcheck_EthereumSepolia_V1],
     query: { enabled: !!fromRouterAddress },
-    chainId: ethereumChain?.definition.id,
+    chainId: sourceChain?.definition.id,
   });
 
   const { data: toFee } = useReadContract({
@@ -113,19 +118,17 @@ export default function HomePage() {
     // TODO: replace this with EquitoVote abi
     abi: healthcheckAbi,
     functionName: "propocolFee",
-    chainId: ethereumChain?.definition.id,
+    chainId: sourceChain?.definition.id,
   });
 
   // TODO: will nee to parseUnits when calling the real thing
   const parsedCreateProposalFee = (createProposalFee as any) || 0.01;
 
-  // TODO: get units for the native coin in the deployed `from`
-  const sourceChainCoinSymbol =
-    ethereumChain?.definition?.nativeCurrency?.symbol;
+  const sourceChainCoinSymbol = sourceChain?.definition?.nativeCurrency?.symbol;
 
   const parsedFromFee = fromFee
     ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
-        ethereumChain?.definition?.nativeCurrency?.symbol
+        sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
@@ -151,19 +154,81 @@ export default function HomePage() {
       args: Object.values(buildCreateProposalArgs(formData)),
       // TODO: add equito fee + equitoVote fee
       value: BigInt(0),
-      chainId: ethereumChain?.definition.id,
+      chainId: sourceChain?.definition.id,
     });
     return waitForTransactionReceipt(config, {
       hash,
-      chainId: ethereumChain?.definition.id,
+      chainId: sourceChain?.definition.id,
     });
   };
 
   const onClickCreateProposal = async () => {
-    setStatus(Status.IsCreatingProposal);
-    // @ts-ignore
-    await switchChainAsync({ chainId: ethereumChain.definition.id });
-    const createProposalReceipt = await createProposal();
+    try {
+      setStatus(Status.IsCreatingProposal);
+
+      await switchChainAsync({ chainId: sourceChain.definition.id });
+
+      const createProposalReceipt = await createProposal();
+
+      const logs = parseEventLogs({
+        abi: routerAbi,
+        logs: createProposalReceipt.logs,
+      });
+
+      console.log("logs");
+      console.log(logs);
+
+      const sendMessageResult = parseEventLogs({
+        abi: routerAbi,
+        logs: createProposalReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : [],
+      )[0];
+
+      console.log("sendMessageResult");
+      console.log(sendMessageResult);
+
+      const { timestamp: sendMessageTimestamp } = await getBlock(config, {
+        chainId: sourceChain?.definition.id,
+        blockNumber: createProposalReceipt.blockNumber,
+      });
+
+      const { proof: sendMessageProof, timestamp: resultTimestamp } =
+        await approve.execute({
+          messageHash: generateHash(sendMessageResult.message),
+          fromTimestamp: Number(sendMessageTimestamp) * 1000,
+          chainSelector: sourceChain.chainSelector,
+        });
+
+      console.log("sendMessageProof");
+      console.log(sendMessageProof);
+
+      console.log("resultTimestamp");
+      console.log(resultTimestamp);
+
+      const executionReceipt = await deliverMessage.execute(
+        sendMessageProof,
+        sendMessageResult.message,
+        sendMessageResult.messageData,
+        toFee,
+      );
+
+      console.log("executionReceipt");
+      console.log(executionReceipt);
+
+      const executionMessage = parseEventLogs({
+        abi: routerAbi,
+        logs: executionReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : [],
+      )[0];
+
+      console.log("executionMessage");
+      console.log(executionMessage);
+    } catch (error) {
+      // TODO: show a toast with the error
+      console.error(error);
+    }
   };
 
   const statusRenderer = {
@@ -184,6 +249,11 @@ export default function HomePage() {
         }}
       />
       {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
+
+      <hr />
+      <div>create proposal section</div>
+
+      <ChainSelect setSourceChain={setSourceChain} />
 
       <div>
         <label htmlFor="title">title</label>
@@ -235,14 +305,16 @@ export default function HomePage() {
 
       {/* TODO: possibly should show these two as a sum */}
       {/* Equito messaging fee */}
-      <div>ethereum from fee: {parsedFromFee}</div>
-      <div>arbitrum to fee: {parsedToFee}</div>
+      <div>source chain fee: {parsedFromFee}</div>
+      <div>destination chain fee: {parsedToFee}</div>
 
       {/* Creating a proposal fee */}
       <div>
         EquitoVote fee: {parsedCreateProposalFee} {sourceChainCoinSymbol} (fee
         is only charged on proposal creation)
       </div>
+
+      <hr />
     </div>
   );
 }
