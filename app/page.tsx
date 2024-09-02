@@ -145,6 +145,32 @@ export default function HomePage() {
     chainId: destinationChain.definition.id,
   });
 
+  const { data: p0 } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "proposals",
+    args: [
+      "0x5580f5d26e36f4717bd94ddf3b0060ed881187cebd816e6726e0df81562fa586",
+    ],
+    chainId: destinationChain.definition.id,
+  });
+
+  const { data: a0 } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "proposalIds",
+    args: [0],
+    chainId: destinationChain.definition.id,
+  });
+
+  const { data: a1 } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "proposalIds",
+    args: [1],
+    chainId: destinationChain.definition.id,
+  });
+
   const totalCreateProposalFee =
     fromFee && createProposalFee
       ? fromFee + (createProposalFee as bigint)
@@ -233,6 +259,9 @@ export default function HomePage() {
       }).flatMap(({ eventName, args }) =>
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
+
+      console.log("executionMessage");
+      console.log(executionMessage);
     } catch (error) {
       console.log(error);
     }
