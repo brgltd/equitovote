@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -10,6 +10,7 @@ import { EquitoProvider } from "../providers/equito-provider";
 import { PingPongProvider } from "../providers/ping-pong-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
+import { Navbar } from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,31 +22,32 @@ const queryClient = new QueryClient();
 /* }; */
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-		<html lang="en">
-			<body className={inter.className}>
-				<WagmiProvider config={wagmiConfig}>
-					<QueryClientProvider client={queryClient}>
-						<RainbowKitProvider
-							theme={midnightTheme({
-								accentColor: "#6f76f6",
-								accentColorForeground: "white",
-								borderRadius: "small",
-							})}
-						>
-							<EquitoProvider>	
-								<PingPongProvider>
-									{children}
-								</PingPongProvider>
-							</EquitoProvider>
-						</RainbowKitProvider>
-					</QueryClientProvider>
-				</WagmiProvider>
-			</body>
-		</html>
-    );
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider
+              theme={midnightTheme({
+                accentColor: "#6f76f6",
+                accentColorForeground: "white",
+                borderRadius: "small",
+              })}
+            >
+              <EquitoProvider>
+                <PingPongProvider>
+                  <Navbar />
+                  {children}
+                </PingPongProvider>
+              </EquitoProvider>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </body>
+    </html>
+  );
 }
