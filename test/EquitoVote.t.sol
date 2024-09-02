@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Router} from "equito/src/Router.sol";
 import {MockVerifier} from "equito/test/mock/MockVerifier.sol";
 import {MockEquitoFees} from "equito/test/mock/MockEquitoFees.sol";
@@ -25,7 +26,7 @@ contract EquitoVoteTest is Test {
         verifier = new MockVerifier();
         fees = new MockEquitoFees();
         router = new Router(
-            0, // local chainSelector
+            0, // Local chainSelector
             address(verifier),
             address(fees),
             EquitoMessageLibrary.addressToBytes64(equitoAddress)
@@ -33,7 +34,6 @@ contract EquitoVoteTest is Test {
 
         equitoVote = new EquitoVote(address(router));
 
-        // Set the peers
         uint256[] memory chainSelectors = new uint256[](2);
         chainSelectors[0] = 1;
         chainSelectors[1] = 2;
@@ -44,21 +44,62 @@ contract EquitoVoteTest is Test {
 
         equitoVote.setPeers(chainSelectors, addresses);
 
-        // Fund the sender
         vm.deal(address(sender), 10 ether);
     }
 
-    function testSimple() public view {
-        assert(equitoVote.version() > 0);
+    function testCreateProposal() public {
+        string memory titleInput = generateTitle(0);
+        createProposalAndExecuteMessage(0, titleInput);
+
+        bytes32 proposalId = equitoVote.proposalIds(0);
+
+        // Entire struct
+        // (
+        //     uint256 startTimestamp,
+        //     uint256 endTimestamp,
+        //     uint256 numVotesYes,
+        //     uint256 numVotesNo,
+        //     uint256 numVotesAbstain,
+        //     address erc20,
+        //     address creator,
+        //     string memory title,
+        //     string memory description,
+        //     bytes32 id
+        // ) = equitoVote.proposals(proposalId);
+
+        (, , , , , , , string memory titleResult, , ) = equitoVote.proposals(
+            proposalId
+        );
+
+        assertEq(titleResult, titleInput);
     }
 
-    function testCreateProposal() public {
+    function testGetProposalsSlice() public {
+        uint256 numOfProposals = 5;
+        for (uint256 i = 0; i < numOfProposals; ++i) {
+            string memory title = generateTitle(i);
+            createProposalAndExecuteMessage(i, title);
+        }
+        uint256 proposalsLength = equitoVote.getProposalIdsLength();
+        assertEq(proposalsLength, numOfProposals);
+        EquitoVote.Proposal[] memory slicedProposals = equitoVote
+            .getProposalsSlice(0, proposalsLength);
+        for (uint256 i = 0; i < proposalsLength; ++i) {
+            assertEq(slicedProposals[i].title, generateTitle(i));
+        }
+    }
+
+    function createProposalAndExecuteMessage(
+        uint256 timeToAdd,
+        string memory titleInput
+    ) private {
+        vm.warp(block.timestamp + timeToAdd);
+
         uint256 fee = router.getFee(address(equitoVote));
         uint256 destinationChainSelector = 2;
 
         uint256 endTimestampInput = block.timestamp + 3600;
         address erc20Input = 0x779877A7B0D9E8603169DdbD7836e478b4624789;
-        string memory titleInput = "title0";
         string memory descriptionInput = "description0";
         bytes32 proposalId = keccak256(abi.encode(msg.sender, block.timestamp));
 
@@ -109,29 +150,11 @@ contract EquitoVoteTest is Test {
             0,
             abi.encode(1)
         );
+    }
 
-        // Entire struct
-        // (
-        //     uint256 startTimestamp,
-        //     uint256 endTimestamp,
-        //     uint256 numVotesYes,
-        //     uint256 numVotesNo,
-        //     uint256 numVotesAbstain,
-        //     address erc20,
-        //     address creator,
-        //     string memory title,
-        //     string memory description,
-        //     bytes32 id
-        // ) = equitoVote.proposals(proposalId);
-
-        (, , , , , , , string memory title, , ) = equitoVote.proposals(
-            proposalId
-        );
-
-        assertEq(title, titleInput);
-        EquitoVote.Proposal[] memory slicedProposals = equitoVote
-            .getProposalsSlice(0, 1);
-
-        assertEq(slicedProposals[0].title, titleInput);
+    function generateTitle(
+        uint256 number
+    ) private pure returns (string memory) {
+        return string.concat("title", Strings.toString(number));
     }
 }

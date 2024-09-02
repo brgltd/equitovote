@@ -18,10 +18,12 @@ export const Addresses = {
 export const AddressesPerChain = {
   EthereumSepolia: {
     EquitoVoteV1: "0x403A16CF04124FE6154e009c69a4e58A5B42F0fa" as Address,
-    EquitoVoteActive: "0x403A16CF04124FE6154e009c69a4e58A5B42F0fa" as Address,
+    EquitoVoteV2: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
+    EquitoVoteActive: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
   },
   ArbitrumSepolia: {
     EquitoVoteV1: "0x8e5eC33684DC8eE00A4Df0E8b58d279c9A9bdb3E" as Address,
-    EquitoVoteActive: "0x8e5eC33684DC8eE00A4Df0E8b58d279c9A9bdb3E" as Address,
+    EquitoVoteV2: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
+    EquitoVoteActive: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
   },
 };

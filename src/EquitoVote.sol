@@ -36,7 +36,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
-    uint256 public protocolFee = 0.0001e18;
+    uint256 public protocolFee = 0.000001e18;
 
     bytes32[] public proposalIds;
 
@@ -194,7 +194,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256 proposalIdIndex = 0;
         uint256 proposalIdsLength = getProposalIdsLength();
         bytes32[] memory proposalIdsCopy = proposalIds;
-        for (uint256 i = 0; i < proposalIdsLength; uncheckedInc(i)) {
+        for (uint256 i = 0; i < proposalIdsLength; i = uncheckedInc(i)) {
             if (proposalId == proposalIdsCopy[i]) {
                 proposalIdIndex = i;
                 break;
@@ -241,12 +241,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         }
     }
 
-    // --- external view functions ---
-
-    function version() external pure returns (uint256) {
-        return 2;
-    }
-
     // --- public view user functions ---
 
     function getProposalIdsLength() public view returns (uint256) {
@@ -265,11 +259,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             endIndex - startIndex
         );
         bytes32[] memory proposalIdsCopy = proposalIds;
-        for (uint256 i = startIndex; i < endIndex; ) {
+        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
             slicedProposals[i] = proposals[proposalIdsCopy[i]];
-            unchecked {
-                ++i;
-            }
         }
         return slicedProposals;
     }
@@ -340,7 +331,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             for (
                 uint256 i = proposalIndex;
                 i < proposalIdsLength - 1;
-                uncheckedInc(i)
+                i = uncheckedInc(i)
             ) {
                 proposalIds[i] = proposalIdsCopy[i + 1];
             }
