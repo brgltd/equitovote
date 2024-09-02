@@ -10,16 +10,16 @@ import {bytes64, EquitoMessage, EquitoMessageLibrary} from "equito/src/libraries
 import {EquitoVote} from "../src/EquitoVote.sol";
 
 contract EquitoVoteTest is Test {
-    Router router;
-    MockVerifier verifier;
-    MockEquitoFees fees;
-    EquitoVote public equitoVote;
+    Router private router;
+    MockVerifier private verifier;
+    MockEquitoFees private fees;
+    EquitoVote private equitoVote;
 
-    address sender = address(0xa0);
-    address equitoAddress = address(0xe0);
+    address private sender = address(0xa0);
+    address private equitoAddress = address(0xe0);
 
-    address peer1 = address(0x01);
-    address peer2 = address(0x02);
+    address private peer1 = address(0x01);
+    address private peer2 = address(0x02);
 
     function setUp() public {
         vm.prank(sender);
