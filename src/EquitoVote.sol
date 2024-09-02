@@ -53,7 +53,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     event CreateProposalMessageSent(
         uint256 indexed destinationChainSelector,
-        bytes32 messageHash
+        bytes32 messageHash,
+        bytes32 proposalId
     );
 
     event VoteOnProposalMessageSent(
@@ -128,7 +129,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             messageData
         );
 
-        emit CreateProposalMessageSent(destinationChainSelector, messageHash);
+        emit CreateProposalMessageSent(
+            destinationChainSelector,
+            messageHash,
+            id
+        );
     }
 
     function voteOnProposal(
@@ -236,6 +241,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         }
     }
 
+    // --- external view functions ---
+
+    function version() external pure returns (uint256) {
+        return 2;
+    }
+
     // --- public view user functions ---
 
     function getProposalIdsLength() public view returns (uint256) {
@@ -253,8 +264,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         Proposal[] memory slicedProposals = new Proposal[](
             endIndex - startIndex
         );
-        for (uint256 i = startIndex; i < endIndex; uncheckedInc(i)) {
-            slicedProposals[i] = proposals[proposalIds[i]];
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        for (uint256 i = startIndex; i < endIndex; ) {
+            slicedProposals[i] = proposals[proposalIdsCopy[i]];
+            unchecked {
+                ++i;
+            }
         }
         return slicedProposals;
     }

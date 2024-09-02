@@ -137,13 +137,26 @@ export default function HomePage() {
       }`
     : "unavailable";
 
-  const { data: proposals } = useReadContract({
+  const { data: proposalsLength } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "getProposalIdsLength",
+    chainId: destinationChain.definition.id,
+  });
+
+  console.log("proposalsLength");
+  console.log(proposalsLength);
+
+  const { data: proposals, error } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
-    args: [0, 4],
+    args: [BigInt(0), BigInt(1)],
     chainId: destinationChain.definition.id,
   });
+
+  console.log("getProposalsSliceError");
+  console.log(error);
 
   const { data: p0 } = useReadContract({
     address: destinationChain.equitoVoteContract,
@@ -168,6 +181,15 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "proposalIds",
     args: [1],
+    chainId: destinationChain.definition.id,
+  });
+
+  // ethereum -> arbitrum
+  const { data: peers } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "peers",
+    args: [1004],
     chainId: destinationChain.definition.id,
   });
 
