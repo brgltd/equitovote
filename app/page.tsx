@@ -27,7 +27,9 @@ const destinationChain = arbitrumChain;
 
 enum Status {
   IsStart = "IS_START",
-  IsCreatingProposal = "IS_CREATING_PROPOSAL",
+  IsCallingCreateProposalSourceChain = "IS_CALLING_CREATE_PROPOSAL_SOURCE_CHAIN",
+  IsExecutingMessageDestinationChain = "IS_EXECUTING_MESSAGE_DESTINATION_CHAIN",
+  IsRetry = "IS_RETRY",
 }
 
 interface FormData {
@@ -223,11 +225,13 @@ export default function HomePage() {
 
   const onClickCreateProposal = async () => {
     try {
-      setStatus(Status.IsCreatingProposal);
+      setStatus(Status.IsCallingCreateProposalSourceChain);
 
       await switchChainAsync({ chainId: sourceChain.definition.id });
 
       const createProposalReceipt = await createProposal();
+
+      setStatus(Status.IsExecutingMessageDestinationChain);
 
       const logs = parseEventLogs({
         abi: routerAbi,
@@ -284,7 +288,10 @@ export default function HomePage() {
 
       console.log("executionMessage");
       console.log(executionMessage);
+
+      setStatus(Status.IsStart);
     } catch (error) {
+      setStatus(Status.IsRetry);
       console.log(error);
     }
   };
@@ -293,7 +300,13 @@ export default function HomePage() {
     [Status.IsStart]: (
       <button onClick={onClickCreateProposal}>Create Proposal</button>
     ),
-    [Status.IsCreatingProposal]: <div>loading</div>,
+    [Status.IsCallingCreateProposalSourceChain]: (
+      <div>creating proposal on source chain</div>
+    ),
+    [Status.IsExecutingMessageDestinationChain]: (
+      <div>executing message on destination chain</div>
+    ),
+    [Status.IsRetry]: <button onClick={onClickCreateProposal}>Retry</button>,
   };
 
   return (
