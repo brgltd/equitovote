@@ -28,6 +28,7 @@ const destinationChain = arbitrumChain;
 enum Status {
   IsStart = "IS_START",
   IsCallingCreateProposalSourceChain = "IS_CALLING_CREATE_PROPOSAL_SOURCE_CHAIN",
+  IsRetrievingBlockSourceChain = "IS_RETRIEVING_BLOCK_SOURCE_CHAIN",
   IsGeneratingProofSourceChain = "IS_GENERATING_PROOF_SOURCE_CHAIN",
   IsExecutingMessageDestinationChain = "IS_EXECUTING_MESSAGE_DESTINATION_CHAIN",
   IsRetry = "IS_RETRY",
@@ -219,9 +220,7 @@ export default function HomePage() {
   const onClickCreateProposal = async () => {
     try {
       setStatus(Status.IsCallingCreateProposalSourceChain);
-
       await switchChainAsync({ chainId: sourceChain.definition.id });
-
       const createProposalReceipt = await createProposal();
 
       const logs = parseEventLogs({
@@ -242,13 +241,13 @@ export default function HomePage() {
       console.log("sendMessageResult");
       console.log(sendMessageResult);
 
-      setStatus(Status.IsGeneratingProofSourceChain);
-
+      setStatus(Status.IsRetrievingBlockSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: sourceChain?.definition.id,
         blockNumber: createProposalReceipt.blockNumber,
       });
 
+      setStatus(Status.IsGeneratingProofSourceChain);
       const { proof: sendMessageProof, timestamp: resultTimestamp } =
         await approve.execute({
           messageHash: generateHash(sendMessageResult.message),
@@ -263,7 +262,6 @@ export default function HomePage() {
       console.log(resultTimestamp);
 
       setStatus(Status.IsExecutingMessageDestinationChain);
-
       const executionReceipt = await deliverMessage.execute(
         sendMessageProof,
         sendMessageResult.message,
@@ -297,6 +295,9 @@ export default function HomePage() {
     ),
     [Status.IsCallingCreateProposalSourceChain]: (
       <div>creating proposal on source chain</div>
+    ),
+    [Status.IsRetrievingBlockSourceChain]: (
+      <div>is retriving block from source chain</div>
     ),
     [Status.IsGeneratingProofSourceChain]: (
       <div>generating proof source chai</div>
