@@ -5,10 +5,10 @@ export function Navbar() {
     <nav>
       <ul>
         <li>
-          <Link href="/create">Create Proposal</Link>
+          <Link href="/proposals">Proposals</Link>
         </li>
         <li>
-          <Link href="/vote">Vote on Proposals</Link>
+          <Link href="/create">Create</Link>
         </li>
       </ul>
     </nav>
