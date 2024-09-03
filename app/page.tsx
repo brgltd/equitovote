@@ -70,21 +70,22 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
 }
 
 // @ts-ignore
-function normalizeBigNumberResponse(data) {
-  const result = data?.[0];
-  if (!result) {
-    return {};
+function normalizeResponse(data) {
+  if (!Array.isArray(data)) {
+    return [];
   }
-  return Object.entries(result).reduce((acc, [key, value]) => {
-    if (typeof value == "bigint") {
-      // @ts-ignore
-      acc[key] = Number(value);
-    } else {
-      // @ts-ignore
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+  return data.map((item) =>
+    Object.entries(item).reduce((acc, [key, value]) => {
+      if (typeof value == "bigint") {
+        // @ts-ignore
+        acc[key] = Number(value);
+      } else {
+        // @ts-ignore
+        acc[key] = value;
+      }
+      return acc;
+    }, {}),
+  );
 }
 
 export default function HomePage() {
@@ -177,7 +178,7 @@ export default function HomePage() {
 
   // console.log("proposals");
   // console.log(proposals);
-  const normalizedProposals = normalizeBigNumberResponse(proposals);
+  const normalizedProposals = normalizeResponse(proposals);
 
   const { data: p0 } = useReadContract({
     address: destinationChain.equitoVoteContract,
