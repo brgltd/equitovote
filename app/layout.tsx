@@ -11,6 +11,7 @@ import { PingPongProvider } from "../providers/ping-pong-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { Navbar } from "@/components/navbar";
+import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,10 +40,12 @@ export default function RootLayout({
               })}
             >
               <EquitoProvider>
-                <PingPongProvider>
-                  <Navbar />
-                  {children}
-                </PingPongProvider>
+                <EquitoVoteProvider>
+                  <PingPongProvider>
+                    <Navbar />
+                    {children}
+                  </PingPongProvider>
+                </EquitoVoteProvider>
               </EquitoProvider>
             </RainbowKitProvider>
           </QueryClientProvider>

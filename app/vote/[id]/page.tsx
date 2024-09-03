@@ -2,10 +2,12 @@
 
 import { useMemo } from "react";
 import { destinationChain } from "@/utils/chains";
-import { useReadContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { buildProposalFromArray } from "@/utils/helpers";
 import { ProposalDataItem } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import { Addresses, AddressesPerChain } from "@/addresses";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -17,6 +19,16 @@ export default function Vote({ params }: { params: { id: string } }) {
     args: [params.id],
     chainId: destinationChain.definition.id,
   });
+
+  const { writeContractAsync } = useWriteContract();
+
+  const { sourceChain } = useEquitoVote();
+
+  // const voteOnProposal = async () => {
+  //   const hash = await writeContractAsync({
+  //     // address: AddressesPerChain.
+  //   });
+  // };
 
   const formattedProposal = useMemo(
     () => buildProposalFromArray(proposal as ProposalDataItem[]),

@@ -21,6 +21,7 @@ import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -63,7 +64,6 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
-  const [sourceChain, setSourceChain] = useState<Chain>(null!);
 
   const proposalTitleRef = useRef<HTMLInputElement>(null);
 
@@ -73,17 +73,18 @@ export default function HomePage() {
 
   const { address: userAddress } = useAccount();
 
-  const fromRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
-  const fromRouterAddress = fromRouter?.data;
-  const toRouter = useRouter({ chainSelector: destinationChain.chainSelector });
-  const toRouterAddress = toRouter?.data;
+  const { sourceChain, setSourceChain, sourceRouter, destinationRouter } =
+    useEquitoVote();
+
+  const fromRouterAddress = sourceRouter?.data;
+  const toRouterAddress = destinationRouter?.data;
 
   const approve = useApprove();
 
   const deliverMessage = useDeliver({
     equito: {
       chain: destinationChain,
-      router: toRouter,
+      router: destinationRouter,
     },
   });
 
