@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { arbitrumChain } from "@/utils/chains";
+import { destinationChain } from "@/utils/chains";
 import { useReadContract } from "wagmi";
 import { buildProposalFromArray } from "@/utils/helpers";
+import { ProposalDataItem } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
-
-const destinationChain = arbitrumChain;
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -20,7 +19,7 @@ export default function Vote({ params }: { params: { id: string } }) {
   });
 
   const normalizedProposal = useMemo(
-    () => buildProposalFromArray(proposal as any[]),
+    () => buildProposalFromArray(proposal as ProposalDataItem[]),
     [proposal],
   );
 

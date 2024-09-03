@@ -1,4 +1,4 @@
-import { FormattedProposal, ProposalResponse } from "@/types";
+import { FormattedProposal, ProposalDataItem, ProposalResponse } from "@/types";
 
 export const placeholderProposal: FormattedProposal = {
   startTimestamp: 0,
@@ -13,7 +13,7 @@ export const placeholderProposal: FormattedProposal = {
   id: "",
 };
 
-export function formatProposalItem(data: any) {
+export function formatProposalItem(data: ProposalDataItem) {
   return typeof data === "bigint" ? Number(data) : data;
 }
 
@@ -35,7 +35,7 @@ export function formatProposals(proposals: ProposalResponse[]) {
     : proposals.map((proposal) => formatProposal(proposal));
 }
 
-export function buildProposalFromArray(array: any[]) {
+export function buildProposalFromArray(array: Array<string | number | bigint>) {
   if (!Array.isArray(array)) {
     return {};
   }

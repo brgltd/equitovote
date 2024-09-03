@@ -224,3 +224,5 @@ export type Chain = {
 };
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
+export const destinationChain = arbitrumChain;

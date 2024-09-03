@@ -16,3 +16,5 @@ type BigintToNumber<T> = {
 };
 
 export type FormattedProposal = BigintToNumber<ProposalResponse>;
+
+export type ProposalDataItem = string | number | bigint;

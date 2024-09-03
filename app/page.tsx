@@ -4,14 +4,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { arbitrumChain } from "@/utils/chains";
+import { destinationChain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { formatProposals } from "@/utils/helpers";
 import { ProposalResponse } from "@/types";
 
 const equitoVoteAbi = equitoVote.abi;
-
-const destinationChain = arbitrumChain;
 
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);

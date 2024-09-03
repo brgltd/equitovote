@@ -13,7 +13,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { useRouter } from "@/hooks/use-router";
 import { Address, formatUnits, parseEventLogs } from "viem";
-import { arbitrumChain, Chain } from "@/utils/chains";
+import { destinationChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
 import { ChainSelect } from "@/components/chain-select";
 import { useApprove } from "@/hooks/use-approve";
@@ -22,8 +22,6 @@ import { useDeliver } from "@/hooks/use-deliver";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
-
-const destinationChain = arbitrumChain;
 
 enum Status {
   IsStart = "IS_START",
