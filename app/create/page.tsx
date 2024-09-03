@@ -69,25 +69,6 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
   };
 }
 
-// @ts-ignore
-function normalizeResponse(data) {
-  if (!Array.isArray(data)) {
-    return [];
-  }
-  return data.map((item) =>
-    Object.entries(item).reduce((acc, [key, value]) => {
-      if (typeof value == "bigint") {
-        // @ts-ignore
-        acc[key] = Number(value);
-      } else {
-        // @ts-ignore
-        acc[key] = value;
-      }
-      return acc;
-    }, {}),
-  );
-}
-
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<Status>(Status.IsStart);
@@ -159,36 +140,6 @@ export default function HomePage() {
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
-
-  const { data: proposalsLength } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "getProposalIdsLength",
-    chainId: destinationChain.definition.id,
-  });
-
-  const { data: proposals } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "getProposalsSlice",
-    args: [BigInt(0), proposalsLength],
-    query: { enabled: !!proposalsLength },
-    chainId: destinationChain.definition.id,
-  });
-
-  // console.log("proposals");
-  // console.log(proposals);
-  const normalizedProposals = normalizeResponse(proposals);
-
-  const { data: p0 } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "proposals",
-    args: [
-      "0x5580f5d26e36f4717bd94ddf3b0060ed881187cebd816e6726e0df81562fa586",
-    ],
-    chainId: destinationChain.definition.id,
-  });
 
   const totalCreateProposalFee =
     fromFee && createProposalFee
@@ -383,13 +334,6 @@ export default function HomePage() {
         EquitoVote fee: {formattedCreateProposalFee} (fee is only charged on
         proposal creation)
       </div>
-
-      <hr />
-
-      <div>list of proposals section</div>
-      <div>{JSON.stringify(normalizedProposals, null, 4) || "Empty"}</div>
-
-      <hr />
     </div>
   );
 }
