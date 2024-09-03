@@ -5,7 +5,7 @@ export function Navbar() {
     <nav>
       <ul>
         <li>
-          <Link href="/proposals">Proposals</Link>
+          <Link href="/">Proposals</Link>
         </li>
         <li>
           <Link href="/create">Create</Link>
