@@ -28,6 +28,7 @@ const destinationChain = arbitrumChain;
 enum Status {
   IsStart = "IS_START",
   IsCallingCreateProposalSourceChain = "IS_CALLING_CREATE_PROPOSAL_SOURCE_CHAIN",
+  IsGeneratingProofSourceChain = "IS_GENERATING_PROOF_SOURCE_CHAIN",
   IsExecutingMessageDestinationChain = "IS_EXECUTING_MESSAGE_DESTINATION_CHAIN",
   IsRetry = "IS_RETRY",
 }
@@ -65,6 +66,24 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
     title: formData.title,
     description: formData.description,
   };
+}
+
+// @ts-ignore
+function normalizeBigNumberResponse(data) {
+  const result = data?.[0];
+  if (!result) {
+    return {};
+  }
+  return Object.entries(result).reduce((acc, [key, value]) => {
+    if (typeof value == "bigint") {
+      // @ts-ignore
+      acc[key] = Number(value);
+    } else {
+      // @ts-ignore
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
 }
 
 export default function HomePage() {
@@ -146,19 +165,18 @@ export default function HomePage() {
     chainId: destinationChain.definition.id,
   });
 
-  console.log("proposalsLength");
-  console.log(proposalsLength);
-
-  const { data: proposals, error } = useReadContract({
+  const { data: proposals } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
-    args: [BigInt(0), BigInt(1)],
+    args: [BigInt(0), proposalsLength],
+    query: { enabled: !!proposalsLength },
     chainId: destinationChain.definition.id,
   });
 
-  console.log("getProposalsSliceError");
-  console.log(error);
+  // console.log("proposals");
+  // console.log(proposals);
+  const normalizedProposals = normalizeBigNumberResponse(proposals);
 
   const { data: p0 } = useReadContract({
     address: destinationChain.equitoVoteContract,
@@ -167,31 +185,6 @@ export default function HomePage() {
     args: [
       "0x5580f5d26e36f4717bd94ddf3b0060ed881187cebd816e6726e0df81562fa586",
     ],
-    chainId: destinationChain.definition.id,
-  });
-
-  const { data: a0 } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "proposalIds",
-    args: [0],
-    chainId: destinationChain.definition.id,
-  });
-
-  const { data: a1 } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "proposalIds",
-    args: [1],
-    chainId: destinationChain.definition.id,
-  });
-
-  // ethereum -> arbitrum
-  const { data: peers } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
-    functionName: "peers",
-    args: [1004],
     chainId: destinationChain.definition.id,
   });
 
@@ -231,8 +224,6 @@ export default function HomePage() {
 
       const createProposalReceipt = await createProposal();
 
-      setStatus(Status.IsExecutingMessageDestinationChain);
-
       const logs = parseEventLogs({
         abi: routerAbi,
         logs: createProposalReceipt.logs,
@@ -251,6 +242,8 @@ export default function HomePage() {
       console.log("sendMessageResult");
       console.log(sendMessageResult);
 
+      setStatus(Status.IsGeneratingProofSourceChain);
+
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: sourceChain?.definition.id,
         blockNumber: createProposalReceipt.blockNumber,
@@ -268,6 +261,8 @@ export default function HomePage() {
 
       console.log("resultTimestamp");
       console.log(resultTimestamp);
+
+      setStatus(Status.IsExecutingMessageDestinationChain);
 
       const executionReceipt = await deliverMessage.execute(
         sendMessageProof,
@@ -302,6 +297,9 @@ export default function HomePage() {
     ),
     [Status.IsCallingCreateProposalSourceChain]: (
       <div>creating proposal on source chain</div>
+    ),
+    [Status.IsGeneratingProofSourceChain]: (
+      <div>generating proof source chai</div>
     ),
     [Status.IsExecutingMessageDestinationChain]: (
       <div>executing message on destination chain</div>
@@ -387,7 +385,7 @@ export default function HomePage() {
       <hr />
 
       <div>list of proposals section</div>
-      <div>{JSON.stringify(proposals, null, 4) || "Empty"}</div>
+      <div>{JSON.stringify(normalizedProposals, null, 4) || "Empty"}</div>
 
       <hr />
     </div>
