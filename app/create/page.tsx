@@ -10,27 +10,19 @@ import {
 } from "wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { routerAbi } from "@equito-sdk/evm";
-import { useRouter } from "@/hooks/use-router";
 import { Address, formatUnits, parseEventLogs } from "viem";
+import { routerAbi } from "@equito-sdk/evm";
+import { generateHash } from "@equito-sdk/viem";
+import { useRouter } from "@/hooks/use-router";
 import { destinationChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
 import { ChainSelect } from "@/components/chain-select";
 import { useApprove } from "@/hooks/use-approve";
-import { generateHash } from "@equito-sdk/viem";
 import { useDeliver } from "@/hooks/use-deliver";
+import { Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
-
-enum Status {
-  IsStart = "IS_START",
-  IsCallingCreateProposalSourceChain = "IS_CALLING_CREATE_PROPOSAL_SOURCE_CHAIN",
-  IsRetrievingBlockSourceChain = "IS_RETRIEVING_BLOCK_SOURCE_CHAIN",
-  IsGeneratingProofSourceChain = "IS_GENERATING_PROOF_SOURCE_CHAIN",
-  IsExecutingMessageDestinationChain = "IS_EXECUTING_MESSAGE_DESTINATION_CHAIN",
-  IsRetry = "IS_RETRY",
-}
 
 interface FormData {
   title: string;
@@ -169,7 +161,7 @@ export default function HomePage() {
 
   const onClickCreateProposal = async () => {
     try {
-      setStatus(Status.IsCallingCreateProposalSourceChain);
+      setStatus(Status.IsExecutingBaseTxOnSourceChain);
       await switchChainAsync({ chainId: sourceChain.definition.id });
       const createProposalReceipt = await createProposal();
 
@@ -191,13 +183,13 @@ export default function HomePage() {
       console.log("sendMessageResult");
       console.log(sendMessageResult);
 
-      setStatus(Status.IsRetrievingBlockSourceChain);
+      setStatus(Status.IsRetrievingBlockOnSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: sourceChain?.definition.id,
         blockNumber: createProposalReceipt.blockNumber,
       });
 
-      setStatus(Status.IsGeneratingProofSourceChain);
+      setStatus(Status.IsGeneratingProofOnSourceChain);
       const { proof: sendMessageProof, timestamp: resultTimestamp } =
         await approve.execute({
           messageHash: generateHash(sendMessageResult.message),
@@ -211,7 +203,7 @@ export default function HomePage() {
       console.log("resultTimestamp");
       console.log(resultTimestamp);
 
-      setStatus(Status.IsExecutingMessageDestinationChain);
+      setStatus(Status.IsExecutingMessageOnDestinationChain);
       const executionReceipt = await deliverMessage.execute(
         sendMessageProof,
         sendMessageResult.message,
@@ -243,16 +235,16 @@ export default function HomePage() {
     [Status.IsStart]: (
       <button onClick={onClickCreateProposal}>Create Proposal</button>
     ),
-    [Status.IsCallingCreateProposalSourceChain]: (
+    [Status.IsExecutingBaseTxOnSourceChain]: (
       <div>creating proposal on source chain</div>
     ),
-    [Status.IsRetrievingBlockSourceChain]: (
+    [Status.IsRetrievingBlockOnSourceChain]: (
       <div>is retriving block from source chain</div>
     ),
-    [Status.IsGeneratingProofSourceChain]: (
+    [Status.IsGeneratingProofOnSourceChain]: (
       <div>generating proof source chai</div>
     ),
-    [Status.IsExecutingMessageDestinationChain]: (
+    [Status.IsExecutingMessageOnDestinationChain]: (
       <div>executing message on destination chain</div>
     ),
     [Status.IsRetry]: <button onClick={onClickCreateProposal}>Retry</button>,

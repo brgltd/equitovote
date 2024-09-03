@@ -18,3 +18,12 @@ type BigintToNumber<T> = {
 export type FormattedProposal = BigintToNumber<ProposalResponse>;
 
 export type ProposalDataItem = string | number | bigint;
+
+export enum Status {
+  IsStart = "IS_START",
+  IsExecutingBaseTxOnSourceChain = "IS_EXECUTING_BASE_TX_ON_SOURCE_CHAIN",
+  IsRetrievingBlockOnSourceChain = "IS_RETRIEVING_BLOCK_ON_SOURCE_CHAIN",
+  IsGeneratingProofOnSourceChain = "IS_GENERATING_PROOF_ON_SOURCE_CHAIN",
+  IsExecutingMessageOnDestinationChain = "IS_EXECUTING_MESSAGE_ON_DESTINATION_CHAIN",
+  IsRetry = "IS_RETRY",
+}

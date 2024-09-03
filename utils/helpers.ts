@@ -35,15 +35,16 @@ export function formatProposals(proposals: ProposalResponse[]) {
     : proposals.map((proposal) => formatProposal(proposal));
 }
 
-export function buildProposalFromArray(array: Array<string | number | bigint>) {
-  if (!Array.isArray(array)) {
-    return {};
-  }
-  return Object.keys(placeholderProposal).reduce(
-    (acc, key, index) => {
-      acc[key] = formatProposalItem(array[index]);
-      return acc;
-    },
-    {} as Record<string, any>,
-  );
+export function buildProposalFromArray(
+  proposalArrayData: Array<ProposalDataItem>,
+) {
+  return !Array.isArray(proposalArrayData)
+    ? {}
+    : Object.keys(placeholderProposal).reduce(
+        (acc, key, index) => {
+          acc[key] = formatProposalItem(proposalArrayData[index]);
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 }

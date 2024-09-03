@@ -18,7 +18,7 @@ export default function Vote({ params }: { params: { id: string } }) {
     chainId: destinationChain.definition.id,
   });
 
-  const normalizedProposal = useMemo(
+  const formattedProposal = useMemo(
     () => buildProposalFromArray(proposal as ProposalDataItem[]),
     [proposal],
   );
@@ -30,20 +30,20 @@ export default function Vote({ params }: { params: { id: string } }) {
       ) : (
         <div>
           <div>
-            <div>startTimestamp {normalizedProposal.startTimestamp}</div>
-            <div>endTimestamp {normalizedProposal.endTimestamp}</div>
-            <div>numVotesYes {normalizedProposal.numVotesYes}</div>
-            <div>numVotesNo {normalizedProposal.numVotesNo}</div>
-            <div>numVotesAbstain {normalizedProposal.numVotesAbstain}</div>
-            <div>erc20 {normalizedProposal.erc20}</div>
-            <div>creator {normalizedProposal.creator}</div>
-            <div>title {normalizedProposal.title}</div>
-            <div>description {normalizedProposal.description}</div>
-            <div>id {normalizedProposal.id}</div>
+            <div>startTimestamp {formattedProposal.startTimestamp}</div>
+            <div>endTimestamp {formattedProposal.endTimestamp}</div>
+            <div>numVotesYes {formattedProposal.numVotesYes}</div>
+            <div>numVotesNo {formattedProposal.numVotesNo}</div>
+            <div>numVotesAbstain {formattedProposal.numVotesAbstain}</div>
+            <div>erc20 {formattedProposal.erc20}</div>
+            <div>creator {formattedProposal.creator}</div>
+            <div>title {formattedProposal.title}</div>
+            <div>description {formattedProposal.description}</div>
+            <div>id {formattedProposal.id}</div>
           </div>
-          <button>Yes</button>
-          <button>No</button>
-          <button>Abstain</button>
+          <button className="block">Yes</button>
+          <button className="block">No</button>
+          <button className="block">Abstain</button>
         </div>
       )}
     </div>
