@@ -1,46 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { arbitrumChain, Chain } from "@/utils/chains";
+import { arbitrumChain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import { formatProposals } from "@/utils/helpers";
+import { ProposalResponse } from "@/types";
 
 const equitoVoteAbi = equitoVote.abi;
 
 const destinationChain = arbitrumChain;
-
-interface ProposalResponse {
-  startTimestamp: bigint;
-  endTimestamp: bigint;
-  numVotesYes: bigint;
-  numVotesNo: bigint;
-  numVotesAbstain: bigint;
-  erc20: string;
-  creator: string;
-  title: string;
-  description: string;
-  id: string;
-}
-
-// @ts-ignore
-function normalizeResponse(data) {
-  if (!Array.isArray(data)) {
-    return [];
-  }
-  return data.map((item) =>
-    Object.entries(item).reduce((acc, [key, value]) => {
-      if (typeof value == "bigint") {
-        // @ts-ignore
-        acc[key] = Number(value);
-      } else {
-        // @ts-ignore
-        acc[key] = value;
-      }
-      return acc;
-    }, {}),
-  );
-}
 
 export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
@@ -64,7 +35,7 @@ export default function HomePage() {
   });
 
   const normalizedProposals = useMemo(
-    () => normalizeResponse(proposals),
+    () => formatProposals(proposals as ProposalResponse[]),
     [proposals],
   );
 
@@ -74,7 +45,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <hr />
       <ConnectButton
         chainStatus="none"
         showBalance={false}
@@ -84,16 +54,29 @@ export default function HomePage() {
         }}
       />
       {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
-      <hr />
 
-      <div>list of proposals section</div>
       {isLoadingProposals ? (
         <div>loading</div>
       ) : (
-        <div>{JSON.stringify(normalizedProposals, null, 4) || "Empty"}</div>
+        normalizedProposals.map((item) => (
+          <div key={item.id}>
+            <hr />
+            <div>
+              <div>startTimestamp {item.startTimestamp}</div>
+              <div>endTimestamp {item.endTimestamp}</div>
+              <div>numVotesYes {item.numVotesYes}</div>
+              <div>numVotesNo {item.numVotesNo}</div>
+              <div>numVotesAbstain {item.numVotesAbstain}</div>
+              <div>erc20 {item.erc20}</div>
+              <div>creator {item.creator}</div>
+              <div>title {item.title}</div>
+              <div>description {item.description}</div>
+              <div>id {item.id}</div>
+              <Link href={`/vote/${item.id}`}>Vote</Link>
+            </div>
+          </div>
+        ))
       )}
-
-      <hr />
     </div>
   );
 }
