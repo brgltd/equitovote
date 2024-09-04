@@ -23,12 +23,14 @@ export const useApprove = () => {
       const equitoClient = await getEquitoClient();
 
       try {
+        console.log("before getConfirmationTime");
         const { proof, timestamp } = await equitoClient.getConfirmationTime({
           chainSelector,
           messageHash,
           fromTimestamp,
           listenTimeout: 100,
         });
+        console.log("after getConfirmationTimeout");
 
         const txLink = `${baseExplorerUrl}?hash=${messageHash}`;
         console.log("txLink");
@@ -41,7 +43,7 @@ export const useApprove = () => {
           "Error getting confirmation time for ",
           messageHash,
           "\n",
-          error
+          error,
         );
 
         let proof: Hex | undefined;

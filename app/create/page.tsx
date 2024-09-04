@@ -287,8 +287,6 @@ export default function HomePage() {
         />
       </div>
 
-      {statusRenderer[status]}
-
       {/* Equito messaging fee */}
       <div>source chain fee: {formattedSourceChainFee}</div>
       <div>destination chain fee: {formattedDestinationChainFee}</div>
@@ -298,6 +296,8 @@ export default function HomePage() {
         EquitoVote fee: {formattedCreateProposalFee} (fee is only charged on
         proposal creation)
       </div>
+
+      {statusRenderer[status]}
     </div>
   );
 }

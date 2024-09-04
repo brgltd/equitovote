@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { buildProposalFromArray } from "@/utils/helpers";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
-import { Address, formatUnits, parseEventLogs } from "viem";
+import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
 import { config } from "@/utils/wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import erc20Abi from "@/abis/erc20.json";
@@ -28,7 +28,9 @@ export default function Vote({ params }: { params: { id: string } }) {
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
 
-  const [inputValue, setInputValue] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const amountRef = useRef<HTMLInputElement>(null);
 
   const {
     sourceChain,
@@ -54,6 +56,10 @@ export default function Vote({ params }: { params: { id: string } }) {
     },
   });
 
+  useEffect(() => {
+    amountRef.current?.focus();
+  }, []);
+
   const { data: proposalData, isLoading: isLoadingProposal } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
@@ -69,7 +75,7 @@ export default function Vote({ params }: { params: { id: string } }) {
     [proposal],
   );
 
-  const { data: tokenNameData, error } = useReadContract({
+  const { data: tokenNameData } = useReadContract({
     address: formattedProposal.erc20 as Address,
     abi: erc20Abi,
     functionName: "name",
@@ -77,9 +83,6 @@ export default function Vote({ params }: { params: { id: string } }) {
     query: { enabled: !!proposal },
   });
   const tokenName = tokenNameData as string;
-
-  console.log(tokenNameData);
-  console.log(error);
 
   const { data: userBalanceData } = useReadContract({
     address: formattedProposal.erc20 as Address,
@@ -141,7 +144,7 @@ export default function Vote({ params }: { params: { id: string } }) {
       args: [
         destinationChain.chainSelector,
         proposalId,
-        BigInt(0.01e18),
+        parseUnits(amount, decimals),
         voteOption,
         formattedProposal.erc20,
       ],
@@ -155,7 +158,8 @@ export default function Vote({ params }: { params: { id: string } }) {
   };
 
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
-    await switchChainAsync({ chainId: sourceChain.definition.id });
+    setStatus(Status.IsExecutingBaseTxOnSourceChain);
+    await switchChainAsync({ chainId: sourceChain?.definition.id });
     // await approveERC20();
     const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
@@ -258,22 +262,31 @@ export default function Vote({ params }: { params: { id: string } }) {
           </div>
           <div>token name: {tokenName}</div>
           <div>token balance: {formattedUserBalance}</div>
-          {/* <input type="number" value={inputValue} /> */}
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            ref={amountRef}
+            className="text-black"
+          />
           <button
             onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
             className="block"
+            disabled={!amount}
           >
             Yes
           </button>
           <button
             onClick={() => onClickVoteOnProposal(VoteOption.No)}
             className="block"
+            disabled={!amount}
           >
             No
           </button>
           <button
             onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
             className="block"
+            disabled={!amount}
           >
             Abstain
           </button>
