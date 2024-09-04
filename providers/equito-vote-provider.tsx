@@ -7,15 +7,21 @@ import {
   PropsWithChildren,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
+import { Address } from "viem";
+import { useAccount } from "wagmi";
 
 type EquitoVoteContext =
   | {
       sourceChain: Chain;
       setSourceChain: Dispatch<SetStateAction<Chain>>;
-      sourceRouter: UseQueryResult<`0x${string}`, Error>;
-      destinationRouter: UseQueryResult<`0x${string}`, Error>;
+      sourceRouter: UseQueryResult<Address, Error>;
+      destinationChain: Chain;
+      destinationRouter: UseQueryResult<Address, Error>;
+      isClient: boolean;
+      userAddress: Address | undefined;
     }
   | undefined;
 
@@ -23,6 +29,13 @@ const equitoVoteContext = createContext<EquitoVoteContext>(undefined);
 
 export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
   const [sourceChain, setSourceChain] = useState<Chain>(null!);
+  const [isClient, setIsClient] = useState(false);
+
+  const { address: userAddress } = useAccount();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const sourceRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
   const destinationRouter = useRouter({
@@ -35,7 +48,10 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
         sourceChain,
         setSourceChain,
         sourceRouter,
+        destinationChain,
         destinationRouter,
+        isClient,
+        userAddress,
       }}
     >
       {children}

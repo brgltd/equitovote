@@ -1,18 +1,11 @@
 "use client";
 
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 
 export function Navbar() {
-  const [isClient, setIsClient] = useState(false);
-
-  const { address: userAddress } = useAccount();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const { isClient, userAddress } = useEquitoVote();
 
   return (
     <nav>

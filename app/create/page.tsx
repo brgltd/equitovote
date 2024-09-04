@@ -9,11 +9,9 @@ import {
   useWriteContract,
 } from "wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { useRouter } from "@/hooks/use-router";
 import { destinationChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
 import { ChainSelect } from "@/components/chain-select";
@@ -88,7 +86,7 @@ export default function HomePage() {
     },
   });
 
-  const { data: fromFee } = useReadContract({
+  const { data: sourceFee } = useReadContract({
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
@@ -97,7 +95,7 @@ export default function HomePage() {
     chainId: sourceChain?.definition.id,
   });
 
-  const { data: toFee } = useReadContract({
+  const { data: destinationFee } = useReadContract({
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
@@ -114,14 +112,14 @@ export default function HomePage() {
     chainId: sourceChain?.definition.id,
   });
 
-  const formattedSourceChainFee = fromFee
-    ? `${Number(formatUnits(fromFee, 18)).toFixed(8)} ${
+  const formattedSourceChainFee = sourceFee
+    ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const formattedDestinationChainFee = toFee
-    ? `${Number(formatUnits(toFee, 18)).toFixed(8)} ${
+  const formattedDestinationChainFee = destinationFee
+    ? `${Number(formatUnits(destinationFee, 18)).toFixed(8)} ${
         destinationChain.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
@@ -133,8 +131,8 @@ export default function HomePage() {
     : "unavailable";
 
   const totalCreateProposalFee =
-    fromFee && createProposalFee
-      ? fromFee + (createProposalFee as bigint)
+    sourceFee && createProposalFee
+      ? sourceFee + (createProposalFee as bigint)
       : BigInt(0);
 
   useEffect(() => {
@@ -209,7 +207,7 @@ export default function HomePage() {
         sendMessageProof,
         sendMessageResult.message,
         sendMessageResult.messageData,
-        toFee,
+        destinationFee,
       );
 
       console.log("executionReceipt");
@@ -243,7 +241,7 @@ export default function HomePage() {
       <div>is retriving block from source chain</div>
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
-      <div>generating proof source chai</div>
+      <div>generating proof source chain</div>
     ),
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div>executing message on destination chain</div>
@@ -253,19 +251,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <ConnectButton
-        chainStatus="none"
-        showBalance={false}
-        accountStatus={{
-          smallScreen: "avatar",
-          largeScreen: "full",
-        }}
-      />
-      {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
-
-      <hr />
-      <div>create proposal section</div>
-
       <ChainSelect setSourceChain={setSourceChain} />
 
       <div>
