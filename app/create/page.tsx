@@ -8,7 +8,6 @@ import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { config } from "@/utils/wagmi";
-import { ChainSelect } from "@/components/chain-select";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { Status } from "@/types";
@@ -66,13 +65,8 @@ export default function HomePage() {
 
   const { switchChainAsync } = useSwitchChain();
 
-  const {
-    sourceChain,
-    setSourceChain,
-    sourceRouter,
-    destinationRouter,
-    destinationChain,
-  } = useEquitoVote();
+  const { sourceChain, sourceRouter, destinationRouter, destinationChain } =
+    useEquitoVote();
 
   const fromRouterAddress = sourceRouter?.data;
   const toRouterAddress = destinationRouter?.data;
@@ -247,8 +241,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <ChainSelect setSourceChain={setSourceChain} />
-
       <div>
         <label htmlFor="title">title</label>
         <input

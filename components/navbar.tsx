@@ -3,9 +3,10 @@
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import { ChainSelect } from "./chain-select";
 
 export function Navbar() {
-  const { isClient, userAddress } = useEquitoVote();
+  const { isClient, userAddress, setSourceChain } = useEquitoVote();
 
   return (
     <nav>
@@ -29,6 +30,7 @@ export function Navbar() {
             ? `address: ${userAddress}`
             : "not connected"}
         </li>
+        <ChainSelect setSourceChain={setSourceChain} />
       </ul>
     </nav>
   );

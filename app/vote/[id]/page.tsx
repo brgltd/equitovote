@@ -28,6 +28,8 @@ export default function Vote({ params }: { params: { id: string } }) {
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
 
+  const [inputValue, setInputValue] = useState("");
+
   const {
     sourceChain,
     sourceRouter,
@@ -67,7 +69,7 @@ export default function Vote({ params }: { params: { id: string } }) {
     [proposal],
   );
 
-  const { data: tokenNameData } = useReadContract({
+  const { data: tokenNameData, error } = useReadContract({
     address: formattedProposal.erc20 as Address,
     abi: erc20Abi,
     functionName: "name",
@@ -75,6 +77,9 @@ export default function Vote({ params }: { params: { id: string } }) {
     query: { enabled: !!proposal },
   });
   const tokenName = tokenNameData as string;
+
+  console.log(tokenNameData);
+  console.log(error);
 
   const { data: userBalanceData } = useReadContract({
     address: formattedProposal.erc20 as Address,
@@ -150,8 +155,8 @@ export default function Vote({ params }: { params: { id: string } }) {
   };
 
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
-    // await switchChainAsync({ chainId: sourceChain.definition.id });
-    await approveERC20();
+    await switchChainAsync({ chainId: sourceChain.definition.id });
+    // await approveERC20();
     const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
     const logs = parseEventLogs({
@@ -253,6 +258,7 @@ export default function Vote({ params }: { params: { id: string } }) {
           </div>
           <div>token name: {tokenName}</div>
           <div>token balance: {formattedUserBalance}</div>
+          {/* <input type="number" value={inputValue} /> */}
           <button
             onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
             className="block"
