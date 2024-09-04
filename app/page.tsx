@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useReadContract } from "wagmi";
-import { destinationChain } from "@/utils/chains";
 import { formatProposals } from "@/utils/helpers";
 import { ProposalResponse } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 
 const equitoVoteAbi = equitoVote.abi;
 
 export default function HomePage() {
+  const { destinationChain } = useEquitoVote();
+
   const { data: proposalsLength } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,

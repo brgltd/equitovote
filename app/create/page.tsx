@@ -2,24 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import { addHours } from "date-fns";
-import {
-  useAccount,
-  useReadContract,
-  useSwitchChain,
-  useWriteContract,
-} from "wagmi";
+import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { destinationChain, Chain } from "@/utils/chains";
 import { config } from "@/utils/wagmi";
 import { ChainSelect } from "@/components/chain-select";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { Status } from "@/types";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import { Chain } from "@/utils/chains";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -45,7 +40,10 @@ const defaultFormData: FormData = {
   token: "",
 };
 
-function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
+function buildCreateProposalArgs(
+  formData: FormData,
+  destinationChain: Chain,
+): CreateProposalArgs {
   const endTimestamp = Math.floor(
     addHours(new Date(), Number(formData.durationHours)).getTime() / 1000,
   );
@@ -59,7 +57,6 @@ function buildCreateProposalArgs(formData: FormData): CreateProposalArgs {
 }
 
 export default function HomePage() {
-  const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
 
@@ -69,10 +66,13 @@ export default function HomePage() {
 
   const { switchChainAsync } = useSwitchChain();
 
-  const { address: userAddress } = useAccount();
-
-  const { sourceChain, setSourceChain, sourceRouter, destinationRouter } =
-    useEquitoVote();
+  const {
+    sourceChain,
+    setSourceChain,
+    sourceRouter,
+    destinationRouter,
+    destinationChain,
+  } = useEquitoVote();
 
   const fromRouterAddress = sourceRouter?.data;
   const toRouterAddress = destinationRouter?.data;
@@ -139,16 +139,12 @@ export default function HomePage() {
     proposalTitleRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   const createProposal = async () => {
     const hash = await writeContractAsync({
       address: sourceChain.equitoVoteContract as Address,
       abi: equitoVoteAbi,
       functionName: "createProposal",
-      args: Object.values(buildCreateProposalArgs(formData)),
+      args: Object.values(buildCreateProposalArgs(formData, destinationChain)),
       value: totalCreateProposalFee,
       chainId: sourceChain?.definition.id,
     });

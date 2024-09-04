@@ -1,17 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { destinationChain } from "@/utils/chains";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { buildProposalFromArray } from "@/utils/helpers";
-import {
-  FormattedProposal,
-  ProposalDataItem,
-  ProposalResponse,
-  Status,
-} from "@/types";
+import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
-import { Addresses, AddressesPerChain } from "@/addresses";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { config } from "@/utils/wagmi";
@@ -157,7 +150,7 @@ export default function Vote({ params }: { params: { id: string } }) {
   };
 
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
-    await switchChainAsync({ chainId: sourceChain.definition.id });
+    // await switchChainAsync({ chainId: sourceChain.definition.id });
     await approveERC20();
     const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
@@ -224,9 +217,9 @@ export default function Vote({ params }: { params: { id: string } }) {
   };
 
   const statusRenderer = {
-    [Status.IsStart]: <div />,
+    [Status.IsStart]: <div>waiting for action</div>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
-      <div>creating proposal on source chain</div>
+      <div>submitting vote on source chain</div>
     ),
     [Status.IsRetrievingBlockOnSourceChain]: (
       <div>is retriving block from source chain</div>
@@ -237,7 +230,7 @@ export default function Vote({ params }: { params: { id: string } }) {
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div>executing message on destination chain</div>
     ),
-    [Status.IsRetry]: <div />,
+    [Status.IsRetry]: <div>waiting for action</div>,
   };
 
   return (
