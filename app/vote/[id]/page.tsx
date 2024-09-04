@@ -43,20 +43,22 @@ export default function Vote({ params }: { params: { id: string } }) {
     [proposal],
   );
 
-  const {
-    data: tokenNameData,
-    isLoading: isLoadingTokenName,
-    error,
-  } = useReadContract({
+  const { data: tokenNameData } = useReadContract({
     address: formattedProposal.erc20 as Address,
     abi: erc20Abi,
     functionName: "name",
     chainId: sourceChain?.definition.id,
-    query: { enabled: !!sourceChain },
+    query: { enabled: !!proposal },
   });
-  console.log(tokenNameData);
-  console.log(error);
   const tokenName = tokenNameData as string;
+
+  // const { data: userBalanceData } = useReadContract({
+  //   address: formattedProposal.erc20 as Address,
+  //   abi: erc20Abi,
+  //   functionName: "name",
+  //   chainId: sourceChain?.definition.id,
+  //   query: { enabled: !!proposal },
+  // });
 
   const approveERC20 = async () => {
     const hash = await writeContractAsync({

@@ -1,21 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useAccount, useReadContract } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useMemo } from "react";
+import { useReadContract } from "wagmi";
 import { destinationChain } from "@/utils/chains";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { formatProposals } from "@/utils/helpers";
 import { ProposalResponse } from "@/types";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
 
 export default function HomePage() {
-  const [isClient, setIsClient] = useState(false);
-
-  const { address: userAddress } = useAccount();
-
   const { data: proposalsLength } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
@@ -37,22 +32,8 @@ export default function HomePage() {
     [proposals],
   );
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   return (
     <div>
-      <ConnectButton
-        chainStatus="none"
-        showBalance={false}
-        accountStatus={{
-          smallScreen: "avatar",
-          largeScreen: "full",
-        }}
-      />
-      {isClient && userAddress ? `address: ${userAddress}` : "not connected"}
-
       {isLoadingProposals ? (
         <div>loading</div>
       ) : (
