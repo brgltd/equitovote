@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
-import { buildProposalFromArray } from "@/utils/helpers";
+import { buildProposalFromArray, placeholderProposal } from "@/utils/helpers";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
@@ -23,12 +23,38 @@ enum VoteOption {
   Abstain = 2,
 }
 
-export default function Vote({ params }: { params: { id: string } }) {
+interface Params {
+  id: string;
+}
+
+interface VoteProps {
+  params: Params;
+}
+
+function buildUpdatedProposal(
+  formattedProposal: FormattedProposal,
+  voteOption: VoteOption,
+  amount: string,
+) {
+  const updatedProposal = { ...formattedProposal };
+  const amountNumber = Number(amount);
+  if (voteOption === VoteOption.Yes) {
+    updatedProposal.numVotesYes += amountNumber;
+  } else if (voteOption === VoteOption.No) {
+    updatedProposal.numVotesNo += amountNumber;
+  } else if (voteOption === VoteOption.Abstain) {
+    updatedProposal.numVotesAbstain += amountNumber;
+  }
+  return updatedProposal;
+}
+
+export default function Vote({ params }: VoteProps) {
   const { id: proposalId } = params;
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
-
   const [amount, setAmount] = useState("");
+  const [activeProposal, setActiveProposal] =
+    useState<FormattedProposal>(placeholderProposal);
 
   const amountRef = useRef<HTMLInputElement>(null);
 
@@ -55,10 +81,6 @@ export default function Vote({ params }: { params: { id: string } }) {
       router: destinationRouter,
     },
   });
-
-  useEffect(() => {
-    amountRef.current?.focus();
-  }, []);
 
   const { data: proposalData, isLoading: isLoadingProposal } = useReadContract({
     address: destinationChain.equitoVoteContract,
@@ -126,6 +148,14 @@ export default function Vote({ params }: { params: { id: string } }) {
       ? formatUnits(userBalance, decimals)
       : "unavailable";
 
+  useEffect(() => {
+    amountRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    setActiveProposal(formattedProposal);
+  }, [formattedProposal]);
+
   const approveERC20 = async () => {
     const hash = await writeContractAsync({
       address: formattedProposal.erc20 as Address,
@@ -158,71 +188,83 @@ export default function Vote({ params }: { params: { id: string } }) {
   };
 
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
-    setStatus(Status.IsExecutingBaseTxOnSourceChain);
-    await switchChainAsync({ chainId: sourceChain?.definition.id });
-    // await approveERC20();
-    const voteOnProposalReceipt = await voteOnProposal(voteOption);
+    try {
+      setStatus(Status.IsExecutingBaseTxOnSourceChain);
+      await switchChainAsync({ chainId: sourceChain?.definition.id });
+      // await approveERC20();
+      const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
-    const logs = parseEventLogs({
-      abi: routerAbi,
-      logs: voteOnProposalReceipt.logs,
-    });
-
-    console.log("logs");
-    console.log(logs);
-
-    const sendMessageResult = parseEventLogs({
-      abi: routerAbi,
-      logs: voteOnProposalReceipt.logs,
-    }).flatMap(({ eventName, args }) =>
-      eventName === "MessageSendRequested" ? [args] : [],
-    )[0];
-
-    console.log("sendMessageResult");
-    console.log(sendMessageResult);
-
-    setStatus(Status.IsRetrievingBlockOnSourceChain);
-    const { timestamp: sendMessageTimestamp } = await getBlock(config, {
-      chainId: sourceChain?.definition.id,
-      blockNumber: voteOnProposalReceipt.blockNumber,
-    });
-
-    setStatus(Status.IsGeneratingProofOnSourceChain);
-    const { proof: sendMessageProof, timestamp: resultTimestamp } =
-      await approve.execute({
-        messageHash: generateHash(sendMessageResult.message),
-        fromTimestamp: Number(sendMessageTimestamp) * 1000,
-        chainSelector: sourceChain.chainSelector,
+      const logs = parseEventLogs({
+        abi: routerAbi,
+        logs: voteOnProposalReceipt.logs,
       });
 
-    console.log("sendMessageProof");
-    console.log(sendMessageProof);
+      console.log("logs");
+      console.log(logs);
 
-    console.log("resultTimestamp");
-    console.log(resultTimestamp);
+      const sendMessageResult = parseEventLogs({
+        abi: routerAbi,
+        logs: voteOnProposalReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : [],
+      )[0];
 
-    setStatus(Status.IsExecutingMessageOnDestinationChain);
-    const executionReceipt = await deliverMessage.execute(
-      sendMessageProof,
-      sendMessageResult.message,
-      sendMessageResult.messageData,
-      destinationFee,
-    );
+      console.log("sendMessageResult");
+      console.log(sendMessageResult);
 
-    console.log("executionReceipt");
-    console.log(executionReceipt);
+      setStatus(Status.IsRetrievingBlockOnSourceChain);
+      const { timestamp: sendMessageTimestamp } = await getBlock(config, {
+        chainId: sourceChain?.definition.id,
+        blockNumber: voteOnProposalReceipt.blockNumber,
+      });
 
-    const executionMessage = parseEventLogs({
-      abi: routerAbi,
-      logs: executionReceipt.logs,
-    }).flatMap(({ eventName, args }) =>
-      eventName === "MessageSendRequested" ? [args] : [],
-    )[0];
+      setStatus(Status.IsGeneratingProofOnSourceChain);
+      const { proof: sendMessageProof, timestamp: resultTimestamp } =
+        await approve.execute({
+          messageHash: generateHash(sendMessageResult.message),
+          fromTimestamp: Number(sendMessageTimestamp) * 1000,
+          chainSelector: sourceChain.chainSelector,
+        });
 
-    console.log("executionMessage");
-    console.log(executionMessage);
+      console.log("sendMessageProof");
+      console.log(sendMessageProof);
 
-    setStatus(Status.IsStart);
+      console.log("resultTimestamp");
+      console.log(resultTimestamp);
+
+      setStatus(Status.IsExecutingMessageOnDestinationChain);
+      const executionReceipt = await deliverMessage.execute(
+        sendMessageProof,
+        sendMessageResult.message,
+        sendMessageResult.messageData,
+        destinationFee,
+      );
+
+      console.log("executionReceipt");
+      console.log(executionReceipt);
+
+      const executionMessage = parseEventLogs({
+        abi: routerAbi,
+        logs: executionReceipt.logs,
+      }).flatMap(({ eventName, args }) =>
+        eventName === "MessageSendRequested" ? [args] : [],
+      )[0];
+
+      console.log("executionMessage");
+      console.log(executionMessage);
+
+      const updatedActiveProposal = buildUpdatedProposal(
+        formattedProposal,
+        voteOption,
+        amount,
+      );
+      setActiveProposal(updatedActiveProposal);
+
+      setStatus(Status.IsStart);
+    } catch (error) {
+      setStatus(Status.IsRetry);
+      console.error(error);
+    }
   };
 
   const statusRenderer = {
