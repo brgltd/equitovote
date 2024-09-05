@@ -254,7 +254,7 @@ export default function Vote({ params }: VoteProps) {
       console.log(executionMessage);
 
       const updatedActiveProposal = buildUpdatedProposal(
-        formattedProposal,
+        activeProposal,
         voteOption,
         amount,
       );
@@ -291,16 +291,16 @@ export default function Vote({ params }: VoteProps) {
       ) : (
         <div>
           <div>
-            <div>startTimestamp {formattedProposal.startTimestamp}</div>
-            <div>endTimestamp {formattedProposal.endTimestamp}</div>
-            <div>numVotesYes {formattedProposal.numVotesYes}</div>
-            <div>numVotesNo {formattedProposal.numVotesNo}</div>
-            <div>numVotesAbstain {formattedProposal.numVotesAbstain}</div>
-            <div>erc20 {formattedProposal.erc20}</div>
-            <div>creator {formattedProposal.creator}</div>
-            <div>title {formattedProposal.title}</div>
-            <div>description {formattedProposal.description}</div>
-            <div>id {formattedProposal.id}</div>
+            <div>startTimestamp {activeProposal.startTimestamp}</div>
+            <div>endTimestamp {activeProposal.endTimestamp}</div>
+            <div>numVotesYes {activeProposal.numVotesYes}</div>
+            <div>numVotesNo {activeProposal.numVotesNo}</div>
+            <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
+            <div>erc20 {activeProposal.erc20}</div>
+            <div>creator {activeProposal.creator}</div>
+            <div>title {activeProposal.title}</div>
+            <div>description {activeProposal.description}</div>
+            <div>id {activeProposal.id}</div>
           </div>
           <div>token name: {tokenName}</div>
           <div>token balance: {formattedUserBalance}</div>
