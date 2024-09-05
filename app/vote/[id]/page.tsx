@@ -49,6 +49,12 @@ function buildUpdatedProposal(
   return updatedProposal;
 }
 
+function formatTimestamp(timestampSeconds: number) {
+  return !timestampSeconds
+    ? ""
+    : format(timestampSeconds * 1000, "dd MMM yyyy hh:mm aaaa");
+}
+
 export default function Vote({ params }: VoteProps) {
   const { id: proposalId } = params;
 
@@ -130,7 +136,7 @@ export default function Vote({ params }: VoteProps) {
     address: formattedProposal.erc20 as Address,
     abi: erc20Abi,
     functionName: "allowance",
-    args: [userAddress, sourceChain.equitoVoteContract],
+    args: [userAddress, sourceChain?.equitoVoteContract],
     chainId: sourceChain?.definition.id,
     query: { enabled: !!proposal && !!userAddress && !!sourceChain },
   });
@@ -153,6 +159,16 @@ export default function Vote({ params }: VoteProps) {
     query: { enabled: !!toRouterAddress },
     chainId: destinationChain.definition.id,
   });
+
+  const { data: amountLockedTokensData } = useReadContract({
+    address: sourceChain?.equitoVoteContract as Address,
+    abi: equitoVoteAbi,
+    functionName: "balances",
+    args: [userAddress, proposalId],
+    query: { enabled: !!userAddress && !!sourceChain },
+    chainId: sourceChain?.definition.id,
+  });
+  const amountLockedTokens = amountLockedTokensData as bigint;
 
   const formattedUserBalance =
     !!userBalance && !!decimalsData
@@ -283,6 +299,20 @@ export default function Vote({ params }: VoteProps) {
     }
   };
 
+  const onClickUnlock = async () => {
+    const hash = await writeContractAsync({
+      address: sourceChain?.equitoVoteContract as Address,
+      abi: equitoVoteAbi,
+      functionName: "unlockTokens",
+      args: [proposalId],
+      chainId: sourceChain?.definition.id,
+    });
+    const receipt = await waitForTransactionReceipt(config, {
+      hash,
+      chainId: sourceChain?.definition.id,
+    });
+  };
+
   const statusRenderer = {
     [Status.IsStart]: <div>waiting for action</div>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
@@ -308,18 +338,10 @@ export default function Vote({ params }: VoteProps) {
         <div>
           <div>
             <div>
-              Created at:{" "}
-              {format(
-                activeProposal.startTimestamp * 1000,
-                "dd MMM yyyy hh:mm aaaa",
-              )}
+              Created at: {formatTimestamp(activeProposal.startTimestamp)}
             </div>
             <div>
-              Finishes at:{" "}
-              {format(
-                activeProposal.endTimestamp * 1000,
-                "dd MMM yyyy hh:mm aaaa",
-              )}
+              Finishes at: {formatTimestamp(activeProposal.endTimestamp)}
             </div>
             <div>
               {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
@@ -363,6 +385,19 @@ export default function Vote({ params }: VoteProps) {
             Abstain
           </button>
           <div>{statusRenderer[status]}</div>
+          <div>
+            {amountLockedTokens ? (
+              <div>
+                Amount locked tokens:{" "}
+                {formatUnits(amountLockedTokens, decimals)}
+                <div>
+                  <button onClick={onClickUnlock}>unlock</button>
+                </div>
+              </div>
+            ) : (
+              <div>no locked tokens</div>
+            )}
+          </div>
         </div>
       )}
     </div>
