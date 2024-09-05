@@ -14,6 +14,7 @@ import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
+import { format } from "date-fns";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -291,16 +292,30 @@ export default function Vote({ params }: VoteProps) {
       ) : (
         <div>
           <div>
-            <div>startTimestamp {activeProposal.startTimestamp}</div>
-            <div>endTimestamp {activeProposal.endTimestamp}</div>
+            <div>
+              Created at:{" "}
+              {format(
+                activeProposal.startTimestamp * 1000,
+                "dd MMM yyyy hh:mm aaaa",
+              )}
+            </div>
+            <div>
+              Finishes at:{" "}
+              {format(
+                activeProposal.endTimestamp * 1000,
+                "dd MMM yyyy hh:mm aaaa",
+              )}
+            </div>
+            <div>
+              {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
+                ? "Completed"
+                : "Active"}
+            </div>
             <div>numVotesYes {activeProposal.numVotesYes}</div>
             <div>numVotesNo {activeProposal.numVotesNo}</div>
             <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
-            <div>erc20 {activeProposal.erc20}</div>
-            <div>creator {activeProposal.creator}</div>
             <div>title {activeProposal.title}</div>
             <div>description {activeProposal.description}</div>
-            <div>id {activeProposal.id}</div>
           </div>
           <div>token name: {tokenName}</div>
           <div>token balance: {formattedUserBalance}</div>
