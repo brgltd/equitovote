@@ -126,6 +126,16 @@ export default function Vote({ params }: VoteProps) {
   });
   const decimals = decimalsData as number;
 
+  const { data: allowanceData } = useReadContract({
+    address: formattedProposal.erc20 as Address,
+    abi: erc20Abi,
+    functionName: "allowance",
+    args: [userAddress, sourceChain.equitoVoteContract],
+    chainId: sourceChain?.definition.id,
+    query: { enabled: !!proposal && !!userAddress && !!sourceChain },
+  });
+  const allowance = allowanceData as bigint;
+
   const { data: sourceFee } = useReadContract({
     address: fromRouterAddress,
     abi: routerAbi,
@@ -162,7 +172,7 @@ export default function Vote({ params }: VoteProps) {
       address: formattedProposal.erc20 as Address,
       abi: erc20Abi,
       functionName: "approve",
-      args: [sourceChain?.equitoVoteContract, "25000000000000000000"],
+      args: [sourceChain?.equitoVoteContract, parseUnits(amount, decimals)],
     });
     await waitForTransactionReceipt(config, { hash });
   };
@@ -191,8 +201,13 @@ export default function Vote({ params }: VoteProps) {
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
     try {
       setStatus(Status.IsExecutingBaseTxOnSourceChain);
+
       await switchChainAsync({ chainId: sourceChain?.definition.id });
-      // await approveERC20();
+
+      if (Number(formatUnits(allowance, decimals)) < Number(amount)) {
+        await approveERC20();
+      }
+
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
       const logs = parseEventLogs({
