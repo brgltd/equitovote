@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { buildProposalFromArray, placeholderProposal } from "@/utils/helpers";
-import { FormattedProposal, ProposalDataItem, Status } from "@/types";
+import {
+  FormattedProposal,
+  ProposalDataItem,
+  Status,
+  UnlockStatus,
+} from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
@@ -328,6 +333,24 @@ export default function Vote({ params }: VoteProps) {
       <div>executing message on destination chain</div>
     ),
     [Status.IsRetry]: <div>waiting for action</div>,
+  };
+
+  const unlockStatusRenderer = {
+    [UnlockStatus.IsStart]: (
+      <div>
+        <button onClick={onClickUnlock}>Unlock</button>
+      </div>
+    ),
+    [UnlockStatus.IsUnlocking]: (
+      <div>
+        <div>unlock in progress</div>
+      </div>
+    ),
+    [UnlockStatus.IsRetry]: (
+      <div>
+        <button onClick={onClickUnlock}>Retry</button>
+      </div>
+    ),
   };
 
   return (

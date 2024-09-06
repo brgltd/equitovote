@@ -27,3 +27,9 @@ export enum Status {
   IsExecutingMessageOnDestinationChain = "IS_EXECUTING_MESSAGE_ON_DESTINATION_CHAIN",
   IsRetry = "IS_RETRY",
 }
+
+export enum UnlockStatus {
+  IsStart = "IS_START",
+  IsUnlocking = "IS_UNLOCKING",
+  IsRetry = "IS_RETRY",
+}
