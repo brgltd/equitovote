@@ -3,12 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { buildProposalFromArray, placeholderProposal } from "@/utils/helpers";
-import {
-  FormattedProposal,
-  ProposalDataItem,
-  Status,
-  UnlockStatus,
-} from "@/types";
+import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
@@ -67,6 +62,7 @@ export default function Vote({ params }: VoteProps) {
   const [amount, setAmount] = useState("");
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
+  const [isUnlocking, setIsUnlocking] = useState(false);
 
   const amountRef = useRef<HTMLInputElement>(null);
 
@@ -305,17 +301,23 @@ export default function Vote({ params }: VoteProps) {
   };
 
   const onClickUnlock = async () => {
-    const hash = await writeContractAsync({
-      address: sourceChain?.equitoVoteContract as Address,
-      abi: equitoVoteAbi,
-      functionName: "unlockTokens",
-      args: [proposalId],
-      chainId: sourceChain?.definition.id,
-    });
-    const receipt = await waitForTransactionReceipt(config, {
-      hash,
-      chainId: sourceChain?.definition.id,
-    });
+    setIsUnlocking(true);
+    try {
+      const hash = await writeContractAsync({
+        address: sourceChain?.equitoVoteContract as Address,
+        abi: equitoVoteAbi,
+        functionName: "unlockTokens",
+        args: [proposalId],
+        chainId: sourceChain?.definition.id,
+      });
+      const receipt = await waitForTransactionReceipt(config, {
+        hash,
+        chainId: sourceChain?.definition.id,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    setIsUnlocking(false);
   };
 
   const statusRenderer = {
@@ -324,7 +326,7 @@ export default function Vote({ params }: VoteProps) {
       <div>submitting vote on source chain</div>
     ),
     [Status.IsRetrievingBlockOnSourceChain]: (
-      <div>is retriving block from source chain</div>
+      <div>is retrieving block from source chain</div>
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
       <div>generating proof source chain</div>
@@ -333,24 +335,6 @@ export default function Vote({ params }: VoteProps) {
       <div>executing message on destination chain</div>
     ),
     [Status.IsRetry]: <div>waiting for action</div>,
-  };
-
-  const unlockStatusRenderer = {
-    [UnlockStatus.IsStart]: (
-      <div>
-        <button onClick={onClickUnlock}>Unlock</button>
-      </div>
-    ),
-    [UnlockStatus.IsUnlocking]: (
-      <div>
-        <div>unlock in progress</div>
-      </div>
-    ),
-    [UnlockStatus.IsRetry]: (
-      <div>
-        <button onClick={onClickUnlock}>Retry</button>
-      </div>
-    ),
   };
 
   return (
@@ -414,7 +398,9 @@ export default function Vote({ params }: VoteProps) {
                 Amount locked tokens:{" "}
                 {formatUnits(amountLockedTokens, decimals)}
                 <div>
-                  <button onClick={onClickUnlock}>unlock</button>
+                  <button onClick={onClickUnlock} disabled={isUnlocking}>
+                    unlock
+                  </button>
                 </div>
               </div>
             ) : (
