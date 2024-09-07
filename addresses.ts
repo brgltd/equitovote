@@ -27,3 +27,5 @@ export const AddressesPerChain = {
     EquitoVoteActive: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
   },
 };
+
+// could be getter function in the object to retrieve the active one 

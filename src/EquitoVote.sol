@@ -7,6 +7,20 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+// alice votes on optimism
+// bob votes on base
+// bob unlocks from base
+
+// alice proposal.originChain = optimism, proposal.erc20Name = chainlink
+// bob is about to vote on base, we need to query proposal.erc20Name, then map from erc20Name to erc20Address for chainlink on base
+//   1. query proposal.erc20Name, then map from erc20Name to erc20Address on base, but this will require a static list of names/addresses 
+// bob unlocks from base, but how does unlockTokens in base will know about proposal data on arbitrum? 
+//   1. unlock the tokens, then make a crosschain call to destinationChain and revert is that proposalId is not finished
+//   2. when voting, retrieve proposalData from destinationChain then crosschain to add data into ProposalBalance check, instead of having only balance
+
+// notes
+// on vote page, we should show originChain name
+
 contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- types ----
 
