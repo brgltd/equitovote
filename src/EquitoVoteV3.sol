@@ -27,11 +27,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256 numVotesYes;
         uint256 numVotesNo;
         uint256 numVotesAbstain;
-        address erc20;
-        address creator;
         string title;
         string description;
         bytes32 id;
+        bytes32 tokenNameHash;
+        // Chain where the proposal was created
+        uint256 originChainSelector;
     }
 
     // --- state variables ---
@@ -44,6 +45,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     mapping(address user => mapping(bytes32 proposalId => uint256 amount))
         public balances;
+
+    mapping(bytes32 tokenNameHash => mapping(uint256 chainSelector => address tokenAddress))
+        public tokenData;
 
     // --- extensions ---
 
@@ -80,6 +84,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     error CallFailed(address destination);
 
+    error InvalidToken(
+        bytes32 tokenNameHash,
+        uint256 sourceChainSelector,
+        address tokenAddress
+    );
+
     // --- init function ---
 
     constructor(address _router) EquitoApp(_router) {}
@@ -94,9 +104,10 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     function createProposal(
         uint256 destinationChainSelector,
         uint256 endTimestamp,
-        address erc20,
         string calldata title,
-        string calldata description
+        string calldata description,
+        bytes32 tokenNameHash,
+        uint256 originChainSelector
     ) external payable nonReentrant {
         bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
 
@@ -106,11 +117,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             numVotesYes: 0,
             numVotesNo: 0,
             numVotesAbstain: 0,
-            erc20: erc20,
-            creator: msg.sender,
             title: title,
             description: description,
-            id: id
+            id: id,
+            tokenNameHash: tokenNameHash,
+            originChainSelector: originChainSelector
         });
 
         bytes memory messageData = abi.encode(
@@ -118,6 +129,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             bytes32(0),
             0,
             VoteOption.Abstain,
+            bytes32(0),
+            address(0),
             newProposal
         );
 
@@ -141,10 +154,15 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         bytes32 proposalId,
         uint256 numVotes,
         VoteOption voteOption,
-        address token
+        bytes32 tokenNameHash,
+        address tokenAddress
     ) external payable nonReentrant {
         balances[msg.sender][proposalId] += numVotes;
-        IERC20(token).safeTransferFrom(msg.sender, address(this), numVotes);
+        IERC20(tokenAddress).safeTransferFrom(
+            msg.sender,
+            address(this),
+            numVotes
+        );
 
         bytes64 memory receiver = peers[destinationChainSelector];
         Proposal memory emptyNewProposal;
@@ -153,6 +171,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             proposalId,
             numVotes,
             voteOption,
+            tokenNameHash,
+            tokenAddress,
             emptyNewProposal
         );
         bytes32 messageHash = router.sendMessage{value: msg.value}(
@@ -164,18 +184,47 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
     }
 
-    /// @dev Can only unlock all at once
-    function unlockTokens(bytes32 proposalId) external nonReentrant {
-        Proposal memory proposal = proposals[proposalId];
-        if (proposal.id == bytes32(0)) {
-            revert ProposalInvalid(proposalId);
+    // /// @dev Can only unlock all at once
+    // function unlockTokens(bytes32 proposalId) external nonReentrant {
+    //     Proposal memory proposal = proposals[proposalId];
+    //     if (proposal.id == bytes32(0)) {
+    //         revert ProposalInvalid(proposalId);
+    //     }
+    //     if (block.timestamp <= proposal.endTimestamp) {
+    //         revert ProposalNotFinished(proposalId, proposal.endTimestamp);
+    //     }
+    //     uint256 amount = balances[msg.sender][proposalId];
+    //     balances[msg.sender][proposalId] = 0;
+    //     IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
+    // }
+
+    function setTokenData(
+        // string calldata name,
+        bytes32 tokenNameHash,
+        uint256[] memory chainSelectors,
+        address[] memory tokenAddresses
+    ) external {
+        // mapping
+        /*
+        tokenData = (
+            "uniswap": (
+                1001: uniswapEthereumAddress,
+                1004: uniswapArbitrumAddress,
+                1006: uniswapOptimismAddress
+            ),
+            "compound": (
+                1001: compoundEthereumAddress,
+                1004: compoundArbitrumAddress,
+                1006: compountOptimismAddress
+            )
+        )
+        */
+        // TODO: add length check
+        uint256 chainSelectorsLength = chainSelectors.length;
+        for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
+            tokenData[tokenNameHash][chainSelectors[i]] = tokenAddresses[i];
         }
-        if (block.timestamp <= proposal.endTimestamp) {
-            revert ProposalNotFinished(proposalId, proposal.endTimestamp);
-        }
-        uint256 amount = balances[msg.sender][proposalId];
-        balances[msg.sender][proposalId] = 0;
-        IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
+        // TODO: add event
     }
 
     // --- external mutative admin functions ---
@@ -269,7 +318,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     /// @notice Receve the cross chain message on the destination chain.
     function _receiveMessageFromPeer(
-        EquitoMessage calldata /* message */,
+        EquitoMessage calldata message,
         bytes calldata messageData
     ) internal override {
         (
@@ -277,16 +326,33 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             bytes32 proposalId,
             uint256 numVotes,
             VoteOption voteOption,
+            bytes32 tokenNameHash,
+            address tokenAddress,
             Proposal memory newProposal
         ) = abi.decode(
                 messageData,
-                (OperationType, bytes32, uint256, VoteOption, Proposal)
+                (
+                    OperationType,
+                    bytes32,
+                    uint256,
+                    VoteOption,
+                    bytes32,
+                    address,
+                    Proposal
+                )
             );
         if (operationType == OperationType.CreateProposal) {
             _createProposal(newProposal);
             emit CreateProposalMessageReceived(newProposal.id);
         } else if (operationType == OperationType.VoteOnProposal) {
-            _voteOnProposal(proposalId, numVotes, voteOption);
+            _voteOnProposal(
+                proposalId,
+                numVotes,
+                voteOption,
+                tokenNameHash,
+                tokenAddress,
+                message.sourceChainSelector
+            );
             emit VoteOnProposalMessageReceived(
                 proposalId,
                 numVotes,
@@ -306,8 +372,21 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     function _voteOnProposal(
         bytes32 proposalId,
         uint256 numVotes,
-        VoteOption voteOption
+        VoteOption voteOption,
+        bytes32 tokenNameHash,
+        address tokenAddress,
+        uint256 sourceChainSelector
     ) private {
+        if (
+            tokenAddress == address(0) ||
+            tokenData[tokenNameHash][sourceChainSelector] != tokenAddress
+        ) {
+            revert InvalidToken(
+                tokenNameHash,
+                sourceChainSelector,
+                tokenAddress
+            );
+        }
         if (voteOption == VoteOption.Yes) {
             proposals[proposalId].numVotesYes += numVotes;
         } else if (voteOption == VoteOption.No) {
