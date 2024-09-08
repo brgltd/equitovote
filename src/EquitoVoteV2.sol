@@ -8,6 +8,7 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+/// @notice EquitoVote version 2
 contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     // --- types ----
 
@@ -31,7 +32,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         string title;
         string description;
         bytes32 id;
-        bytes32 tokenNameHash;
+        string tokenName;
         // Chain where the proposal was created
         uint256 originChainSelector;
     }
@@ -47,8 +48,10 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     mapping(address user => mapping(bytes32 proposalId => uint256 amount))
         public balances;
 
-    mapping(bytes32 tokenNameHash => mapping(uint256 chainSelector => address tokenAddress))
+    mapping(string tokenName => mapping(uint256 chainSelector => address tokenAddress))
         public tokenData;
+
+    string[] public tokenNames;
 
     // --- extensions ---
 
@@ -78,12 +81,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     event ProtocolFeeUpdated(uint256 newProtocolFee);
 
     event TokenDataUpdated(
-        bytes32 indexed tokenNameHash,
+        string indexed tokenName,
         uint256[] chainSelectors,
         address[] tokenAddresses
     );
 
-    event TokenDataDeleted(bytes32 tokenNameHash, uint256[] chainSelectors);
+    event TokenDataDeleted(string tokenName, uint256[] chainSelectors);
 
     // --- errors ---
 
@@ -94,7 +97,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     error CallFailed(address destination);
 
     error InvalidToken(
-        bytes32 tokenNameHash,
+        string tokenName,
         uint256 sourceChainSelector,
         address tokenAddress
     );
@@ -103,6 +106,8 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         uint256 chainSelectorsLength,
         uint256 tokenAddressesLength
     );
+
+    error TokenAlreadySet(string tokenName);
 
     // --- init function ---
 
@@ -120,7 +125,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         uint256 endTimestamp,
         string calldata title,
         string calldata description,
-        bytes32 tokenNameHash,
+        string calldata tokenName,
         uint256 originChainSelector
     ) external payable nonReentrant {
         bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
@@ -134,7 +139,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
             title: title,
             description: description,
             id: id,
-            tokenNameHash: tokenNameHash,
+            tokenName: tokenName,
             originChainSelector: originChainSelector
         });
 
@@ -217,20 +222,31 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     // }
 
     function setTokenData(
-        // string calldata name,
-        bytes32 tokenNameHash,
+        string calldata tokenName,
         uint256[] memory chainSelectors,
         address[] memory tokenAddresses
     ) external {
+        if (msg.sender != owner()) {
+            uint256 tokenNamesLength = tokenNames.length;
+            for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
+                if (
+                    keccak256(abi.encode(tokenName)) ==
+                    keccak256(abi.encode(tokenNames[i]))
+                ) {
+                    revert TokenAlreadySet(tokenName);
+                }
+            }
+        }
         uint256 chainSelectorsLength = chainSelectors.length;
         uint256 tokenAddressesLength = tokenAddresses.length;
         if (chainSelectorsLength != tokenAddressesLength) {
             revert LengthMismatch(chainSelectorsLength, tokenAddressesLength);
         }
         for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
-            tokenData[tokenNameHash][chainSelectors[i]] = tokenAddresses[i];
+            tokenData[tokenName][chainSelectors[i]] = tokenAddresses[i];
         }
-        emit TokenDataUpdated(tokenNameHash, chainSelectors, tokenAddresses);
+        tokenNames.push(tokenName);
+        emit TokenDataUpdated(tokenName, chainSelectors, tokenAddresses);
     }
 
     // --- external mutative admin functions ---
@@ -241,14 +257,25 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     }
 
     function deleteTokenData(
-        bytes32 tokenNameHash,
+        string calldata tokenName,
         uint256[] memory chainSelectors
     ) external onlyOwner {
         uint256 chainSelectorsLength = chainSelectors.length;
         for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
-            tokenData[tokenNameHash][chainSelectors[i]] = address(0);
+            tokenData[tokenName][chainSelectors[i]] = address(0);
         }
-        emit TokenDataDeleted(tokenNameHash, chainSelectors);
+        uint256 tokenNamesLength = tokenNames.length;
+        for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
+            if (
+                keccak256(abi.encode(tokenName)) ==
+                keccak256(abi.encode(tokenNames[i]))
+            ) {
+                tokenNames[i] = tokenNames[tokenNamesLength - 1];
+                break;
+            }
+        }
+        tokenNames.pop();
+        emit TokenDataDeleted(tokenName, chainSelectors);
     }
 
     /// @dev If there are too many proposals, this function can run out of gas.
@@ -383,16 +410,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         address tokenAddress,
         uint256 sourceChainSelector
     ) private {
-        bytes32 tokenNameHash = proposals[proposalId].tokenNameHash;
+        string memory tokenName = proposals[proposalId].tokenName;
         if (
             tokenAddress == address(0) ||
-            tokenData[tokenNameHash][sourceChainSelector] != tokenAddress
+            tokenData[tokenName][sourceChainSelector] != tokenAddress
         ) {
-            revert InvalidToken(
-                tokenNameHash,
-                sourceChainSelector,
-                tokenAddress
-            );
+            revert InvalidToken(tokenName, sourceChainSelector, tokenAddress);
         }
         if (voteOption == VoteOption.Yes) {
             proposals[proposalId].numVotesYes += numVotes;
