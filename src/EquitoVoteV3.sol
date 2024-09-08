@@ -76,6 +76,17 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     event ProtocolFeeUpdated(uint256 newProtocolFee);
 
+    event TokenDataUpdated(
+        bytes32 indexed tokenNameHash,
+        uint256[] chainSelectors,
+        address[] tokenAddresses
+    );
+
+    event TokenDataDeleted(
+        bytes32 tokenNameHash,
+        uint256[] chainSelectors
+    );
+
     // --- errors ---
 
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
@@ -88,6 +99,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         bytes32 tokenNameHash,
         uint256 sourceChainSelector,
         address tokenAddress
+    );
+
+    error LengthMismatch(
+        uint256 chainSelectorsLength,
+        uint256 tokenAddressesLength
     );
 
     // --- init function ---
@@ -201,27 +217,15 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256[] memory chainSelectors,
         address[] memory tokenAddresses
     ) external {
-        // mapping
-        /*
-        tokenData = (
-            "uniswap": (
-                1001: uniswapEthereumAddress,
-                1004: uniswapArbitrumAddress,
-                1006: uniswapOptimismAddress
-            ),
-            "compound": (
-                1001: compoundEthereumAddress,
-                1004: compoundArbitrumAddress,
-                1006: compountOptimismAddress
-            )
-        )
-        */
-        // TODO: add length check
         uint256 chainSelectorsLength = chainSelectors.length;
+        uint256 tokenAddressesLength = tokenAddresses.length;
+        if (chainSelectorsLength != tokenAddressesLength) {
+            revert LengthMismatch(chainSelectorsLength, tokenAddressesLength);
+        }
         for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
             tokenData[tokenNameHash][chainSelectors[i]] = tokenAddresses[i];
         }
-        // TODO: add event
+        emit TokenDataUpdated(tokenNameHash, chainSelectors, tokenAddresses);
     }
 
     // --- external mutative admin functions ---
@@ -229,6 +233,17 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     function setProtocolFee(uint256 newProtocolFee) external onlyOwner {
         protocolFee = newProtocolFee;
         emit ProtocolFeeUpdated(newProtocolFee);
+    }
+
+    function deleteTokenData(
+        bytes32 tokenNameHash,
+        uint256[] memory chainSelectors
+    )  external onlyOwner {
+        uint256 chainSelectorsLength = chainSelectors.length;
+        for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
+            tokenData[tokenNameHash][chainSelectors[i]] = address(0);
+        }
+        emit TokenDataDeleted(tokenNameHash, chainSelectors);
     }
 
     /// @dev If there are too many proposals, this function can run out of gas.
