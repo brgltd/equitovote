@@ -129,7 +129,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             bytes32(0),
             0,
             VoteOption.Abstain,
-            bytes32(0),
             address(0),
             newProposal
         );
@@ -154,7 +153,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         bytes32 proposalId,
         uint256 numVotes,
         VoteOption voteOption,
-        bytes32 tokenNameHash,
         address tokenAddress
     ) external payable nonReentrant {
         balances[msg.sender][proposalId] += numVotes;
@@ -171,7 +169,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             proposalId,
             numVotes,
             voteOption,
-            tokenNameHash,
             tokenAddress,
             emptyNewProposal
         );
@@ -326,20 +323,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             bytes32 proposalId,
             uint256 numVotes,
             VoteOption voteOption,
-            bytes32 tokenNameHash,
             address tokenAddress,
             Proposal memory newProposal
         ) = abi.decode(
                 messageData,
-                (
-                    OperationType,
-                    bytes32,
-                    uint256,
-                    VoteOption,
-                    bytes32,
-                    address,
-                    Proposal
-                )
+                (OperationType, bytes32, uint256, VoteOption, address, Proposal)
             );
         if (operationType == OperationType.CreateProposal) {
             _createProposal(newProposal);
@@ -349,7 +337,6 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
                 proposalId,
                 numVotes,
                 voteOption,
-                tokenNameHash,
                 tokenAddress,
                 message.sourceChainSelector
             );
@@ -373,10 +360,10 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         bytes32 proposalId,
         uint256 numVotes,
         VoteOption voteOption,
-        bytes32 tokenNameHash,
         address tokenAddress,
         uint256 sourceChainSelector
     ) private {
+        bytes32 tokenNameHash = proposals[proposalId].tokenNameHash;
         if (
             tokenAddress == address(0) ||
             tokenData[tokenNameHash][sourceChainSelector] != tokenAddress
