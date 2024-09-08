@@ -221,6 +221,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     //     IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
     // }
 
+	/// @notice Set token data to be used in proposals.
+	/// @dev Will be queried during voting to ensure the provided token matches
+	///		 the proposal token across different chains.
     function setTokenData(
         string calldata tokenName,
         uint256[] memory chainSelectors,
