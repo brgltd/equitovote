@@ -48,9 +48,6 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     mapping(bytes32 id => Proposal) public proposals;
 
-    // mapping(address user => mapping(bytes32 proposalId => uint256 amount))
-    // public balances;
-
     mapping(address user => mapping(bytes32 proposalId => uint256 votes)) userVotes;
 
     mapping(string tokenName => mapping(uint256 chainSelector => address tokenAddress))

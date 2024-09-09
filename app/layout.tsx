@@ -17,10 +17,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 const queryClient = new QueryClient();
 
-export const metadata: Metadata = {
-  title: "Equito Vote",
-  description: "Multichain DAO voting protocol",
-};
+// export const metadata: Metadata = {
+//   title: "Equito Vote",
+//   description: "Multichain DAO voting protocol",
+// };
 
 export default function RootLayout({
   children,
@@ -49,7 +49,7 @@ export default function RootLayout({
                     <Navbar />
                     {children}
                   </EquitoVoteProvider>
-                </PingPongProvider> 
+                </PingPongProvider>
               </EquitoProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
