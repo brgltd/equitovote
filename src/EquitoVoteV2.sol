@@ -3,7 +3,8 @@ pragma solidity ^0.8.23;
 
 import {EquitoApp} from "equito/src/EquitoApp.sol";
 import {bytes64, EquitoMessage} from "equito/src/libraries/EquitoMessageLibrary.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
+import {IVotesExtension} from "./IVotesExtension.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -26,6 +27,8 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     struct Proposal {
         uint256 startTimestamp;
         uint256 endTimestamp;
+        // ERC20Votes uses block.number by default for snapshots
+        uint256 endBlockNumber;
         uint256 numVotesYes;
         uint256 numVotesNo;
         uint256 numVotesAbstain;
@@ -45,17 +48,15 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     mapping(bytes32 id => Proposal) public proposals;
 
-    mapping(address user => mapping(bytes32 proposalId => uint256 amount))
-        public balances;
+    // mapping(address user => mapping(bytes32 proposalId => uint256 amount))
+    // public balances;
+
+    mapping(address user => mapping(bytes32 proposalId => uint256 votes)) userVotes;
 
     mapping(string tokenName => mapping(uint256 chainSelector => address tokenAddress))
         public tokenData;
 
     string[] public tokenNames;
-
-    // --- extensions ---
-
-    using SafeERC20 for IERC20;
 
     // --- events ---
 
@@ -109,6 +110,11 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     error TokenAlreadySet(string tokenName);
 
+    error NotEnoughDelegatedTokens(
+        uint256 numberUserVotes,
+        uint256 numberUserDelegatedTokens
+    );
+
     // --- init function ---
 
     constructor(address _router) EquitoApp(_router) {}
@@ -133,6 +139,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         Proposal memory newProposal = Proposal({
             startTimestamp: block.timestamp,
             endTimestamp: endTimestamp,
+            endBlockNumber: block.number,
             numVotesYes: 0,
             numVotesNo: 0,
             numVotesAbstain: 0,
@@ -172,15 +179,26 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         bytes32 proposalId,
         uint256 numVotes,
         VoteOption voteOption,
-        address tokenAddress
+        address tokenAddress,
+        bool isDemonstration
     ) external payable nonReentrant {
-        balances[msg.sender][proposalId] += numVotes;
+        uint256 numberUserVotes = userVotes[msg.sender][proposalId];
 
-        IERC20(tokenAddress).safeTransferFrom(
+        uint256 numberUserDelegatedTokens = getAmountDelegatedTokens(
             msg.sender,
-            address(this),
-            numVotes
+            tokenAddress,
+            proposalId,
+            isDemonstration
         );
+
+        if (numVotes + numberUserVotes > numberUserDelegatedTokens) {
+            revert NotEnoughDelegatedTokens(
+                numberUserVotes,
+                numberUserDelegatedTokens
+            );
+        }
+
+        userVotes[msg.sender][proposalId] += numVotes;
 
         bytes64 memory receiver = peers[destinationChainSelector];
 
@@ -207,23 +225,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
     }
 
-    // /// @dev Can only unlock all at once
-    // function unlockTokens(bytes32 proposalId) external nonReentrant {
-    //     Proposal memory proposal = proposals[proposalId];
-    //     if (proposal.id == bytes32(0)) {
-    //         revert ProposalInvalid(proposalId);
-    //     }
-    //     if (block.timestamp <= proposal.endTimestamp) {
-    //         revert ProposalNotFinished(proposalId, proposal.endTimestamp);
-    //     }
-    //     uint256 amount = balances[msg.sender][proposalId];
-    //     balances[msg.sender][proposalId] = 0;
-    //     IERC20(proposal.erc20).safeTransfer(msg.sender, amount);
-    // }
-
-	/// @notice Set token data to be used in proposals.
-	/// @dev Will be queried during voting to ensure the provided token matches
-	///		 the proposal token across different chains.
+    /// @notice Set token data to be used in proposals.
+    /// @dev Will be queried during voting to ensure the provided token matches
+    ///		 the proposal token across different chains.
     function setTokenData(
         string calldata tokenName,
         uint256[] memory chainSelectors,
@@ -341,6 +345,30 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     function getProposalIdsLength() public view returns (uint256) {
         return proposalIds.length;
+    }
+
+    // --- private view functions ---
+
+    function getAmountDelegatedTokens(
+        address user,
+        address token,
+        bytes32 proposalId,
+        bool isDemonstration
+    ) public view returns (uint256) {
+        // We use `isDemonstration` to allow retieving the current delegation power instead
+        // of a past one. Otherwise, for hackathon demonstrations on testnets, users/judges
+        // won't be able to vote of proposals since they would be delegating after
+        // the proposal creation.
+        return
+            isDemonstration
+                ? IVotes(token).getVotes(user)
+                : IVotes(token).getPastVotes(
+                    user,
+                    keccak256(abi.encode(IVotesExtension(token).CLOCK_MODE)) ==
+                        keccak256(abi.encode("mode=blocknumber&from=default"))
+                        ? proposals[proposalId].endBlockNumber
+                        : proposals[proposalId].endTimestamp
+                );
     }
 
     /// @notice Build up an array of proposals and return it using the index params.
