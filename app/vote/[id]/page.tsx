@@ -207,6 +207,11 @@ export default function Vote({ params }: VoteProps) {
     chainId: destinationChain.definition.id,
   });
 
+  const isVoteButtonEnabled = useMemo(
+    () => !!tokenAddress && !!amount,
+    [tokenAddress, amount],
+  );
+
   useEffect(() => {
     amountRef.current?.focus();
   }, []);
@@ -225,7 +230,8 @@ export default function Vote({ params }: VoteProps) {
         proposalId,
         parseUnits(amount, decimals),
         voteOption,
-        formattedProposal.erc20,
+        tokenAddress,
+        isGetPastVotesEnabled,
       ],
       chainId: sourceChain?.definition.id,
       value: sourceFee,
@@ -383,21 +389,21 @@ export default function Vote({ params }: VoteProps) {
         <button
           onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
           className="block"
-          disabled={!amount}
+          disabled={!isVoteButtonEnabled}
         >
           Yes
         </button>
         <button
           onClick={() => onClickVoteOnProposal(VoteOption.No)}
           className="block"
-          disabled={!amount}
+          disabled={!isVoteButtonEnabled}
         >
           No
         </button>
         <button
           onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
           className="block"
-          disabled={!amount}
+          disabled={!isVoteButtonEnabled}
         >
           Abstain
         </button>
