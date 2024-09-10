@@ -50,27 +50,10 @@ contract EquitoVoteTest is Test {
     function testCreateProposal() public {
         string memory titleInput = generateTitle(0);
         createProposalAndExecuteMessage(0, titleInput);
-
         bytes32 proposalId = equitoVote.proposalIds(0);
-
-        // Entire struct
-        // (
-        //     uint256 startTimestamp,
-        //     uint256 endTimestamp,
-        //     uint256 numVotesYes,
-        //     uint256 numVotesNo,
-        //     uint256 numVotesAbstain,
-        //     address erc20,
-        //     address creator,
-        //     string memory title,
-        //     string memory description,
-        //     bytes32 id
-        // ) = equitoVote.proposals(proposalId);
-
         (, , , , , , , string memory titleResult, , ) = equitoVote.proposals(
             proposalId
         );
-
         assertEq(titleResult, titleInput);
     }
 
