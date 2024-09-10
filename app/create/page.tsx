@@ -46,6 +46,7 @@ const defaultFormData: FormData = {
 function buildCreateProposalArgs(
   formData: FormData,
   destinationChain: Chain,
+  sourceChain: Chain,
 ): CreateProposalArgs {
   const endTimestamp = Math.floor(
     addHours(new Date(), Number(formData.durationHours)).getTime() / 1000,
@@ -55,8 +56,8 @@ function buildCreateProposalArgs(
     endTimestamp: endTimestamp,
     title: formData.title,
     description: formData.description,
-    tokenName: "",
-    originChainSelector: 0,
+    tokenName: formData.tokenName,
+    originChainSelector: sourceChain.chainSelector,
   };
 }
 
@@ -152,7 +153,9 @@ export default function HomePage() {
       address: sourceChain.equitoVoteContract as Address,
       abi: equitoVoteAbi,
       functionName: "createProposal",
-      args: Object.values(buildCreateProposalArgs(formData, destinationChain)),
+      args: Object.values(
+        buildCreateProposalArgs(formData, destinationChain, sourceChain),
+      ),
       value: totalCreateProposalFee,
       chainId: sourceChain?.definition.id,
     });
@@ -234,10 +237,17 @@ export default function HomePage() {
     }
   };
 
+  const CreateProposalButton = ({ cta }: { cta: string }) => (
+    <button
+      onClick={onClickCreateProposal}
+      disabled={!Object.values(formData).every(Boolean) || !sourceChain}
+    >
+      {cta}
+    </button>
+  );
+
   const statusRenderer = {
-    [Status.IsStart]: (
-      <button onClick={onClickCreateProposal}>Create Proposal</button>
-    ),
+    [Status.IsStart]: <CreateProposalButton cta="Create Proposal" />,
     [Status.IsExecutingBaseTxOnSourceChain]: (
       <div>creating proposal on source chain</div>
     ),
@@ -250,18 +260,29 @@ export default function HomePage() {
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div>executing message on destination chain</div>
     ),
-    [Status.IsRetry]: <button onClick={onClickCreateProposal}>Retry</button>,
+    [Status.IsRetry]: <CreateProposalButton cta="Retry" />,
   };
 
   return (
     <div>
       <div>
-        <ul>
-          {tokenNames?.map((tokenName) => <li key={tokenName}>{tokenName}</li>)}
-          <li>
-            <Link href="/set-token-data">Add New Token</Link>
-          </li>
-        </ul>
+        <select
+          value={formData.tokenName}
+          onChange={(e) =>
+            setFormData({ ...formData, tokenName: e.target.value })
+          }
+        >
+          <option value="">Select an option</option>
+          {tokenNames?.map((tokenName) => (
+            <option key={tokenName} value={tokenName}>
+              {tokenName}
+            </option>
+          ))}
+        </select>
+        <div>
+          <span>Your DAO token not present?</span>
+          <Link href="/set-token-data">Add New Token</Link>
+        </div>
       </div>
 
       <div>

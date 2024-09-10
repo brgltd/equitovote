@@ -24,8 +24,8 @@ contract EquitoHackathonToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
     constructor(
         address startingFaucet
     )
-        ERC20("EquitoHackathon", "EHT")
-        ERC20Permit("EquitoHackathon")
+        ERC20("EquitoHackathonToken", "EHT")
+        ERC20Permit("EquitoHackathonToken")
         Ownable(msg.sender)
     {
         faucet = startingFaucet;
