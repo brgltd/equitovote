@@ -75,6 +75,7 @@ export default function Vote({ params }: VoteProps) {
   const [amount, setAmount] = useState("");
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
+  const [isDelegating, setIsDelegating] = useState(false);
 
   const amountRef = useRef<HTMLInputElement>(null);
 
@@ -150,6 +151,16 @@ export default function Vote({ params }: VoteProps) {
   });
   const clockMode = clockModeData as string | undefined;
 
+  const { data: userTokenBalanceData } = useReadContract({
+    address: tokenAddress,
+    abi: erc20VotesAbi,
+    functionName: "balanceOf",
+    args: [userAddress],
+    chainId: sourceChain?.definition.id,
+    query: { enabled: !!tokenAddress },
+  });
+  const userTokenBalance = userTokenBalanceData as bigint | undefined;
+
   const { data: amountDelegatedTokensData } = useReadContract({
     address: tokenAddress,
     abi: erc20VotesAbi,
@@ -219,6 +230,26 @@ export default function Vote({ params }: VoteProps) {
   useEffect(() => {
     setActiveProposal(formattedProposal);
   }, [formattedProposal]);
+
+  const onClickDelegate = async () => {
+    setIsDelegating(true);
+    try {
+      const hash = await writeContractAsync({
+        address: tokenAddress as Address,
+        abi: erc20VotesAbi,
+        functionName: "delegate",
+        args: [userAddress],
+        chainId: sourceChain?.definition.id,
+      });
+      await waitForTransactionReceipt(config, {
+        hash,
+        chainId: sourceChain?.definition.id,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    setIsDelegating(false);
+  };
 
   const voteOnProposal = async (voteOption: VoteOption) => {
     const hash = await writeContractAsync({
@@ -375,10 +406,22 @@ export default function Vote({ params }: VoteProps) {
           <div>tokenName {activeProposal.tokenName}</div>
           <div>originalChainSelector {activeProposal.originChainSelector}</div>
         </div>
+        <hr />
+        <div>token balance: {formatBigInt(userTokenBalance)}</div>
         <div>
           amount delegated tokens: {formatBigInt(amountDelegatedTokens)}
         </div>
         <div>amount user votes: {formatBigInt(amountUserVotes)}</div>
+        <div>
+          <button
+            onClick={onClickDelegate}
+            disabled={!!tokenAddress && !isDelegating}
+          >
+            Delegate Tokens
+          </button>
+          {isDelegating && <div>delegatin in progress...</div>}
+        </div>
+        <hr />
         <input
           type="number"
           value={amount}
