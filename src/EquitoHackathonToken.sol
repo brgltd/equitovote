@@ -32,7 +32,7 @@ contract EquitoHackathonToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         _mint(msg.sender, 1_000_000e18);
     }
 
-    function mint(address to, uint256 amount) public virtual onlyOwner {
+    function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
     }
 

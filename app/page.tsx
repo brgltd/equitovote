@@ -55,7 +55,8 @@ export default function HomePage() {
               <div>id {item.id}</div>
               <div>startBlockNumber {item.startBlockNumber}</div>
               <div>tokenName {item.tokenName}</div>
-              <div>originalChainSelector {item.originalChainSelector}</div>
+              <div>Proposal Created On: {item.originalChainSelector}</div>
+              <div>Voting Available On: [1001, 1004, 1006]</div>
               <Link href={`/vote/${item.id}`}>Vote</Link>
             </div>
           </div>
