@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
-import { buildProposalFromArray, placeholderProposal } from "@/utils/helpers";
-import { FormattedProposal, ProposalDataItem, Status } from "@/types";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import {
+  buildProposalFromArray,
+  placeholderProposal,
+  verifyIsGetPastVotesEnabled,
+} from "@/utils/helpers";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
+import { format } from "date-fns";
 import { config } from "@/utils/wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import erc20Abi from "@/abis/erc20.json";
@@ -14,9 +17,14 @@ import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
-import { format } from "date-fns";
+import { FormattedProposal, ProposalDataItem, Status } from "@/types";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 
 const equitoVoteAbi = equitoVote.abi;
+const erc20VotesAbi = erc20Votes.abi;
+
+const isGetPastVotesEnabled = verifyIsGetPastVotesEnabled();
 
 enum VoteOption {
   Yes = 0,
@@ -62,7 +70,6 @@ export default function Vote({ params }: VoteProps) {
   const [amount, setAmount] = useState("");
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
-  const [isUnlocking, setIsUnlocking] = useState(false);
 
   const amountRef = useRef<HTMLInputElement>(null);
 
@@ -101,28 +108,48 @@ export default function Vote({ params }: VoteProps) {
 
   //@ts-ignore
   const formattedProposal: FormattedProposal = useMemo(
-    () => buildProposalFromArray(proposal),
+    () => buildProposalFromArray(proposal, true),
     [proposal],
   );
 
-  const { data: tokenNameData } = useReadContract({
-    address: formattedProposal.erc20 as Address,
-    abi: erc20Abi,
-    functionName: "name",
-    chainId: sourceChain?.definition.id,
-    query: { enabled: !!proposal },
+  // Token address for the chain that the user is currently connected
+  const { data: tokenAddressData } = useReadContract({
+    address: destinationChain.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "tokenData",
+    args: [formattedProposal.tokenName, sourceChain.chainSelector],
+    chainId: destinationChain.definition.id,
+    query: { enabled: !!proposal && !!sourceChain },
   });
-  const tokenName = tokenNameData as string;
+  const tokenAddress = tokenAddressData as Address | undefined;
 
-  const { data: userBalanceData } = useReadContract({
-    address: formattedProposal.erc20 as Address,
-    abi: erc20Abi,
-    functionName: "balanceOf",
-    args: [userAddress],
-    chainId: sourceChain?.definition.id,
-    query: { enabled: !!proposal && !!userAddress },
+  const { data: clockModeData } = useReadContract({
+    address: tokenAddress,
+    abi: erc20VotesAbi,
+    functionName: "CLOCK_MODE",
+    chainId: sourceChain.definition.id,
+    query: { enabled: !!tokenAddress },
   });
-  const userBalance = userBalanceData as bigint;
+  const clockMode = clockModeData as string | undefined;
+
+  const { data: amountDelegatedTokens } = useReadContract({
+    address: tokenAddress,
+    abi: erc20VotesAbi,
+    functionName: isGetPastVotesEnabled ? "getPastVotes" : "getVotes",
+    args: isGetPastVotesEnabled
+      ? [
+          userAddress,
+          clockMode === "mode=blocknumber&from=default"
+            ? formattedProposal.startBlockNumber
+            : formattedProposal.startTimestamp,
+        ]
+      : [userAddress],
+    chainId: sourceChain.definition.id,
+    query: {
+      // If isGetPastVotesEnabled is false, then clock mode is irrelevant.
+      enabled: !!tokenAddress && (!isGetPastVotesEnabled || !!clockMode),
+    },
+  });
 
   const { data: decimalsData } = useReadContract({
     address: formattedProposal.erc20 as Address,
@@ -170,11 +197,6 @@ export default function Vote({ params }: VoteProps) {
     chainId: sourceChain?.definition.id,
   });
   const amountLockedTokens = amountLockedTokensData as bigint;
-
-  const formattedUserBalance =
-    !!userBalance && !!decimalsData
-      ? formatUnits(userBalance, decimals)
-      : "unavailable";
 
   useEffect(() => {
     amountRef.current?.focus();
@@ -300,26 +322,6 @@ export default function Vote({ params }: VoteProps) {
     }
   };
 
-  const onClickUnlock = async () => {
-    setIsUnlocking(true);
-    try {
-      const hash = await writeContractAsync({
-        address: sourceChain?.equitoVoteContract as Address,
-        abi: equitoVoteAbi,
-        functionName: "unlockTokens",
-        args: [proposalId],
-        chainId: sourceChain?.definition.id,
-      });
-      const receipt = await waitForTransactionReceipt(config, {
-        hash,
-        chainId: sourceChain?.definition.id,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-    setIsUnlocking(false);
-  };
-
   const statusRenderer = {
     [Status.IsStart]: <div>waiting for action</div>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
@@ -363,11 +365,9 @@ export default function Vote({ params }: VoteProps) {
             <div>startBlockNumber {activeProposal.startBlockNumber}</div>
             <div>tokenName {activeProposal.tokenName}</div>
             <div>
-              originalChainSelector {activeProposal.originalChainSelector}
+              originalChainSelector {activeProposal.originChainSelector}
             </div>
           </div>
-          <div>token name: {tokenName}</div>
-          <div>token balance: {formattedUserBalance}</div>
           <input
             type="number"
             value={amount}
@@ -397,21 +397,6 @@ export default function Vote({ params }: VoteProps) {
             Abstain
           </button>
           <div>{statusRenderer[status]}</div>
-          <div>
-            {amountLockedTokens ? (
-              <div>
-                Amount locked tokens:{" "}
-                {formatUnits(amountLockedTokens, decimals)}
-                <div>
-                  <button onClick={onClickUnlock} disabled={isUnlocking}>
-                    unlock
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>no locked tokens</div>
-            )}
-          </div>
         </div>
       )}
     </div>

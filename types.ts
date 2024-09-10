@@ -13,7 +13,7 @@ export interface ProposalResponse {
   // v2
   startBlockNumber?: number;
   tokenName?: string;
-  originalChainSelector?: number;
+  originChainSelector?: number;
 }
 
 type BigintToNumber<T> = {

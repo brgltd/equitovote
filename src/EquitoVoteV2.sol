@@ -26,8 +26,6 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     struct Proposal {
         uint256 startTimestamp;
-        // ERC20Votes uses block.number by default for snapshots
-        uint256 startBlockNumber;
         uint256 endTimestamp;
         uint256 numVotesYes;
         uint256 numVotesNo;
@@ -36,6 +34,8 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         string description;
         bytes32 id;
         string tokenName;
+        // ERC20Votes uses block.number by default for snapshots
+        uint256 startBlockNumber;
         // Chain where the proposal was created
         uint256 originChainSelector;
     }
@@ -177,7 +177,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         uint256 numVotes,
         VoteOption voteOption,
         address tokenAddress,
-        bool isDemonstration
+        bool isGetPastVotesEnabled
     ) external payable nonReentrant {
         uint256 numberUserVotes = userVotes[msg.sender][proposalId];
 
@@ -185,7 +185,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
             msg.sender,
             tokenAddress,
             proposalId,
-            isDemonstration
+            isGetPastVotesEnabled
         );
 
         if (numVotes + numberUserVotes > numberUserDelegatedTokens) {
@@ -346,26 +346,26 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- private view functions ---
 
+    /// @dev We use `isGetPastVotesEnabled` to control wheather we want to retrive a past voting power
+    //       or the current one. For hackathon demonstrations on testnets, we want to enable the current
+    //       voting power so that users/judges are able to vote of proposals even if they delegate tokens
+    //       after the proposal is created.
     function getAmountDelegatedTokens(
         address user,
         address token,
         bytes32 proposalId,
-        bool isDemonstration
+        bool isGetPastVotesEnabled
     ) public view returns (uint256) {
-        // We use `isDemonstration` to allow retieving the current delegation power instead
-        // of a past one. Otherwise, for hackathon demonstrations on testnets, users/judges
-        // won't be able to vote of proposals since they would very likely be delegating after
-        // the proposal creation.
         return
-            isDemonstration
-                ? IVotes(token).getVotes(user)
-                : IVotes(token).getPastVotes(
+            isGetPastVotesEnabled
+                ? IVotes(token).getPastVotes(
                     user,
                     keccak256(abi.encode(IVotesExtension(token).CLOCK_MODE)) ==
                         keccak256(abi.encode("mode=blocknumber&from=default"))
                         ? proposals[proposalId].startBlockNumber
                         : proposals[proposalId].endTimestamp
-                );
+                )
+                : IVotes(token).getVotes(user);
     }
 
     /// @notice Build up an array of proposals and return it using the index params.
