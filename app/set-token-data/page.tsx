@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useWriteContract } from "wagmi";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
+import { waitForTransactionReceipt } from "@wagmi/core";
+import { config } from "@/utils/wagmi";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -38,6 +40,10 @@ export default function SetTokenDataPage() {
           formData.optimismAddress,
         ],
       ],
+    });
+    await waitForTransactionReceipt(config, {
+      hash,
+      chainId: arbitrumChain.definition.id,
     });
   };
 
