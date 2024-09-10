@@ -12,8 +12,11 @@ import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { Status } from "@/types";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { Chain } from "@/utils/chains";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import Link from "next/link";
+
+const tokenNamesMock = ["EquitoHackathon"];
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -107,6 +110,15 @@ export default function HomePage() {
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
+
+  const { data: tokensNamesData } = useReadContract({
+    address: destinationChain?.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "tokenNames",
+    chainId: destinationChain.definition.id,
+  });
+  // const tokenNames = tokensNamesData as string[] | undefined;
+  const tokenNames = tokenNamesMock;
 
   const formattedSourceChainFee = sourceFee
     ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
@@ -243,6 +255,15 @@ export default function HomePage() {
 
   return (
     <div>
+      <div>
+        <ul>
+          {tokenNames?.map((tokenName) => <li key={tokenName}>{tokenName}</li>)}
+          <li>
+            <Link href="/set-token-data">Add New Token</Link>
+          </li>
+        </ul>
+      </div>
+
       <div>
         <label htmlFor="title">title</label>
         <input
