@@ -83,6 +83,14 @@ export const arbitrumChain = {
   equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
 };
 
+export const optimismChain = {
+  chainSelector: 1006,
+  name: "Optimism Sepolia",
+  img: 11840,
+  definition: optimismSepolia,
+  pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4",
+};
+
 export const chains: Chain[] = [
   ethereumChain,
   {
@@ -107,13 +115,7 @@ export const chains: Chain[] = [
     definition: avalancheFuji,
     pingPongContract: "0x79c440ABA2bB23D44fEB21bF1Cc6a37E0657E7Fd",
   },
-  {
-    chainSelector: 1006,
-    name: "Optimism Sepolia",
-    img: 11840,
-    definition: optimismSepolia,
-    pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4",
-  },
+  optimismChain,
   {
     chainSelector: 1007,
     name: "Base Sepolia",

@@ -1,6 +1,12 @@
 "use client";
 
+import { AddressesPerChain } from "@/addresses";
 import { useState } from "react";
+import { useWriteContract } from "wagmi";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
+
+const equitoVoteAbi = equitoVote.abi;
 
 const defaultFormData = {
   tokenName: "",
@@ -11,6 +17,29 @@ const defaultFormData = {
 
 export default function SetTokenDataPage() {
   const [formData, setFormData] = useState(defaultFormData);
+
+  const { writeContractAsync } = useWriteContract();
+
+  const onClickSetTokenData = async () => {
+    const hash = await writeContractAsync({
+      address: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
+      abi: equitoVoteAbi,
+      functionName: "setTokenData",
+      args: [
+        formData.tokenName,
+        [
+          ethereumChain.chainSelector,
+          arbitrumChain.chainSelector,
+          optimismChain.chainSelector,
+        ],
+        [
+          formData.ethereumAddress,
+          formData.arbitrumAddress,
+          formData.optimismAddress,
+        ],
+      ],
+    });
+  };
 
   return (
     <div>
@@ -64,6 +93,15 @@ export default function SetTokenDataPage() {
           }
           className="text-black"
         />
+      </div>
+
+      <div>
+        <button
+          onClick={onClickSetTokenData}
+          disabled={Object.values(formData).every(Boolean)}
+        >
+          Set Token Data
+        </button>
       </div>
     </div>
   );
