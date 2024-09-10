@@ -21,23 +21,22 @@ interface FormData {
   title: string;
   description: string;
   durationHours: string;
-  tokenName: string;
+  token: string;
 }
 
 interface CreateProposalArgs {
   destinationChainSelector: number;
   endTimestamp: number;
+  erc20: string;
   title: string;
   description: string;
-  tokenName?: string;
-  originChainSelector?: number;
 }
 
 const defaultFormData: FormData = {
   title: "",
   description: "",
   durationHours: "",
-  tokenName: "",
+  token: "",
 };
 
 function buildCreateProposalArgs(
@@ -50,10 +49,9 @@ function buildCreateProposalArgs(
   return {
     destinationChainSelector: destinationChain.chainSelector,
     endTimestamp: endTimestamp,
+    erc20: formData.token,
     title: formData.title,
     description: formData.description,
-    tokenName: "",
-    originChainSelector: 0,
   };
 }
 
@@ -70,8 +68,8 @@ export default function HomePage() {
   const { sourceChain, sourceRouter, destinationRouter, destinationChain } =
     useEquitoVote();
 
-  const sourceRouterAddress = sourceRouter?.data;
-  const destinationRouterAddress = destinationRouter?.data;
+  const fromRouterAddress = sourceRouter?.data;
+  const toRouterAddress = destinationRouter?.data;
 
   const approve = useApprove();
 
@@ -83,20 +81,20 @@ export default function HomePage() {
   });
 
   const { data: sourceFee } = useReadContract({
-    address: sourceRouterAddress,
+    address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
     args: [sourceChain?.equitoVoteContract as Address],
-    query: { enabled: !!sourceRouterAddress },
+    query: { enabled: !!fromRouterAddress },
     chainId: sourceChain?.definition.id,
   });
 
   const { data: destinationFee } = useReadContract({
-    address: destinationRouterAddress,
+    address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
     args: [destinationChain.equitoVoteContract as Address],
-    query: { enabled: !!destinationRouterAddress },
+    query: { enabled: !!toRouterAddress },
     chainId: destinationChain.definition.id,
   });
 
@@ -104,7 +102,7 @@ export default function HomePage() {
     address: sourceChain?.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "protocolFee",
-    query: { enabled: !!sourceRouterAddress },
+    query: { enabled: !!fromRouterAddress },
     chainId: sourceChain?.definition.id,
   });
 
@@ -275,6 +273,16 @@ export default function HomePage() {
           onChange={(e) =>
             setFormData({ ...formData, durationHours: e.target.value })
           }
+          className="text-black"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="token">ERC20 Token Address</label>
+        <input
+          id="token"
+          value={formData.token}
+          onChange={(e) => setFormData({ ...formData, token: e.target.value })}
           className="text-black"
         />
       </div>

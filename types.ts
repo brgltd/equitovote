@@ -4,11 +4,16 @@ export interface ProposalResponse {
   numVotesYes: bigint;
   numVotesNo: bigint;
   numVotesAbstain: bigint;
-  erc20: string;
-  creator: string;
   title: string;
   description: string;
   id: string;
+  // v1
+  erc20?: string;
+  creator?: string;
+  // v2
+  startBlockNumber?: number;
+  tokenName?: string;
+  originalChainSelector?: number;
 }
 
 type BigintToNumber<T> = {

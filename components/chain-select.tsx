@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSwitchChain } from "wagmi";
-import { Chain, chains } from "../utils/chains";
+import { Chain, supportedChains } from "../utils/chains";
 import { toast } from "sonner";
 
 export function ChainSelect({ setSourceChain }: any) {
@@ -30,7 +30,7 @@ export function ChainSelect({ setSourceChain }: any) {
       {isOpen && (
         <div>
           <ul>
-            {chains.map((item) => (
+            {supportedChains.map((item) => (
               <li
                 key={item.chainSelector}
                 onClick={() => onClickSelectChain(item)}

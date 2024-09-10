@@ -360,11 +360,6 @@ export default function Vote({ params }: VoteProps) {
             <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
             <div>title {activeProposal.title}</div>
             <div>description {activeProposal.description}</div>
-            <div>startBlockNumber {activeProposal.startBlockNumber}</div>
-            <div>tokenName {activeProposal.tokenName}</div>
-            <div>
-              originalChainSelector {activeProposal.originalChainSelector}
-            </div>
           </div>
           <div>token name: {tokenName}</div>
           <div>token balance: {formattedUserBalance}</div>

@@ -88,7 +88,8 @@ export const optimismChain = {
   name: "Optimism Sepolia",
   img: 11840,
   definition: optimismSepolia,
-  pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4",
+  pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
+  // TODO: add equitoVoteContract once deployed
 };
 
 export const chains: Chain[] = [
@@ -214,6 +215,12 @@ export const chains: Chain[] = [
     definition: opBNBTestnet,
     pingPongContract: "0x8b671D34202fE0b07Ec701a02Dd0d5c36A90c79E",
   },
+];
+
+export const supportedChains: Chain[] = [
+  ethereumChain,
+  arbitrumChain,
+  optimismChain,
 ];
 
 export type Chain = {

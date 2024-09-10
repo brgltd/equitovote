@@ -26,9 +26,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     struct Proposal {
         uint256 startTimestamp;
-        uint256 endTimestamp;
         // ERC20Votes uses block.number by default for snapshots
-        uint256 endBlockNumber;
+        uint256 startBlockNumber;
+        uint256 endTimestamp;
         uint256 numVotesYes;
         uint256 numVotesNo;
         uint256 numVotesAbstain;
@@ -135,8 +135,8 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
         Proposal memory newProposal = Proposal({
             startTimestamp: block.timestamp,
+            startBlockNumber: block.number,
             endTimestamp: endTimestamp,
-            endBlockNumber: block.number,
             numVotesYes: 0,
             numVotesNo: 0,
             numVotesAbstain: 0,
@@ -354,7 +354,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     ) public view returns (uint256) {
         // We use `isDemonstration` to allow retieving the current delegation power instead
         // of a past one. Otherwise, for hackathon demonstrations on testnets, users/judges
-        // won't be able to vote of proposals since they would be delegating after
+        // won't be able to vote of proposals since they would very likely be delegating after
         // the proposal creation.
         return
             isDemonstration
@@ -363,7 +363,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
                     user,
                     keccak256(abi.encode(IVotesExtension(token).CLOCK_MODE)) ==
                         keccak256(abi.encode("mode=blocknumber&from=default"))
-                        ? proposals[proposalId].endBlockNumber
+                        ? proposals[proposalId].startBlockNumber
                         : proposals[proposalId].endTimestamp
                 );
     }
