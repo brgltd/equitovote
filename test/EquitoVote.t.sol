@@ -59,16 +59,17 @@ contract EquitoVoteTest is Test {
 
     function testGetProposalsSlice() public {
         uint256 numOfProposals = 5;
+        string[] memory titles = new string[](numOfProposals);
         for (uint256 i = 0; i < numOfProposals; ++i) {
-            string memory title = generateTitle(i);
-            createProposalAndExecuteMessage(i, title);
+            titles[i] = generateTitle(i);
+            createProposalAndExecuteMessage(i, titles[i]);
         }
         uint256 proposalsLength = equitoVote.getProposalIdsLength();
         assertEq(proposalsLength, numOfProposals);
         EquitoVote.Proposal[] memory slicedProposals = equitoVote
             .getProposalsSlice(0, proposalsLength);
         for (uint256 i = 0; i < proposalsLength; ++i) {
-            assertEq(slicedProposals[i].title, generateTitle(i));
+            assertEq(slicedProposals[i].title, titles[i]);
         }
     }
 
