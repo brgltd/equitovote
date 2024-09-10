@@ -388,7 +388,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- internal mutative functions ---
 
-    /// @notice Receve the cross chain message on the destination chain.
+    /// @notice Receive the cross chain message on the destination chain.
     function _receiveMessageFromPeer(
         EquitoMessage calldata message,
         bytes calldata messageData

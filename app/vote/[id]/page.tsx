@@ -12,7 +12,6 @@ import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
 import { format } from "date-fns";
 import { config } from "@/utils/wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
-import erc20Abi from "@/abis/erc20.json";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
@@ -20,6 +19,8 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
+
+import equitoVoteV1 from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
@@ -63,6 +64,10 @@ function formatTimestamp(timestampSeconds: number) {
     : format(timestampSeconds * 1000, "dd MMM yyyy hh:mm aaaa");
 }
 
+function formatBigInt(input: bigint | undefined) {
+  return !input ? "N/A" : Number(input);
+}
+
 export default function Vote({ params }: VoteProps) {
   const { id: proposalId } = params;
 
@@ -97,9 +102,15 @@ export default function Vote({ params }: VoteProps) {
     },
   });
 
-  const { data: proposalData, isLoading: isLoadingProposal } = useReadContract({
+  const {
+    data: proposalData,
+    isLoading: isLoadingProposal,
+    isError: isErrorFetchingProposals,
+    error: errorFetchingProposals,
+  } = useReadContract({
     address: destinationChain.equitoVoteContract,
-    abi: equitoVoteAbi,
+    // abi: equitoVoteAbi,
+    abi: equitoVoteV1.abi,
     functionName: "proposals",
     args: [proposalId],
     chainId: destinationChain.definition.id,
@@ -112,14 +123,21 @@ export default function Vote({ params }: VoteProps) {
     [proposal],
   );
 
+  const isProposalLoaded = useMemo(
+    () => !!Object.keys(formattedProposal || {}).length,
+    [formattedProposal],
+  );
+
   // Token address for the chain that the user is currently connected
   const { data: tokenAddressData } = useReadContract({
     address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "tokenData",
-    args: [formattedProposal.tokenName, sourceChain.chainSelector],
+    args: [formattedProposal?.tokenName, sourceChain?.chainSelector],
     chainId: destinationChain.definition.id,
-    query: { enabled: !!proposal && !!sourceChain },
+    query: {
+      enabled: isProposalLoaded && !!sourceChain,
+    },
   });
   const tokenAddress = tokenAddressData as Address | undefined;
 
@@ -127,12 +145,12 @@ export default function Vote({ params }: VoteProps) {
     address: tokenAddress,
     abi: erc20VotesAbi,
     functionName: "CLOCK_MODE",
-    chainId: sourceChain.definition.id,
+    chainId: sourceChain?.definition.id,
     query: { enabled: !!tokenAddress },
   });
   const clockMode = clockModeData as string | undefined;
 
-  const { data: amountDelegatedTokens } = useReadContract({
+  const { data: amountDelegatedTokensData } = useReadContract({
     address: tokenAddress,
     abi: erc20VotesAbi,
     functionName: isGetPastVotesEnabled ? "getPastVotes" : "getVotes",
@@ -144,31 +162,32 @@ export default function Vote({ params }: VoteProps) {
             : formattedProposal.startTimestamp,
         ]
       : [userAddress],
-    chainId: sourceChain.definition.id,
+    chainId: sourceChain?.definition.id,
     query: {
       // If isGetPastVotesEnabled is false, then clock mode is irrelevant.
       enabled: !!tokenAddress && (!isGetPastVotesEnabled || !!clockMode),
     },
   });
+  const amountDelegatedTokens = amountDelegatedTokensData as bigint | undefined;
+
+  const { data: amountUserVotesData } = useReadContract({
+    address: sourceChain?.equitoVoteContract,
+    abi: equitoVoteAbi,
+    functionName: "userVotes",
+    args: [formattedProposal.tokenName, formattedProposal?.id],
+    chainId: sourceChain?.definition.id,
+    query: { enabled: isProposalLoaded && !!sourceChain },
+  });
+  const amountUserVotes = amountUserVotesData as bigint | undefined;
 
   const { data: decimalsData } = useReadContract({
-    address: formattedProposal.erc20 as Address,
-    abi: erc20Abi,
+    address: tokenAddress,
+    abi: erc20VotesAbi,
     functionName: "decimals",
     chainId: sourceChain?.definition.id,
-    query: { enabled: !!proposal && !!userAddress },
+    query: { enabled: !!tokenAddress },
   });
   const decimals = decimalsData as number;
-
-  const { data: allowanceData } = useReadContract({
-    address: formattedProposal.erc20 as Address,
-    abi: erc20Abi,
-    functionName: "allowance",
-    args: [userAddress, sourceChain?.equitoVoteContract],
-    chainId: sourceChain?.definition.id,
-    query: { enabled: !!proposal && !!userAddress && !!sourceChain },
-  });
-  const allowance = allowanceData as bigint;
 
   const { data: sourceFee } = useReadContract({
     address: fromRouterAddress,
@@ -188,16 +207,6 @@ export default function Vote({ params }: VoteProps) {
     chainId: destinationChain.definition.id,
   });
 
-  const { data: amountLockedTokensData } = useReadContract({
-    address: sourceChain?.equitoVoteContract as Address,
-    abi: equitoVoteAbi,
-    functionName: "balances",
-    args: [userAddress, proposalId],
-    query: { enabled: !!userAddress && !!sourceChain },
-    chainId: sourceChain?.definition.id,
-  });
-  const amountLockedTokens = amountLockedTokensData as bigint;
-
   useEffect(() => {
     amountRef.current?.focus();
   }, []);
@@ -205,16 +214,6 @@ export default function Vote({ params }: VoteProps) {
   useEffect(() => {
     setActiveProposal(formattedProposal);
   }, [formattedProposal]);
-
-  const approveERC20 = async () => {
-    const hash = await writeContractAsync({
-      address: formattedProposal.erc20 as Address,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [sourceChain?.equitoVoteContract, parseUnits(amount, decimals)],
-    });
-    await waitForTransactionReceipt(config, { hash });
-  };
 
   const voteOnProposal = async (voteOption: VoteOption) => {
     const hash = await writeContractAsync({
@@ -243,9 +242,9 @@ export default function Vote({ params }: VoteProps) {
 
       await switchChainAsync({ chainId: sourceChain?.definition.id });
 
-      if (Number(formatUnits(allowance, decimals)) < Number(amount)) {
-        await approveERC20();
-      }
+      // if (Number(formatUnits(allowance, decimals)) < Number(amount)) {
+      //   await approveERC20();
+      // }
 
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
@@ -339,66 +338,71 @@ export default function Vote({ params }: VoteProps) {
     [Status.IsRetry]: <div>waiting for action</div>,
   };
 
+  if (isLoadingProposal) {
+    return <div>loading</div>;
+  }
+
+  if (isErrorFetchingProposals) {
+    console.error(errorFetchingProposals);
+    return <div>error</div>;
+  }
+
   return (
     <div>
-      {isLoadingProposal ? (
-        <div>loading</div>
-      ) : (
+      <div>
         <div>
           <div>
-            <div>
-              Created at: {formatTimestamp(activeProposal.startTimestamp)}
-            </div>
-            <div>
-              Finishes at: {formatTimestamp(activeProposal.endTimestamp)}
-            </div>
-            <div>
-              {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
-                ? "Completed"
-                : "Active"}
-            </div>
-            <div>numVotesYes {activeProposal.numVotesYes}</div>
-            <div>numVotesNo {activeProposal.numVotesNo}</div>
-            <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
-            <div>title {activeProposal.title}</div>
-            <div>description {activeProposal.description}</div>
-            <div>startBlockNumber {activeProposal.startBlockNumber}</div>
-            <div>tokenName {activeProposal.tokenName}</div>
-            <div>
-              originalChainSelector {activeProposal.originChainSelector}
-            </div>
+            Created at: {formatTimestamp(activeProposal.startTimestamp)}
           </div>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            ref={amountRef}
-            className="text-black"
-          />
-          <button
-            onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
-            className="block"
-            disabled={!amount}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => onClickVoteOnProposal(VoteOption.No)}
-            className="block"
-            disabled={!amount}
-          >
-            No
-          </button>
-          <button
-            onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
-            className="block"
-            disabled={!amount}
-          >
-            Abstain
-          </button>
-          <div>{statusRenderer[status]}</div>
+          <div>Finishes at: {formatTimestamp(activeProposal.endTimestamp)}</div>
+          <div>
+            {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
+              ? "Completed"
+              : "Active"}
+          </div>
+          <div>numVotesYes {activeProposal.numVotesYes}</div>
+          <div>numVotesNo {activeProposal.numVotesNo}</div>
+          <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
+          <div>title {activeProposal.title}</div>
+          <div>description {activeProposal.description}</div>
+          <div>startBlockNumber {activeProposal.startBlockNumber}</div>
+          <div>tokenName {activeProposal.tokenName}</div>
+          <div>originalChainSelector {activeProposal.originChainSelector}</div>
         </div>
-      )}
+        <div>
+          amount delegated tokens: {formatBigInt(amountDelegatedTokens)}
+        </div>
+        <div>amount user votes: {formatBigInt(amountUserVotes)}</div>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          ref={amountRef}
+          className="text-black"
+        />
+        <button
+          onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
+          className="block"
+          disabled={!amount}
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => onClickVoteOnProposal(VoteOption.No)}
+          className="block"
+          disabled={!amount}
+        >
+          No
+        </button>
+        <button
+          onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
+          className="block"
+          disabled={!amount}
+        >
+          Abstain
+        </button>
+        <div>{statusRenderer[status]}</div>
+      </div>
     </div>
   );
 }
