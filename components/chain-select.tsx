@@ -4,9 +4,12 @@ import { useState } from "react";
 import { useSwitchChain } from "wagmi";
 import { Chain, supportedChains } from "../utils/chains";
 import { toast } from "sonner";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 
-export function ChainSelect({ setSourceChain }: any) {
+export function ChainSelect() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { sourceChain, setSourceChain } = useEquitoVote();
 
   const { switchChainAsync } = useSwitchChain();
 
@@ -47,6 +50,7 @@ export function ChainSelect({ setSourceChain }: any) {
           </ul>
         </div>
       )}
+      <div>selected chain: {sourceChain?.definition.name}</div>
     </div>
   );
 }
