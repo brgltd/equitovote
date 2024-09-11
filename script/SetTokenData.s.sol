@@ -7,12 +7,8 @@ import {EquitoVoteV2} from "../src/EquitoVoteV2.sol";
 contract SetTokenData is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        // address payable equitoVoteV2Address = payable(
-        //     vm.envAddress("EQUITO_VOTE_OPTIMISM_SEPOLIA")
-        // );
-
         address payable equitoVoteV2Address = payable(
-            0x7B1E2d74D82Ac57d86f783f8Abbd1D255206929e
+            vm.envAddress("EQUITO_VOTE_OPTIMISM_SEPOLIA")
         );
 
         EquitoVoteV2 equitoVoteV2 = EquitoVoteV2(equitoVoteV2Address);
@@ -29,13 +25,10 @@ contract SetTokenData is Script {
         addresses[1] = 0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA;
         addresses[2] = 0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e;
 
-        // vm.startBroadcast(deployerPrivateKey);
-        // equitoVoteV2.setTokenData2(tokenName, chainSelectors, addresses);
-        // vm.stopBroadcast();
-
         vm.startBroadcast(deployerPrivateKey);
-        uint256 value = equitoVoteV2.poke();
-        console.log("value", value);
+        equitoVoteV2.setTokenData(tokenName, chainSelectors, addresses);
+        vm.stopBroadcast();
+
         vm.stopBroadcast();
     }
 }
