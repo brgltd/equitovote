@@ -89,7 +89,7 @@ export const optimismChain = {
   img: 11840,
   definition: optimismSepolia,
   pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
-  // TODO: add equitoVoteContract once deployed
+  equitoVoteContract: AddressesPerChain.OptimismSepolia.EquitoVoteActive,
 };
 
 export const blastChain = {
