@@ -7,7 +7,8 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
-contract EquitoHackathonToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
+/// @notice Demonstration token for Equito hackathon, ERC20Votes compatible
+contract VoteSphereToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
     uint256 public amountFaucetToMint = 1_000e18;
 
     address public faucet;
@@ -21,14 +22,11 @@ contract EquitoHackathonToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         _;
     }
 
-    constructor(
-        address startingFaucet
-    )
-        ERC20("EquitoHackathonToken", "EHT")
-        ERC20Permit("EquitoHackathonToken")
+    constructor()
+        ERC20("VoteSphere", "VSP")
+        ERC20Permit("VoteSphere")
         Ownable(msg.sender)
     {
-        faucet = startingFaucet;
         _mint(msg.sender, 1_000_000e18);
     }
 
@@ -40,7 +38,7 @@ contract EquitoHackathonToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         _mint(to, amountFaucetToMint);
     }
 
-    function updateFaucet(address newFaucet) external onlyOwner {
+    function setFaucet(address newFaucet) external onlyOwner {
         faucet = newFaucet;
     }
 
