@@ -1,20 +1,28 @@
 "use client";
 
-import { AddressesPerChain } from "@/addresses";
 import { useState } from "react";
-import { useWriteContract } from "wagmi";
+import { useSwitchChain, useWriteContract } from "wagmi";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
+import { Address, parseUnits } from "viem";
 
 const equitoVoteAbi = equitoVote.abi;
 
+// const defaultFormData = {
+//   tokenName: "",
+//   ethereumAddress: "",
+//   arbitrumAddress: "",
+//   optimismAddress: "",
+// };
+
 const defaultFormData = {
-  tokenName: "",
-  ethereumAddress: "",
-  arbitrumAddress: "",
-  optimismAddress: "",
+  tokenName: "VoteSphere4",
+  ethereumAddress: "0x2ee891078cc2a08c31e494f19E36F772806b1613",
+  arbitrumAddress: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA",
+  optimismAddress: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e",
 };
 
 export default function SetTokenDataPage() {
@@ -22,29 +30,39 @@ export default function SetTokenDataPage() {
 
   const { writeContractAsync } = useWriteContract();
 
+  const { switchChainAsync } = useSwitchChain();
+
+  const { destinationChain } = useEquitoVote();
+
   const onClickSetTokenData = async () => {
-    const hash = await writeContractAsync({
-      address: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
-      abi: equitoVoteAbi,
-      functionName: "setTokenData",
-      args: [
-        formData.tokenName,
-        [
-          ethereumChain.chainSelector,
-          arbitrumChain.chainSelector,
-          optimismChain.chainSelector,
+    try {
+      await switchChainAsync({ chainId: destinationChain.definition.id });
+      const hash = await writeContractAsync({
+        address: destinationChain.equitoVoteContractV2 as Address,
+        abi: equitoVoteAbi,
+        functionName: "setTokenData",
+        args: [
+          formData.tokenName,
+          [
+            ethereumChain.chainSelector,
+            arbitrumChain.chainSelector,
+            optimismChain.chainSelector,
+          ],
+          [
+            formData.ethereumAddress,
+            formData.arbitrumAddress,
+            formData.optimismAddress,
+          ],
         ],
-        [
-          formData.ethereumAddress,
-          formData.arbitrumAddress,
-          formData.optimismAddress,
-        ],
-      ],
-    });
-    await waitForTransactionReceipt(config, {
-      hash,
-      chainId: arbitrumChain.definition.id,
-    });
+        chainId: destinationChain.definition.id,
+      });
+      await waitForTransactionReceipt(config, {
+        hash,
+        chainId: destinationChain.definition.id,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

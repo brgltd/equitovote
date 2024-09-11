@@ -24,7 +24,7 @@ export const AddressesPerChain = {
   },
   ArbitrumSepolia: {
     EquitoVoteV1: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
-    EquitoVoteV2: "0x8E4a5DF04571504E6E2168DAd18dA09d871179d7" as Address,
+    EquitoVoteV2: "0x72E06B268E5aC284262FF7809Dc3941Fe991F6C9" as Address,
 
     VoteSphereToken: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
   },

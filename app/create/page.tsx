@@ -16,8 +16,6 @@ import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import Link from "next/link";
 
-const tokenNamesMock = ["EquitoHackathon"];
-
 const equitoVoteAbi = equitoVote.abi;
 
 interface FormData {
@@ -114,14 +112,22 @@ export default function HomePage() {
     chainId: sourceChain?.definition.id,
   });
 
-  const { data: tokensNamesData } = useReadContract({
-    address: destinationChain?.equitoVoteContractV2,
+  const { data: tokenNamesLength } = useReadContract({
+    address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
-    functionName: "tokenNames",
+    functionName: "getTokenNamesLength",
     chainId: destinationChain.definition.id,
   });
-  // const tokenNames = tokensNamesData as string[] | undefined;
-  const tokenNames = tokenNamesMock;
+
+  const { data: tokenNamesData } = useReadContract({
+    address: destinationChain.equitoVoteContractV2,
+    abi: equitoVoteAbi,
+    functionName: "getTokenNamesSlice",
+    args: [0, tokenNamesLength],
+    query: { enabled: !!tokenNamesLength },
+    chainId: destinationChain.definition.id,
+  });
+  const tokenNames = tokenNamesData as string[] | undefined;
 
   const formattedSourceChainFee = sourceFee
     ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${

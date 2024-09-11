@@ -399,6 +399,22 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         return slicedProposals;
     }
 
+    function getTokenNamesSlice(
+        uint256 startIndex,
+        uint256 endIndex
+    ) external view returns (string[] memory) {
+        string[] memory slicedTokenNames = new string[](endIndex - startIndex);
+        string[] memory tokenNamesCopy = tokenNames;
+        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
+            slicedTokenNames[i] = tokenNamesCopy[i];
+        }
+        return slicedTokenNames;
+    }
+
+    function getTokenNamesLength() external view returns (uint256) {
+        return tokenNames.length;
+    }
+
     // --- internal mutative functions ---
 
     /// @notice Receive the cross chain message on the destination chain.

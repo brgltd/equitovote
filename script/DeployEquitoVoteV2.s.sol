@@ -3,9 +3,9 @@ pragma solidity ^0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
 import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses.sol";
-import {EquitoVote} from "../src/EquitoVote.sol";
+import {EquitoVoteV2} from "../src/EquitoVoteV2.sol";
 
-contract DeployEquitoVote is Script {
+contract DeployEquitoVoteV2 is Script {
     string constant DEPLOYED_TO_ETHEREUM_SEPOLIA = "ETHEREUM_SEPOLIA";
 
     string constant DEPLOYED_TO_ARBITRUM_SEPOLIA = "ARBITRUM_SEPOLIA";
@@ -15,18 +15,18 @@ contract DeployEquitoVote is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        address routerAddress = getChain();
+        address routerAddress = getRouterAddress();
 
         vm.startBroadcast(deployerPrivateKey);
 
         console.log("deploying EquitoVote");
-        EquitoVote equitoVote = new EquitoVote(routerAddress);
-        console.log("EquitoVote deployed to", address(equitoVote));
+        EquitoVoteV2 equitoVoteV2 = new EquitoVoteV2(routerAddress);
+        console.log("EquitoVote deployed to", address(equitoVoteV2));
 
         vm.stopBroadcast();
     }
 
-    function getChain() private view returns (address) {
+    function getRouterAddress() private view returns (address) {
         string memory deployedTo = vm.envString("DEPLOYED_TO");
         if (
             keccak256(abi.encodePacked(deployedTo)) ==
