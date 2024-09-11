@@ -86,6 +86,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     event TokenDataDeleted(string tokenName, uint256[] chainSelectors);
 
+    event TokenDataUpdated(
+        string tokenName,
+        uint256 chainSelector,
+        address tokenAddress
+    );
+
     // --- errors ---
 
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
@@ -256,6 +262,15 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     function setProtocolFee(uint256 newProtocolFee) external onlyOwner {
         protocolFee = newProtocolFee;
         emit ProtocolFeeUpdated(newProtocolFee);
+    }
+
+    function updateTokenData(
+        string calldata tokenName,
+        uint256 chainSelector,
+        address tokenAddress
+    ) external onlyOwner {
+        tokenData[tokenName][chainSelector] = tokenAddress;
+        emit TokenDataUpdated(tokenName, chainSelector, tokenAddress);
     }
 
     function deleteTokenData(

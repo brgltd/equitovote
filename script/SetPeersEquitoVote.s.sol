@@ -10,6 +10,8 @@ contract SetPeersEquitoVote is Script {
 
     string constant DEPLOYED_TO_ARBITRUM_SEPOLIA = "ARBITRUM_SEPOLIA";
 
+    string constant DEPLOYED_TO_OPTIMISM_SEPOLIA = "OPTIMISM_SEPOLIA";
+
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
@@ -21,20 +23,32 @@ contract SetPeersEquitoVote is Script {
             vm.envAddress("EQUITO_VOTE_ARBITRUM_SEPOLIA")
         );
 
+        address payable equitoVoteOptimismSepolia = payable(
+            vm.envAddress("EQUITO_VOTE_OPTIMISM_SEPOLIA")
+        );
+
         EquitoVote equitoVote = EquitoVote(
-            getChain(equitoVoteEthereumSepolia, equitoVoteArbitrumSepolia)
+            getChain(
+                equitoVoteEthereumSepolia,
+                equitoVoteArbitrumSepolia,
+                equitoVoteOptimismSepolia
+            )
         );
 
         uint256[] memory chainSelectors = new uint256[](2);
         chainSelectors[0] = 1001; // Ethereum
         chainSelectors[1] = 1004; // Arbitrum
+        chainSelectors[2] = 1006; // Optimism
 
-        bytes64[] memory addresses = new bytes64[](2);
+        bytes64[] memory addresses = new bytes64[](3);
         addresses[0] = EquitoMessageLibrary.addressToBytes64(
             equitoVoteEthereumSepolia
         );
         addresses[1] = EquitoMessageLibrary.addressToBytes64(
             equitoVoteArbitrumSepolia
+        );
+        addresses[2] = EquitoMessageLibrary.addressToBytes64(
+            equitoVoteOptimismSepolia
         );
 
         vm.startBroadcast(deployerPrivateKey);
@@ -46,7 +60,8 @@ contract SetPeersEquitoVote is Script {
 
     function getChain(
         address payable equitoVoteEthereumSepolia,
-        address payable equitoVoteArbitrumSepolia
+        address payable equitoVoteArbitrumSepolia,
+        address payable equitoVoteOptimismSepolia
     ) private view returns (address payable) {
         string memory deployedTo = vm.envString("DEPLOYED_TO");
         if (
@@ -59,6 +74,11 @@ contract SetPeersEquitoVote is Script {
             keccak256(abi.encodePacked(DEPLOYED_TO_ARBITRUM_SEPOLIA))
         ) {
             return equitoVoteArbitrumSepolia;
+        } else if (
+            keccak256(abi.encodePacked(deployedTo)) ==
+            keccak256(abi.encodePacked(DEPLOYED_TO_OPTIMISM_SEPOLIA))
+        ) {
+            return equitoVoteOptimismSepolia;
         }
         revert("Invalid DEPLOYED_TO");
     }
