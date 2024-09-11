@@ -206,7 +206,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         bytes64 memory receiver = peers[destinationChainSelector];
 
         uint256 normalizedNumVotes = numVotes /
-            IERC20Metadata(tokenAddress).decimals();
+            10 ** IERC20Metadata(tokenAddress).decimals();
 
         Proposal memory emptyNewProposal;
 

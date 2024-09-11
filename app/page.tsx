@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useReadContract } from "wagmi";
 import { formatProposals } from "@/utils/helpers";
 import { ProposalResponse } from "@/types";
-import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 
 const equitoVoteAbi = equitoVote.abi;
@@ -63,13 +63,11 @@ export default function HomePage() {
             <div>numVotesYes {item.numVotesYes}</div>
             <div>numVotesNo {item.numVotesNo}</div>
             <div>numVotesAbstain {item.numVotesAbstain}</div>
-            <div>erc20 {item.erc20}</div>
-            <div>creator {item.creator}</div>
             <div>title {item.title}</div>
             <div>description {item.description}</div>
             <div>id {item.id}</div>
             <div>startBlockNumber {item.startBlockNumber}</div>
-            <div>tokenName {item.tokenName}</div>
+            <div>token name {item.tokenName}</div>
             <div>Proposal Created On: {item.originChainSelector}</div>
             <div>Voting Available On: [1001, 1004, 1006]</div>
             <Link href={`/vote/${item.id}`}>Vote</Link>

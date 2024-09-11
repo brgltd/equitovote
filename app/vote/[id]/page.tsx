@@ -408,7 +408,7 @@ export default function Vote({ params }: VoteProps) {
         <div>
           <button
             onClick={onClickDelegate}
-            disabled={!!tokenAddress && !isDelegating}
+            disabled={!tokenAddress || isDelegating}
           >
             Delegate Tokens
           </button>
