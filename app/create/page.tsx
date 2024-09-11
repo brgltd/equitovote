@@ -90,7 +90,7 @@ export default function HomePage() {
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [sourceChain?.equitoVoteContract as Address],
+    args: [sourceChain?.equitoVoteContractV2 as Address],
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
@@ -99,13 +99,13 @@ export default function HomePage() {
     address: destinationRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [destinationChain.equitoVoteContract as Address],
+    args: [destinationChain.equitoVoteContractV2 as Address],
     query: { enabled: !!destinationRouterAddress },
     chainId: destinationChain.definition.id,
   });
 
   const { data: createProposalFee } = useReadContract({
-    address: sourceChain?.equitoVoteContract,
+    address: sourceChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "protocolFee",
     query: { enabled: !!sourceRouterAddress },
@@ -113,7 +113,7 @@ export default function HomePage() {
   });
 
   const { data: tokensNamesData } = useReadContract({
-    address: destinationChain?.equitoVoteContract,
+    address: destinationChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "tokenNames",
     chainId: destinationChain.definition.id,
@@ -150,7 +150,7 @@ export default function HomePage() {
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
-      address: sourceChain.equitoVoteContract as Address,
+      address: sourceChain.equitoVoteContractV2 as Address,
       abi: equitoVoteAbi,
       functionName: "createProposal",
       args: Object.values(

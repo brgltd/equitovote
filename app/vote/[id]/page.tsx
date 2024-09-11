@@ -20,8 +20,6 @@ import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 
-import equitoVoteV1 from "@/out/EquitoVote.sol/EquitoVote.json";
-
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
 
@@ -109,9 +107,8 @@ export default function Vote({ params }: VoteProps) {
     isError: isErrorFetchingProposals,
     error: errorFetchingProposals,
   } = useReadContract({
-    address: destinationChain.equitoVoteContract,
-    // abi: equitoVoteAbi,
-    abi: equitoVoteV1.abi,
+    address: destinationChain.equitoVoteContractV2,
+    abi: equitoVoteAbi,
     functionName: "proposals",
     args: [proposalId],
     chainId: destinationChain.definition.id,
@@ -131,7 +128,7 @@ export default function Vote({ params }: VoteProps) {
 
   // Token address for the chain that the user is currently connected
   const { data: tokenAddressData } = useReadContract({
-    address: destinationChain.equitoVoteContract,
+    address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "tokenData",
     args: [formattedProposal?.tokenName, sourceChain?.chainSelector],
@@ -182,7 +179,7 @@ export default function Vote({ params }: VoteProps) {
   const amountDelegatedTokens = amountDelegatedTokensData as bigint | undefined;
 
   const { data: amountUserVotesData } = useReadContract({
-    address: sourceChain?.equitoVoteContract,
+    address: sourceChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "userVotes",
     args: [formattedProposal.tokenName, formattedProposal?.id],
@@ -204,7 +201,7 @@ export default function Vote({ params }: VoteProps) {
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [sourceChain?.equitoVoteContract as Address],
+    args: [sourceChain?.equitoVoteContractV2 as Address],
     query: { enabled: !!fromRouterAddress },
     chainId: sourceChain?.definition.id,
   });
@@ -213,7 +210,7 @@ export default function Vote({ params }: VoteProps) {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [destinationChain.equitoVoteContract as Address],
+    args: [destinationChain.equitoVoteContractV2 as Address],
     query: { enabled: !!toRouterAddress },
     chainId: destinationChain.definition.id,
   });
@@ -253,7 +250,7 @@ export default function Vote({ params }: VoteProps) {
 
   const voteOnProposal = async (voteOption: VoteOption) => {
     const hash = await writeContractAsync({
-      address: sourceChain?.equitoVoteContract as Address,
+      address: sourceChain?.equitoVoteContractV2 as Address,
       abi: equitoVoteAbi,
       functionName: "voteOnProposal",
       args: [

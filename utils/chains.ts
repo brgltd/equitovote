@@ -71,7 +71,8 @@ export const ethereumChain = {
   img: 1027,
   definition: sepolia,
   pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
-  equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteActive,
+  equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteV1,
+  equitoVoteContractV1: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
 };
 
 export const arbitrumChain = {
@@ -80,7 +81,8 @@ export const arbitrumChain = {
   img: 11841,
   definition: arbitrumSepolia,
   pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
-  equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
+  equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteV1,
+  equitoVoteContractV1: AddressesPerChain.ArbitrumSepolia.EquitoVoteV2,
 };
 
 export const optimismChain = {
@@ -89,7 +91,8 @@ export const optimismChain = {
   img: 11840,
   definition: optimismSepolia,
   pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
-  equitoVoteContract: AddressesPerChain.OptimismSepolia.EquitoVoteActive,
+  equitoVoteContract: AddressesPerChain.OptimismSepolia.EquitoVoteV1,
+  equitoVoteContractV2: AddressesPerChain.OptimismSepolia.EquitoVoteV2,
 };
 
 export const blastChain = {
@@ -232,6 +235,7 @@ export type Chain = {
   definition: Definition;
   pingPongContract: Address;
   equitoVoteContract?: Address;
+  equitoVoteContractV2?: Address;
 };
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";

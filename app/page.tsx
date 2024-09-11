@@ -14,14 +14,14 @@ export default function HomePage() {
   const { destinationChain } = useEquitoVote();
 
   const { data: proposalsLength } = useReadContract({
-    address: destinationChain.equitoVoteContract,
+    address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "getProposalIdsLength",
     chainId: destinationChain.definition.id,
   });
 
   const { data: proposals, isLoading: isLoadingProposals } = useReadContract({
-    address: destinationChain.equitoVoteContract,
+    address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
     args: [0, proposalsLength],
