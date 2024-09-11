@@ -35,7 +35,7 @@ contract SetPeersEquitoVote is Script {
             )
         );
 
-        uint256[] memory chainSelectors = new uint256[](2);
+        uint256[] memory chainSelectors = new uint256[](3);
         chainSelectors[0] = 1001; // Ethereum
         chainSelectors[1] = 1004; // Arbitrum
         chainSelectors[2] = 1006; // Optimism
