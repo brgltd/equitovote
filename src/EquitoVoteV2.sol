@@ -230,15 +230,13 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         uint256[] memory chainSelectors,
         address[] memory tokenAddresses
     ) external {
-        if (msg.sender != owner()) {
-            uint256 tokenNamesLength = tokenNames.length;
-            for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
-                if (
-                    keccak256(abi.encode(tokenName)) ==
-                    keccak256(abi.encode(tokenNames[i]))
-                ) {
-                    revert TokenAlreadySet(tokenName);
-                }
+        uint256 tokenNamesLength = tokenNames.length;
+        for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
+            if (
+                keccak256(abi.encode(tokenName)) ==
+                keccak256(abi.encode(tokenNames[i]))
+            ) {
+                revert TokenAlreadySet(tokenName);
             }
         }
         uint256 chainSelectorsLength = chainSelectors.length;

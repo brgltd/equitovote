@@ -83,13 +83,21 @@ export const arbitrumChain = {
   equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteActive,
 };
 
+export const blastChain = {
+  chainSelector: 1018,
+  name: "Blast Sepolia",
+  img: 28480,
+  definition: blastSepolia,
+  pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
+  // TODO: add equitoVoteContract once deployed
+};
+
 export const optimismChain = {
   chainSelector: 1006,
   name: "Optimism Sepolia",
   img: 11840,
   definition: optimismSepolia,
   pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
-  // TODO: add equitoVoteContract once deployed
 };
 
 export const chains: Chain[] = [
@@ -180,13 +188,7 @@ export const chains: Chain[] = [
     definition: seiEvmAtlantic,
     pingPongContract: "0x79B880BB92fa287255A1d8Ede1cC77d15dc361Ce",
   },
-  {
-    chainSelector: 1018,
-    name: "Blast Sepolia",
-    img: 28480,
-    definition: blastSepolia,
-    pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631",
-  },
+  blastChain,
   {
     chainSelector: 1019,
     name: "Gnosis Chiado",

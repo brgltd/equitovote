@@ -212,7 +212,6 @@ export default function Page() {
       console.log("executionMessage");
       console.log(executionMessage);
     } catch (error) {
-      // TODO: show a toast with the error
       console.error(error);
     }
   };

@@ -279,10 +279,6 @@ export default function Vote({ params }: VoteProps) {
 
       await switchChainAsync({ chainId: sourceChain?.definition.id });
 
-      // if (Number(formatUnits(allowance, decimals)) < Number(amount)) {
-      //   await approveERC20();
-      // }
-
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
       const logs = parseEventLogs({
@@ -419,7 +415,7 @@ export default function Vote({ params }: VoteProps) {
           >
             Delegate Tokens
           </button>
-          {isDelegating && <div>delegatin in progress...</div>}
+          {isDelegating && <div>delegation in progress...</div>}
         </div>
         <hr />
         <input

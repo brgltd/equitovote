@@ -106,7 +106,7 @@ export default function SetTokenDataPage() {
           onClick={onClickSetTokenData}
           disabled={!Object.values(formData).every(Boolean)}
         >
-          Set Token Data
+          Add Token
         </button>
       </div>
     </div>
