@@ -66,6 +66,15 @@ function formatBigInt(input: bigint | undefined) {
   return !input ? "N/A" : Number(input);
 }
 
+function formatBalance(
+  input: bigint | undefined,
+  decimals: number | undefined,
+) {
+  return !input || !decimals
+    ? "N/A"
+    : Number(formatUnits(input, decimals)).toFixed(4);
+}
+
 export default function Vote({ params }: VoteProps) {
   const { id: proposalId } = params;
 
@@ -400,9 +409,10 @@ export default function Vote({ params }: VoteProps) {
           <div>originalChainSelector {activeProposal.originChainSelector}</div>
         </div>
         <hr />
-        <div>token balance: {formatBigInt(userTokenBalance)}</div>
+        <div>token balance: {formatBalance(userTokenBalance, decimals)}</div>
         <div>
-          amount delegated tokens: {formatBigInt(amountDelegatedTokens)}
+          amount delegated tokens:{" "}
+          {formatBalance(amountDelegatedTokens, decimals)}
         </div>
         <div>amount user votes: {formatBigInt(amountUserVotes)}</div>
         <div>
