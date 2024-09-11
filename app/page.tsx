@@ -20,7 +20,12 @@ export default function HomePage() {
     chainId: destinationChain.definition.id,
   });
 
-  const { data: proposals, isLoading: isLoadingProposals } = useReadContract({
+  const {
+    data: proposals,
+    isLoading: isLoadingProposals,
+    isError: isErrorFetchingProposals,
+    error: errorFetchingProposals,
+  } = useReadContract({
     address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
@@ -34,34 +39,43 @@ export default function HomePage() {
     [proposals],
   );
 
+  if (isErrorFetchingProposals) {
+    console.error(errorFetchingProposals);
+    return <div>error</div>;
+  }
+
+  if (isLoadingProposals) {
+    return <div>loading</div>;
+  }
+
+  if (!normalizedProposals.length) {
+    return <div>no proposal created</div>;
+  }
+
   return (
     <div>
-      {isLoadingProposals ? (
-        <div>loading</div>
-      ) : (
-        normalizedProposals.map((item) => (
-          <div key={item.id}>
-            <hr />
-            <div>
-              <div>startTimestamp {item.startTimestamp}</div>
-              <div>endTimestamp {item.endTimestamp}</div>
-              <div>numVotesYes {item.numVotesYes}</div>
-              <div>numVotesNo {item.numVotesNo}</div>
-              <div>numVotesAbstain {item.numVotesAbstain}</div>
-              <div>erc20 {item.erc20}</div>
-              <div>creator {item.creator}</div>
-              <div>title {item.title}</div>
-              <div>description {item.description}</div>
-              <div>id {item.id}</div>
-              <div>startBlockNumber {item.startBlockNumber}</div>
-              <div>tokenName {item.tokenName}</div>
-              <div>Proposal Created On: {item.originChainSelector}</div>
-              <div>Voting Available On: [1001, 1004, 1006]</div>
-              <Link href={`/vote/${item.id}`}>Vote</Link>
-            </div>
+      {normalizedProposals.map((item) => (
+        <div key={item.id}>
+          <hr />
+          <div>
+            <div>startTimestamp {item.startTimestamp}</div>
+            <div>endTimestamp {item.endTimestamp}</div>
+            <div>numVotesYes {item.numVotesYes}</div>
+            <div>numVotesNo {item.numVotesNo}</div>
+            <div>numVotesAbstain {item.numVotesAbstain}</div>
+            <div>erc20 {item.erc20}</div>
+            <div>creator {item.creator}</div>
+            <div>title {item.title}</div>
+            <div>description {item.description}</div>
+            <div>id {item.id}</div>
+            <div>startBlockNumber {item.startBlockNumber}</div>
+            <div>tokenName {item.tokenName}</div>
+            <div>Proposal Created On: {item.originChainSelector}</div>
+            <div>Voting Available On: [1001, 1004, 1006]</div>
+            <Link href={`/vote/${item.id}`}>Vote</Link>
           </div>
-        ))
-      )}
+        </div>
+      ))}
     </div>
   );
 }
