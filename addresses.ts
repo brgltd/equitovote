@@ -24,13 +24,13 @@ export const AddressesPerChain = {
   },
   ArbitrumSepolia: {
     EquitoVoteV1: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
-    EquitoVoteV2: "0x454CbDa3dD385bF6db681f3E716A2a94b738bBd7" as Address,
+    EquitoVoteV2: "0x8E4a5DF04571504E6E2168DAd18dA09d871179d7" as Address,
 
     VoteSphere: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
   },
   OptimismSepolia: {
     EquitoVoteV1: "0x0000000000000000000000000000000000000000" as Address, // V1 not deployed to optimism
-    EquitoVoteV2: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
+    EquitoVoteV2: "0x496667E89C15409e9a1E7e0f2D15DcDFac430300" as Address,
 
     VoteSphere: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
   },
