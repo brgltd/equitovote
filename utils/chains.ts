@@ -72,7 +72,7 @@ export const ethereumChain = {
   definition: sepolia,
   pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
   equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteV1,
-  equitoVoteContractV1: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
+  equitoVoteContractV2: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
 };
 
 export const arbitrumChain = {
@@ -82,7 +82,7 @@ export const arbitrumChain = {
   definition: arbitrumSepolia,
   pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
   equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteV1,
-  equitoVoteContractV1: AddressesPerChain.ArbitrumSepolia.EquitoVoteV2,
+  equitoVoteContractV2: AddressesPerChain.ArbitrumSepolia.EquitoVoteV2,
 };
 
 export const optimismChain = {

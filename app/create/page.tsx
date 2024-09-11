@@ -86,7 +86,7 @@ export default function HomePage() {
     },
   });
 
-  const { data: sourceFee } = useReadContract({
+  const { data: sourceFee, error } = useReadContract({
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
@@ -94,6 +94,8 @@ export default function HomePage() {
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
+
+  console.log(error);
 
   const { data: destinationFee } = useReadContract({
     address: destinationRouterAddress,
