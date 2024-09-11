@@ -20,21 +20,18 @@ export const AddressesPerChain = {
     EquitoVoteV1: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
     EquitoVoteActive: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
 
-    VoteSphereV1: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
-    VoteShereActive: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
+    VoteSphere: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
   },
   ArbitrumSepolia: {
     EquitoVoteV1: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
     EquitoVoteActive: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
 
-    VoteSphereV1: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
-    VoteSphereActive: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
+    VoteSphere: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
   },
   OptimismSepolia: {
     EquitoVoteV1: "" as Address,
     EquitoVoteActive: "" as Address,
 
-    VoteSphereV1: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
-    VoteSphereActive: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
+    VoteSphere: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
   },
 };
