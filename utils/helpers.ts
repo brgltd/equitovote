@@ -67,5 +67,5 @@ export function buildProposalFromArray(
 }
 
 export function verifyIsGetPastVotesEnabled() {
-  return process.env.NEXT_PUBLIC_GET_PAST_VOTES_ENABLED === "true";
+  return process.env.NEXT_PUBLIC_IS_GET_PAST_VOTES_ENABLED_ENABLED === "true";
 }
