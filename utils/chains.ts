@@ -228,6 +228,14 @@ export const supportedChains: Chain[] = [
   optimismChain,
 ];
 
+export const supportedChainsMap = supportedChains.reduce(
+  (acc: SupportedChainsMap, curr) => {
+    acc[curr.definition.id] = curr;
+    return acc;
+  },
+  {},
+);
+
 export type Chain = {
   chainSelector: number;
   name: string;
@@ -237,6 +245,8 @@ export type Chain = {
   equitoVoteContract?: Address;
   equitoVoteContractV2?: Address;
 };
+
+export type SupportedChainsMap = Record<number, Chain>;
 
 export const NATIVE_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 

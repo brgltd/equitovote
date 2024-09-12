@@ -1,5 +1,6 @@
 import { useRouter } from "@/hooks/use-router";
-import { Chain, destinationChain } from "@/utils/chains";
+import { Chain, destinationChain, supportedChainsMap } from "@/utils/chains";
+import { config } from "@/utils/wagmi";
 import { UseQueryResult } from "@tanstack/react-query";
 import {
   createContext,
@@ -11,7 +12,7 @@ import {
   useState,
 } from "react";
 import { Address } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 
 type EquitoVoteContext =
   | {
@@ -33,9 +34,16 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
 
   const { address: userAddress } = useAccount();
 
+  const chainId = useChainId();
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    const connectedChain = supportedChainsMap[chainId];
+    setSourceChain(connectedChain);
+  }, [chainId]);
 
   const sourceRouter = useRouter({ chainSelector: sourceChain?.chainSelector });
   const destinationRouter = useRouter({
