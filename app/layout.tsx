@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -16,7 +16,7 @@ import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
-const darkTheme = createTheme({
+const muiDarkTheme = createTheme({
   palette: {
     mode: "dark",
   },
@@ -38,20 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* <head> 
-        <title>title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head> */}
-
       <body className={inter.className}>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider
-              theme={midnightTheme({
-                accentColor: "#6f76f6",
-                accentColorForeground: "white",
-              })}
-            >
+            <RainbowKitProvider theme={darkTheme()}>
               {/* EquitoProvider and PingPongProvider used for testing and healthcheck */}
               {/* route /pingpong = test contracts deployed from equito team */}
               {/* route /healthcheck = test a healthcheck contract that makes a crosschain call */}
@@ -60,7 +50,7 @@ export default function RootLayout({
                   {/* EquitoVoteProvider holds global data, e.g. connected address, user source chain etc */}
                   <EquitoVoteProvider>
                     <AppRouterCacheProvider>
-                      <ThemeProvider theme={darkTheme}>
+                      <ThemeProvider theme={muiDarkTheme}>
                         <CssBaseline />
                         <Navbar />
                         {children}
