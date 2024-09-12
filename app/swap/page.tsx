@@ -8,11 +8,11 @@ import {
   useAccount,
 } from "wagmi";
 import { waitForTransactionReceipt, getBlock } from "@wagmi/core";
-import { formatUnits, parseEventLogs } from "viem";
+import { Address, formatUnits, parseEventLogs } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { chains } from "../../utils/chains";
+import { ethereumChain, arbitrumChain } from "../../utils/chains";
 import { config } from "../../utils/wagmi";
 import { useRouter } from "../../hooks/use-router";
 import { useApprove } from "../../hooks/use-approve";
@@ -22,10 +22,6 @@ import erc20Abi from "../../abis/erc20.json";
 import equitoSwap from "../../out/EquitoSwap.sol/EquitoSwap.json";
 
 const equitoSwapAbi = equitoSwap.abi;
-
-// TODO: replace with chain select.
-const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
-const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -49,7 +45,7 @@ export default function Page() {
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoSwap_EthereumSepolia_V1],
+    args: [Addresses.EquitoSwap_EthereumSepolia_V1 as Address],
     query: { enabled: !!fromRouterAddress },
     chainId: ethereumChain.definition.id,
   });
@@ -58,13 +54,13 @@ export default function Page() {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoSwap_ArbitrumSepolia_V1],
+    args: [Addresses.EquitoSwap_ArbitrumSepolia_V1 as Address],
     query: { enabled: !!toRouterAddress },
     chainId: arbitrumChain.definition.id,
   });
 
   const { data: peers } = useReadContract({
-    address: Addresses.EquitoSwap_EthereumSepolia_V1,
+    address: Addresses.EquitoSwap_EthereumSepolia_V1 as Address,
     abi: equitoSwapAbi,
     functionName: "peers",
     args: [1004],
@@ -72,7 +68,7 @@ export default function Page() {
   });
 
   const { data: arbitrumPeers } = useReadContract({
-    address: Addresses.EquitoSwap_ArbitrumSepolia_V1,
+    address: Addresses.EquitoSwap_ArbitrumSepolia_V1 as Address,
     abi: equitoSwapAbi,
     functionName: "peers",
     args: [1001],
@@ -110,7 +106,7 @@ export default function Page() {
 
   const approveLink = async () => {
     const hash = await writeContractAsync({
-      address: Addresses.Link_EthereumSepolia,
+      address: Addresses.Link_EthereumSepolia as Address,
       abi: erc20Abi,
       functionName: "approve",
       // approve 25 link
@@ -121,7 +117,7 @@ export default function Page() {
 
   const bridgeToken = async () => {
     const hash = await writeContractAsync({
-      address: Addresses.EquitoSwap_EthereumSepolia_V1,
+      address: Addresses.EquitoSwap_EthereumSepolia_V1 as Address,
       abi: equitoSwapAbi,
       functionName: "bridgeERC20",
       args: [
@@ -129,7 +125,7 @@ export default function Page() {
         Addresses.Link_EthereumSepolia, // sourceToken
         "0100000000000000000", // sourceAmount, 0.1 link
       ],
-      value: fromFee || 0,
+      value: fromFee || BigInt(0),
       chainId: ethereumChain?.definition.id,
     });
     return waitForTransactionReceipt(config, {
@@ -138,9 +134,10 @@ export default function Page() {
     });
   };
 
+  // @ts-ignore
   const deliverAndExecuteMessage = async (proof, message, messageData) => {
     const hash = await writeContractAsync({
-      address: toRouterAddress,
+      address: toRouterAddress as Address,
       abi: routerAbi,
       functionName: "deliverAndExecuteMessage",
       value: toFee,

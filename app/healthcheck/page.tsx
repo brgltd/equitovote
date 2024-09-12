@@ -8,11 +8,11 @@ import {
   useAccount,
 } from "wagmi";
 import { waitForTransactionReceipt, getBlock } from "@wagmi/core";
-import { formatUnits, parseEventLogs } from "viem";
+import { Address, formatUnits, parseEventLogs } from "viem";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { chains } from "../../utils/chains";
+import { ethereumChain, arbitrumChain } from "../../utils/chains";
 import { config } from "../../utils/wagmi";
 import { useRouter } from "../../hooks/use-router";
 import { useApprove } from "../../hooks/use-approve";
@@ -21,9 +21,6 @@ import { Addresses } from "../../addresses";
 import healthcheckContract from "../../out/Healthcheck.sol/Healthcheck.json";
 
 const healthcheckAbi = healthcheckContract.abi;
-
-const ethereumChain = chains.find((chain) => chain.name === "Ethereum Sepolia");
-const arbitrumChain = chains.find((chain) => chain.name === "Arbitrum Sepolia");
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -47,7 +44,7 @@ export default function Page() {
     address: fromRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoSwap_EthereumSepolia_V1],
+    args: [Addresses.EquitoSwap_EthereumSepolia_V1 as Address],
     query: { enabled: !!fromRouterAddress },
     chainId: ethereumChain.definition.id,
   });
@@ -56,7 +53,7 @@ export default function Page() {
     address: toRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [Addresses.EquitoSwap_ArbitrumSepolia_V1],
+    args: [Addresses.EquitoSwap_ArbitrumSepolia_V1 as Address],
     query: { enabled: !!toRouterAddress },
     chainId: arbitrumChain.definition.id,
   });

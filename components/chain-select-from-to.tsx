@@ -6,12 +6,15 @@ import { useEquito } from "../providers/equito-provider";
 import { chains } from "../utils/chains";
 import { toast } from "sonner";
 
+// @ts-ignore
 export function ChainSelect({ mode, disabled }) {
   const [isOpen, setIsOpen] = useState(false);
+  // @ts-ignore
   const { chain, setChain } = useEquito()[mode];
 
   const { switchChainAsync } = useSwitchChain();
 
+  // @ts-ignore
   const onClickSelectChain = async (chain) => {
     setIsOpen(false);
     if (mode === "from") {

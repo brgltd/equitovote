@@ -1,9 +1,9 @@
 "use client";
 
-import { useEquitoVote } from "@/providers/equito-vote-provider";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ChainSelect } from "./chain-select";
+import { useEquitoVote } from "@/providers/equito-vote-provider";
 
 export function Navbar() {
   const { isClient, userAddress } = useEquitoVote();
@@ -19,7 +19,7 @@ export function Navbar() {
         </li>
         <li>
           <ConnectButton
-            chainStatus="none"
+            chainStatus="full"
             showBalance={false}
             accountStatus={{
               smallScreen: "avatar",
@@ -30,7 +30,7 @@ export function Navbar() {
             ? `address: ${userAddress}`
             : "not connected"}
         </li>
-        <ChainSelect />
+        {/* <ChainSelect /> */}
       </ul>
     </nav>
   );

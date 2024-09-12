@@ -1,8 +1,3 @@
-export function ChainCard({ mode }) {
-	return (
-		<input
-			id="mode"
-			placeholder="write your message"
-		/>
-	);
+export function ChainCard({ mode }: { mode: string }) {
+  return <input id="mode" placeholder="write your message" />;
 }
