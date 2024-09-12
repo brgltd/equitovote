@@ -35,12 +35,17 @@ import { SyntheticEvent, useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export function Navbar() {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<null | number>(null);
   const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname === "/") setValue(0);
-    if (pathname === "/create") setValue(1);
+    if (pathname === "/") {
+      setValue(0);
+    } else if (pathname === "/create") {
+      setValue(1);
+    } else {
+      setValue(null);
+    }
   }, [pathname]);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
