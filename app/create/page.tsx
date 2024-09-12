@@ -15,6 +15,22 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import Link from "next/link";
+import { MenuItem, TextField } from "@mui/material";
+
+const currencies = [
+  {
+    value: "EUR",
+    label: "€",
+  },
+  {
+    value: "BTC",
+    label: "฿",
+  },
+  {
+    value: "JPY",
+    label: "¥",
+  },
+];
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -271,8 +287,9 @@ export default function HomePage() {
 
   return (
     <div>
+      <h2>Create New Proposal</h2>
       <div>
-        <select
+        {/* <select
           value={formData.tokenName}
           onChange={(e) =>
             setFormData({ ...formData, tokenName: e.target.value })
@@ -288,17 +305,38 @@ export default function HomePage() {
         <div>
           <span>Your DAO token not present?</span>
           <Link href="/set-token-data">Add New Token</Link>
-        </div>
+        </div> */}
+
+        <TextField
+          // error
+          id="outlined-select-currency"
+          select
+          label="Select a Token"
+          // defaultValue="EUR"
+          helperText="Please select your currency"
+        >
+          {currencies.map((option: any) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </div>
 
       <div>
-        <label htmlFor="title">title</label>
+        {/* <label htmlFor="title">title</label>
         <input
           id="title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           ref={proposalTitleRef}
           className="text-black"
+        /> */}
+        <TextField
+          // error
+          id="create-proposal-title"
+          label="Title"
+          // helperText="Please enter title"
         />
       </div>
 
