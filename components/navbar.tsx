@@ -48,7 +48,7 @@ export function Navbar() {
   };
 
   return (
-    <div className="flex md:flex-row flex-col items-center mt-6 mb-8 justify-center">
+    <div className="flex md:flex-row flex-col md:items-start items-center mt-6 mb-8 justify-center">
       <div className="md:ml-12 mb-8 md:mb-8">
         <Tabs
           value={value}
