@@ -2,12 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --text-color: red;
-}
-
 body {
-  color: var(--text-color) !important;
   background: linear-gradient(
     to right,
     #1b1d33,
