@@ -187,13 +187,13 @@ export default function Vote({ params }: VoteProps) {
   });
   const amountDelegatedTokens = amountDelegatedTokensData as bigint | undefined;
 
-  const { data: amountUserVotesData } = useReadContract({
+  const { data: amountUserVotesData, error } = useReadContract({
     address: sourceChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "userVotes",
-    args: [formattedProposal.tokenName, formattedProposal?.id],
+    args: [userAddress, formattedProposal?.id],
     chainId: sourceChain?.definition.id,
-    query: { enabled: isProposalLoaded && !!sourceChain },
+    query: { enabled: isProposalLoaded && !!sourceChain && !!userAddress },
   });
   const amountUserVotes = amountUserVotesData as bigint | undefined;
 
