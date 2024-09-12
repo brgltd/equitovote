@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.13.1",
+    "@emotion/styled": "^11.13.0",
     "@equito-sdk/client": "^0.1.4",
     "@equito-sdk/core": "^0.1.4",
     "@equito-sdk/evm": "^0.1.4",
     "@equito-sdk/viem": "^0.1.4",
+    "@mui/material": "^6.1.0",
+    "@mui/material-nextjs": "^6.1.0",
     "@rainbow-me/rainbowkit": "^2.1.4",
     "@tanstack/react-query": "^5.51.23",
     "@wagmi/core": "^2.13.0",

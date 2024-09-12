@@ -56,7 +56,6 @@ export default function HomePage() {
     <div>
       {normalizedProposals.map((item) => (
         <div key={item.id}>
-          <hr />
           <div>
             <div>startTimestamp {item.startTimestamp}</div>
             <div>endTimestamp {item.endTimestamp}</div>

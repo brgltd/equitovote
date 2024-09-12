@@ -5,6 +5,9 @@ import { Inter } from "next/font/google";
 import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import { wagmiConfig } from "../utils/wagmi";
 import { EquitoProvider } from "../providers/equito-provider";
 import { PingPongProvider } from "../providers/ping-pong-provider";
@@ -12,6 +15,12 @@ import { Navbar } from "@/components/navbar";
 import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +38,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* <head> 
+        <title>title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head> */}
+
       <body className={inter.className}>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
@@ -45,8 +59,13 @@ export default function RootLayout({
                 <PingPongProvider>
                   {/* EquitoVoteProvider holds global data, e.g. connected address, user source chain etc */}
                   <EquitoVoteProvider>
-                    <Navbar />
-                    {children}
+                    <AppRouterCacheProvider>
+                      <ThemeProvider theme={darkTheme}>
+                        <CssBaseline />
+                        <Navbar />
+                        {children}
+                      </ThemeProvider>
+                    </AppRouterCacheProvider>
                   </EquitoVoteProvider>
                 </PingPongProvider>
               </EquitoProvider>
