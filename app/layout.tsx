@@ -36,7 +36,6 @@ export default function RootLayout({
               theme={midnightTheme({
                 accentColor: "#6f76f6",
                 accentColorForeground: "white",
-                borderRadius: "small",
               })}
             >
               {/* EquitoProvider and PingPongProvider used for testing and healthcheck */}

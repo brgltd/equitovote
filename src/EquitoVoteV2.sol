@@ -42,6 +42,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
+    // Very small value to simulate a protocol fee for creating proposals during the hackathon
     uint256 public protocolFee = 0.000001e18;
 
     bytes32[] public proposalIds;
