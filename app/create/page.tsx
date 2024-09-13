@@ -21,17 +21,17 @@ import { Button } from "@/components/button";
 const equitoVoteAbi = equitoVote.abi;
 
 enum FormKeys {
-  Title = "title",
-  Description = "description",
-  DurationHours = "durationHours",
-  TokenName = "tokenName",
+  title = "title",
+  description = "description",
+  durationHours = "durationHours",
+  tokenName = "tokenName",
 }
 
 interface FormData {
-  [FormKeys.Title]: string;
-  [FormKeys.Description]: string;
-  [FormKeys.DurationHours]: string;
-  [FormKeys.TokenName]: string;
+  [FormKeys.title]: string;
+  [FormKeys.description]: string;
+  [FormKeys.durationHours]: string;
+  [FormKeys.tokenName]: string;
 }
 
 interface CreateProposalArgs {
@@ -317,9 +317,9 @@ export default function HomePage() {
           onChange={(e) =>
             setFormData({ ...formData, tokenName: e.target.value })
           }
-          error={formErrors.has(FormKeys.TokenName) && !formData.tokenName}
+          error={formErrors.has(FormKeys.tokenName) && !formData.tokenName}
           helperText={
-            formErrors.has(FormKeys.TokenName) && !formData.tokenName
+            formErrors.has(FormKeys.tokenName) && !formData.tokenName
               ? "Please select a token"
               : undefined
           }
@@ -353,9 +353,9 @@ export default function HomePage() {
           label="Title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          error={formErrors.has(FormKeys.Title) && !formData.title}
+          error={formErrors.has(FormKeys.title) && !formData.title}
           helperText={
-            formErrors.has(FormKeys.Title) && !formData.title
+            formErrors.has(FormKeys.title) && !formData.title
               ? "Please select a title"
               : undefined
           }
