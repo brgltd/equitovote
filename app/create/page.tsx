@@ -8,7 +8,7 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { MenuItem, TextField } from "@mui/material";
+import { CircularProgress, MenuItem, TextField } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -36,8 +36,8 @@ interface CreateProposalArgs {
 }
 
 interface OptionString {
-  label: string;
-  value: string;
+  label?: string | undefined;
+  value?: string | undefined;
 }
 
 const defaultFormData: FormData = {
@@ -123,14 +123,15 @@ export default function HomePage() {
     chainId: destinationChain.definition.id,
   });
 
-  const { data: tokenNamesData } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
-    abi: equitoVoteAbi,
-    functionName: "getTokenNamesSlice",
-    args: [0, tokenNamesLength],
-    query: { enabled: !!tokenNamesLength },
-    chainId: destinationChain.definition.id,
-  });
+  const { data: tokenNamesData, isPending: isPendingTokenNames } =
+    useReadContract({
+      address: destinationChain.equitoVoteContractV2,
+      abi: equitoVoteAbi,
+      functionName: "getTokenNamesSlice",
+      args: [0, tokenNamesLength],
+      query: { enabled: !!tokenNamesLength },
+      chainId: destinationChain.definition.id,
+    });
   const tokenNames = tokenNamesData as string[] | undefined;
 
   const formattedSourceChainFee = sourceFee
@@ -159,15 +160,6 @@ export default function HomePage() {
   const tokenNamesOption = useMemo(
     () => tokenNames?.map((name) => ({ value: name, label: name })),
     [tokenNames],
-  );
-
-  const tokenNamesOption2 = useMemo(
-    () => [
-      { ...tokenNamesOption?.[0] },
-      { value: "Option 2", label: "Option 2" },
-      { value: "Option 3", label: "Option 3" },
-    ],
-    [tokenNamesOption],
   );
 
   useEffect(() => {
@@ -291,8 +283,8 @@ export default function HomePage() {
 
   return (
     <div className="ml-16">
-      <h2 className="mb-6">Create New Proposal</h2>
-      <div className="mb-6">
+      <h2 className="mb-6 text-xl font-semibold">Create New Proposal</h2>
+      <div className="mb-6 flex flex-row items-center">
         {/* <select
           value={formData.tokenName}
           onChange={(e) =>
@@ -318,14 +310,19 @@ export default function HomePage() {
           sx={{ width: "300px" }}
           // error
           // helperText="Please select your currency"
+          disabled={isPendingTokenNames}
         >
-          {/* @ts-ignore */}
-          {tokenNamesOption2?.map((option: OptionString) => (
+          {(tokenNamesOption || []).map((option: OptionString) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
           ))}
         </TextField>
+        {isPendingTokenNames && (
+          <div className="ml-8">
+            <CircularProgress size={30} />
+          </div>
+        )}
       </div>
 
       <div className="mb-6">
