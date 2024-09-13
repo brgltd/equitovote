@@ -13,7 +13,6 @@ import {
   createTheme,
   MenuItem,
   TextField,
-  useTheme,
 } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
@@ -22,7 +21,6 @@ import { Status } from "@/types";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
-import { ButtonLink } from "@/components/button-link";
 import { Button } from "@/components/button";
 
 const equitoVoteAbi = equitoVote.abi;
@@ -270,27 +268,6 @@ export default function HomePage() {
   };
 
   const CreateProposalButton = ({ cta }: { cta: string }) => (
-    // <Button
-    //   onClick={onClickCreateProposal}
-    //   // disabled={!Object.values(formData).every(Boolean) || !sourceChain}
-    //   variant="contained"
-    //   // sx={{
-    //   //   bgcolor: lightTheme.palette.primary.main,
-    //   //   color: lightTheme.palette.primary.contrastText,
-    //   //   "&:hover": {
-    //   //     bgcolor: lightTheme.palette.primary.dark,
-    //   //   },
-    //   // }}
-    //   sx={{
-    //     backgroundColor: "rgba(25, 118, 210, 0.5)",
-    //     color: "white",
-    //     "&:hover": {
-    //       bgcolor: lightTheme.palette.primary.dark,
-    //     },
-    //   }}
-    // >
-    //   {cta}
-    // </Button>
     <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
   );
 
@@ -341,7 +318,7 @@ export default function HomePage() {
           label="Token Name"
           sx={{ width: "350px" }}
           // error
-          // helperText="Please select your currency"
+          // helperText="Please select a token"
           disabled={isPendingTokenNames}
           value={formData.tokenName}
           onChange={(e) =>
