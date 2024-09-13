@@ -83,7 +83,7 @@ function buildCreateProposalArgs(
 export default function CreateProposalPage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
-  const [formErrors, setFormErrors] = useState(new Set());
+  const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
 
   const proposalTitleRef = useRef<HTMLInputElement>(null);
 
@@ -201,7 +201,7 @@ export default function CreateProposalPage() {
 
   const onClickCreateProposal = async () => {
     if (!Object.values(formData).every(Boolean)) {
-      const updatedFormErrors = new Set();
+      const updatedFormErrors: Set<FormKeys> = new Set();
       if (!formData.tokenName) {
         updatedFormErrors.add(FormKeys.tokenName);
       }
