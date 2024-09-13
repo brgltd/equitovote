@@ -8,12 +8,7 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import {
-  CircularProgress,
-  createTheme,
-  MenuItem,
-  TextField,
-} from "@mui/material";
+import { CircularProgress, MenuItem, TextField } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -71,15 +66,10 @@ function buildCreateProposalArgs(
   };
 }
 
-const lightTheme = createTheme({
-  palette: {
-    mode: "light",
-  },
-});
-
 export default function HomePage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
+  const [formErrors, setFormErrors] = useState(new Set());
 
   const proposalTitleRef = useRef<HTMLInputElement>(null);
 
@@ -196,8 +186,25 @@ export default function HomePage() {
   };
 
   const onClickCreateProposal = async () => {
+    if (!Object.values(formData).every(Boolean)) {
+      const updatedFormErrors = new Set();
+      if (!formData.tokenName) {
+        updatedFormErrors.add("tokenName");
+      }
+      if (!formData.title) {
+        updatedFormErrors.add("title");
+      }
+      if (!formData.description) {
+        updatedFormErrors.add("description");
+      }
+      if (!formData.durationHours) {
+        updatedFormErrors.add("durationHours");
+      }
+      setFormErrors(updatedFormErrors);
+      return;
+    }
+    setStatus(Status.IsExecutingBaseTxOnSourceChain);
     try {
-      setStatus(Status.IsExecutingBaseTxOnSourceChain);
       await switchChainAsync({ chainId: sourceChain.definition.id });
       const createProposalReceipt = await createProposal();
 
@@ -294,36 +301,22 @@ export default function HomePage() {
     <div className="ml-16">
       <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
       <div className="mb-4 flex flex-row items-center">
-        {/* <select
-          value={formData.tokenName}
-          onChange={(e) =>
-            setFormData({ ...formData, tokenName: e.target.value })
-          }
-        >
-          <option value="">Select an option</option>
-          {tokenNames?.map((tokenName) => (
-            <option key={tokenName} value={tokenName}>
-              {tokenName}
-            </option>
-          ))}
-        </select>
-        <div>
-          <span>Your DAO token not present?</span>
-          <Link href="/set-token-data">Add New Token</Link>
-        </div> */}
-
         <TextField
           id="select"
           select
           label="Token Name"
-          sx={{ width: "350px" }}
-          // error
-          // helperText="Please select a token"
           disabled={isPendingTokenNames}
           value={formData.tokenName}
           onChange={(e) =>
             setFormData({ ...formData, tokenName: e.target.value })
           }
+          error={formErrors.has("tokenName") && !formData.tokenName}
+          helperText={
+            formErrors.has("tokenName") && !formData.tokenName
+              ? "Please select a token"
+              : undefined
+          }
+          sx={{ width: "350px" }}
         >
           {(tokenNamesOption || []).map((option: OptionString) => (
             <MenuItem key={option.value} value={option.value}>
@@ -348,22 +341,18 @@ export default function HomePage() {
       </div>
 
       <div className="mb-6">
-        {/* <label htmlFor="title">title</label>
-        <input
-          id="title"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          ref={proposalTitleRef}
-          className="text-black"
-        /> */}
         <TextField
-          // error
           id="title"
           label="Title"
-          // helperText="Please enter title"
-          sx={{ width: "350px" }}
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          error={formErrors.has("title") && !formData.title}
+          helperText={
+            formErrors.has("title") && !formData.title
+              ? "Please select a token"
+              : undefined
+          }
+          sx={{ width: "350px" }}
         />
       </div>
 
