@@ -8,7 +8,7 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { CircularProgress, MenuItem, TextField } from "@mui/material";
+import { CircularProgress, MenuItem, Skeleton, TextField } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -17,6 +17,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { Button } from "@/components/button";
+import { FeeSkeleton } from "@/components/fee-skeleton";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -117,7 +118,7 @@ export default function CreateProposalPage() {
     },
   });
 
-  const { data: sourceFee } = useReadContract({
+  const { data: sourceFee, isPending: isPendingSourceFee } = useReadContract({
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
@@ -126,22 +127,24 @@ export default function CreateProposalPage() {
     chainId: sourceChain?.definition.id,
   });
 
-  const { data: destinationFee } = useReadContract({
-    address: destinationRouterAddress,
-    abi: routerAbi,
-    functionName: "getFee",
-    args: [destinationChain.equitoVoteContractV2 as Address],
-    query: { enabled: !!destinationRouterAddress },
-    chainId: destinationChain.definition.id,
-  });
+  const { data: destinationFee, isPending: isPendingDestinationFee } =
+    useReadContract({
+      address: destinationRouterAddress,
+      abi: routerAbi,
+      functionName: "getFee",
+      args: [destinationChain.equitoVoteContractV2 as Address],
+      query: { enabled: !!destinationRouterAddress },
+      chainId: destinationChain.definition.id,
+    });
 
-  const { data: createProposalFeeData } = useReadContract({
-    address: sourceChain?.equitoVoteContractV2,
-    abi: equitoVoteAbi,
-    functionName: "protocolFee",
-    query: { enabled: !!sourceRouterAddress },
-    chainId: sourceChain?.definition.id,
-  });
+  const { data: createProposalFeeData, isPending: isPendingCreateProposalFee } =
+    useReadContract({
+      address: sourceChain?.equitoVoteContractV2,
+      abi: equitoVoteAbi,
+      functionName: "protocolFee",
+      query: { enabled: !!sourceRouterAddress },
+      chainId: sourceChain?.definition.id,
+    });
   const createProposalFee = createProposalFeeData as bigint;
 
   const { data: tokenNamesLength } = useReadContract({
@@ -166,26 +169,26 @@ export default function CreateProposalPage() {
     ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
-    : "unavailable";
+    : "Unavailable";
 
   const formattedDestinationChainFee = !!destinationFee
     ? `${Number(formatUnits(destinationFee, 18)).toFixed(8)} ${
         destinationChain.definition?.nativeCurrency?.symbol
       }`
-    : "unavailable";
+    : "Unavailable";
 
   const formattedCreateProposalFee = !!createProposalFee
     ? `${Number(formatUnits(createProposalFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
-    : "unavailable";
+    : "Unavailable";
 
   const formattedTotalUserFee =
     !!sourceFee && !!destinationFee && !!createProposalFee
       ? `${Number(formatUnits(sourceFee + destinationFee + createProposalFee, 18)).toFixed(8)} ${
           sourceChain?.definition?.nativeCurrency?.symbol
         }`
-      : "unavailable";
+      : "Unavailable";
 
   const totalCreateProposalFee =
     sourceFee && createProposalFee ? sourceFee + createProposalFee : BigInt(0);
@@ -448,10 +451,36 @@ export default function CreateProposalPage() {
         </div>
 
         <ul className="space-y-4 text-gray-400 text-sm">
-          <li>Source Chain Fee: {formattedSourceChainFee}</li>
-          <li>Destination Chain Fee: {formattedDestinationChainFee}</li>
-          <li>Create Proposal Fee: {formattedCreateProposalFee}</li>
-          <li>Total Fee: {formattedTotalUserFee}</li>
+          <li className="flex flex-row items-center">
+            <span className="mr-2">Source Chain Fee: </span>
+            {isPendingSourceFee ? <FeeSkeleton /> : formattedSourceChainFee}
+          </li>
+          <li className="flex flex-row">
+            <span className="mr-2">Destination Chain Fee:</span>
+            {isPendingDestinationFee ? (
+              <FeeSkeleton />
+            ) : (
+              formattedDestinationChainFee
+            )}
+          </li>
+          <li className="flex flex-row">
+            <span className="mr-2">Create Proposal Fee:</span>
+            {isPendingCreateProposalFee ? (
+              <FeeSkeleton />
+            ) : (
+              formattedCreateProposalFee
+            )}
+          </li>
+          <li className="flex flex-row">
+            <span className="mr-2">Total Fee:</span>
+            {isPendingSourceFee ||
+            isPendingDestinationFee ||
+            isPendingCreateProposalFee ? (
+              <FeeSkeleton />
+            ) : (
+              formattedTotalUserFee
+            )}
+          </li>
         </ul>
       </div>
       {statusRenderer[status]}
