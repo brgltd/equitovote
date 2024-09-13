@@ -20,11 +20,18 @@ import { Button } from "@/components/button";
 
 const equitoVoteAbi = equitoVote.abi;
 
+enum FormKeys {
+  title = "title",
+  description = "description",
+  durationHours = "durationHours",
+  TokenName = "tokenName",
+}
+
 interface FormData {
-  title: string;
-  description: string;
-  durationHours: string;
-  tokenName: string;
+  [FormKeys.title]: string;
+  [FormKeys.description]: string;
+  [FormKeys.durationHours]: string;
+  [FormKeys.TokenName]: string;
 }
 
 interface CreateProposalArgs {
@@ -310,9 +317,9 @@ export default function HomePage() {
           onChange={(e) =>
             setFormData({ ...formData, tokenName: e.target.value })
           }
-          error={formErrors.has("tokenName") && !formData.tokenName}
+          error={formErrors.has(FormKeys.TokenName) && !formData.tokenName}
           helperText={
-            formErrors.has("tokenName") && !formData.tokenName
+            formErrors.has(FormKeys.TokenName) && !formData.tokenName
               ? "Please select a token"
               : undefined
           }
@@ -346,10 +353,10 @@ export default function HomePage() {
           label="Title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          error={formErrors.has("title") && !formData.title}
+          error={formErrors.has(FormKeys.title) && !formData.title}
           helperText={
-            formErrors.has("title") && !formData.title
-              ? "Please select a token"
+            formErrors.has(FormKeys.title) && !formData.title
+              ? "Please select a title"
               : undefined
           }
           sx={{ width: "350px" }}
