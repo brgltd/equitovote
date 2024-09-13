@@ -3,7 +3,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
+import {
+  RainbowKitProvider,
+  darkTheme as rainbowDarkTheme,
+} from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -16,12 +19,6 @@ import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
-const muiDarkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
 const inter = Inter({ subsets: ["latin"] });
 
 const queryClient = new QueryClient();
@@ -31,6 +28,17 @@ const queryClient = new QueryClient();
 //   description: "Multichain DAO voting protocol",
 // };
 
+export const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
+
+export const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,7 +49,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider theme={darkTheme()}>
+            <RainbowKitProvider theme={rainbowDarkTheme()}>
               {/* EquitoProvider and PingPongProvider used for testing and healthcheck */}
               {/* route /pingpong = test contracts deployed from equito team */}
               {/* route /healthcheck = test a healthcheck contract that makes a crosschain call */}
@@ -50,7 +58,7 @@ export default function RootLayout({
                   {/* EquitoVoteProvider holds global data, e.g. connected address, user source chain etc */}
                   <EquitoVoteProvider>
                     <AppRouterCacheProvider>
-                      <ThemeProvider theme={muiDarkTheme}>
+                      <ThemeProvider theme={darkTheme}>
                         <CssBaseline />
                         <Navbar />
                         {children}

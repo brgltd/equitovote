@@ -8,7 +8,13 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { Button, CircularProgress, MenuItem, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  createTheme,
+  MenuItem,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -17,6 +23,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { ButtonLink } from "@/components/button-link";
+import { Button } from "@/components/button";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -65,6 +72,12 @@ function buildCreateProposalArgs(
     originChainSelector: sourceChain.chainSelector,
   };
 }
+
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
 
 export default function HomePage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
@@ -257,12 +270,28 @@ export default function HomePage() {
   };
 
   const CreateProposalButton = ({ cta }: { cta: string }) => (
-    <button
-      onClick={onClickCreateProposal}
-      disabled={!Object.values(formData).every(Boolean) || !sourceChain}
-    >
-      {cta}
-    </button>
+    // <Button
+    //   onClick={onClickCreateProposal}
+    //   // disabled={!Object.values(formData).every(Boolean) || !sourceChain}
+    //   variant="contained"
+    //   // sx={{
+    //   //   bgcolor: lightTheme.palette.primary.main,
+    //   //   color: lightTheme.palette.primary.contrastText,
+    //   //   "&:hover": {
+    //   //     bgcolor: lightTheme.palette.primary.dark,
+    //   //   },
+    //   // }}
+    //   sx={{
+    //     backgroundColor: "rgba(25, 118, 210, 0.5)",
+    //     color: "white",
+    //     "&:hover": {
+    //       bgcolor: lightTheme.palette.primary.dark,
+    //     },
+    //   }}
+    // >
+    //   {cta}
+    // </Button>
+    <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
   );
 
   const statusRenderer = {
@@ -281,6 +310,8 @@ export default function HomePage() {
     ),
     [Status.IsRetry]: <CreateProposalButton cta="Retry" />,
   };
+
+  console.log(JSON.stringify(formData));
 
   return (
     <div className="ml-16">
@@ -312,6 +343,10 @@ export default function HomePage() {
           // error
           // helperText="Please select your currency"
           disabled={isPendingTokenNames}
+          value={formData.tokenName}
+          onChange={(e) =>
+            setFormData({ ...formData, tokenName: e.target.value })
+          }
         >
           {(tokenNamesOption || []).map((option: OptionString) => (
             <MenuItem key={option.value} value={option.value}>
@@ -350,6 +385,8 @@ export default function HomePage() {
           label="Title"
           // helperText="Please enter title"
           sx={{ width: "350px" }}
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
       </div>
 
