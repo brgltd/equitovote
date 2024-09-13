@@ -60,8 +60,17 @@ export default function RootLayout({
                     <AppRouterCacheProvider>
                       <ThemeProvider theme={darkTheme}>
                         <CssBaseline />
-                        <Navbar />
-                        {children}
+                        <div className="flex flex-row justify-center">
+                          {/* <div className="max-w-screen-2xl border"> */}
+                          <div
+                            // style={{ maxWidth: 1500, border: "1px solid red" }}
+                            // style={{ border: "1px solid red" }}
+                            style={{ width: 1300 }}
+                          >
+                            <Navbar />
+                            {children}
+                          </div>
+                        </div>
                       </ThemeProvider>
                     </AppRouterCacheProvider>
                   </EquitoVoteProvider>

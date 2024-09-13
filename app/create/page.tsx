@@ -325,13 +325,13 @@ export default function CreateProposalPage() {
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
-        <CircularProgress size={24} />
+        <CircularProgress size={20} />
         <div className="ml-4 text-sm">Generating Proof on Source Chain</div>
       </div>
     ),
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div className="flex flex-row items-center mt-4">
-        <CircularProgress size={24} />
+        <CircularProgress size={20} />
         <div className="ml-4 text-sm">
           Executing Message on Destination Chain
         </div>
