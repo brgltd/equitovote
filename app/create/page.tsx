@@ -8,13 +8,7 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import {
-  CircularProgress,
-  MenuItem,
-  Skeleton,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { CircularProgress, MenuItem, TextField, Tooltip } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -338,14 +332,13 @@ export default function CreateProposalPage() {
   return (
     <div className="ml-16">
       <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
-      <div className="flex flex-row">
+      <div className="flex flex-row mb-8">
         <div className="mr-16">
           <div className="mb-4 flex flex-row items-center">
             <TextField
               id={FormKeys.tokenName}
               select
               label={formLabels.tokenName}
-              disabled={isPendingTokenNames}
               value={formData.tokenName}
               onChange={(e) => {
                 const updatedFormErrors = new Set(formErrors);
@@ -361,17 +354,23 @@ export default function CreateProposalPage() {
               }
               sx={{ width: "350px" }}
             >
-              {(tokenNamesOption || []).map((option: OptionString) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
+              {isPendingTokenNames ? (
+                <div className="flex flex-row items-center justify-center">
+                  <MenuItem
+                    key="token-names-loading"
+                    value="token-names-loading"
+                  >
+                    <CircularProgress />
+                  </MenuItem>
+                </div>
+              ) : (
+                (tokenNamesOption || []).map((option: OptionString) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
             </TextField>
-            {isPendingTokenNames && (
-              <div className="ml-8">
-                <CircularProgress size={30} />
-              </div>
-            )}
           </div>
           <div className="mb-8">
             You DAO token not present?{" "}
