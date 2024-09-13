@@ -308,25 +308,36 @@ export default function CreateProposalPage() {
     }
   };
 
-  const CreateProposalButton = ({ cta }: { cta: string }) => (
-    <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
-  );
-
   const statusRenderer = {
-    [Status.IsStart]: <CreateProposalButton cta="Create Proposal" />,
+    [Status.IsStart]: <></>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
-      <div>creating proposal on source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4 text-sm">Creating Proposal on Source Chain</div>
+      </div>
     ),
+    // Same message as next step since it's executing quickly
     [Status.IsRetrievingBlockOnSourceChain]: (
-      <div>is retriving block from source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4 text-sm">Generating Proof on Source Chain</div>
+      </div>
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
-      <div>generating proof source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={24} />
+        <div className="ml-4 text-sm">Generating Proof on Source Chain</div>
+      </div>
     ),
     [Status.IsExecutingMessageOnDestinationChain]: (
-      <div>executing message on destination chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={24} />
+        <div className="ml-4 text-sm">
+          Executing Message on Destination Chain
+        </div>
+      </div>
     ),
-    [Status.IsRetry]: <CreateProposalButton cta="Retry" />,
+    [Status.IsRetry]: <></>,
   };
 
   return (
@@ -510,6 +521,7 @@ export default function CreateProposalPage() {
           </li>
         </ul>
       </div>
+      <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
       {statusRenderer[status]}
     </div>
   );
