@@ -34,6 +34,11 @@ interface FormData {
   [FormKeys.tokenName]: string;
 }
 
+interface OptionString {
+  label?: string | undefined;
+  value?: string | undefined;
+}
+
 interface CreateProposalArgs {
   destinationChainSelector: number;
   endTimestamp: number;
@@ -43,16 +48,18 @@ interface CreateProposalArgs {
   originChainSelector?: number;
 }
 
-interface OptionString {
-  label?: string | undefined;
-  value?: string | undefined;
-}
-
 const defaultFormData: FormData = {
-  title: "",
-  description: "",
-  durationHours: "",
-  tokenName: "",
+  [FormKeys.title]: "",
+  [FormKeys.description]: "",
+  [FormKeys.durationHours]: "",
+  [FormKeys.tokenName]: "",
+};
+
+const formPlaceholders: FormData = {
+  [FormKeys.title]: "Title",
+  [FormKeys.description]: "Description",
+  [FormKeys.durationHours]: "Duration in Hours",
+  [FormKeys.tokenName]: "Token Name",
 };
 
 function buildCreateProposalArgs(
@@ -73,7 +80,7 @@ function buildCreateProposalArgs(
   };
 }
 
-export default function HomePage() {
+export default function CreateProposalPage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState(new Set());
@@ -196,16 +203,16 @@ export default function HomePage() {
     if (!Object.values(formData).every(Boolean)) {
       const updatedFormErrors = new Set();
       if (!formData.tokenName) {
-        updatedFormErrors.add("tokenName");
+        updatedFormErrors.add(FormKeys.tokenName);
       }
       if (!formData.title) {
-        updatedFormErrors.add("title");
+        updatedFormErrors.add(FormKeys.title);
       }
       if (!formData.description) {
-        updatedFormErrors.add("description");
+        updatedFormErrors.add(FormKeys.description);
       }
       if (!formData.durationHours) {
-        updatedFormErrors.add("durationHours");
+        updatedFormErrors.add(FormKeys.durationHours);
       }
       setFormErrors(updatedFormErrors);
       return;
@@ -309,9 +316,9 @@ export default function HomePage() {
       <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
       <div className="mb-4 flex flex-row items-center">
         <TextField
-          id="select"
+          id={FormKeys.tokenName}
           select
-          label="Token Name"
+          label={formPlaceholders.tokenName}
           disabled={isPendingTokenNames}
           value={formData.tokenName}
           onChange={(e) =>
@@ -349,29 +356,37 @@ export default function HomePage() {
 
       <div className="mb-6">
         <TextField
-          id="title"
-          label="Title"
+          id={FormKeys.title}
+          label={formPlaceholders.title}
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           error={formErrors.has(FormKeys.title) && !formData.title}
           helperText={
             formErrors.has(FormKeys.title) && !formData.title
-              ? "Please select a title"
+              ? "Please enter a title"
               : undefined
           }
           sx={{ width: "350px" }}
         />
       </div>
 
-      <div>
-        <label htmlFor="description">description</label>
-        <input
-          id="description"
+      <div className="mb-8">
+        <TextField
+          id={FormKeys.description}
+          label={formPlaceholders.description}
+          multiline
+          rows={4}
           value={formData.description}
           onChange={(e) =>
             setFormData({ ...formData, description: e.target.value })
           }
-          className="text-black"
+          error={formErrors.has(FormKeys.description) && !formData.description}
+          helperText={
+            formErrors.has(FormKeys.description) && !formData.description
+              ? "Please enter a description"
+              : undefined
+          }
+          sx={{ width: "350px" }}
         />
       </div>
 

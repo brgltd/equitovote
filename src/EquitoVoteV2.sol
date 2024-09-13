@@ -9,7 +9,6 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-/// @notice EquitoVote version 2
 contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     // --- types ----
 
