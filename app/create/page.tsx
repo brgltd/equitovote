@@ -447,12 +447,12 @@ export default function CreateProposalPage() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>Source Chain Fee: {formattedSourceChainFee}</div>
-          <div>Destination Chain Fee: {formattedDestinationChainFee}</div>
-          <div>Create Proposal Fee: {formattedCreateProposalFee}</div>
-          <div>Total Fee: {formattedTotalUserFee}</div>
-        </div>
+        <ul className="space-y-4 text-gray-400 text-sm">
+          <li>Source Chain Fee: {formattedSourceChainFee}</li>
+          <li>Destination Chain Fee: {formattedDestinationChainFee}</li>
+          <li>Create Proposal Fee: {formattedCreateProposalFee}</li>
+          <li>Total Fee: {formattedTotalUserFee}</li>
+        </ul>
       </div>
       {statusRenderer[status]}
     </div>
