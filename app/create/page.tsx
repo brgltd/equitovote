@@ -55,12 +55,16 @@ const defaultFormData: FormData = {
   [FormKeys.tokenName]: "",
 };
 
-const formPlaceholders: FormData = {
+const formLabels: FormData = {
   [FormKeys.title]: "Title",
   [FormKeys.description]: "Description",
   [FormKeys.durationHours]: "Duration in Hours",
   [FormKeys.tokenName]: "Token Name",
 };
+
+function isDurationValid(duration: string) {
+  return Number(duration) >= 1;
+}
 
 function buildCreateProposalArgs(
   formData: FormData,
@@ -211,7 +215,7 @@ export default function CreateProposalPage() {
       if (!formData.description) {
         updatedFormErrors.add(FormKeys.description);
       }
-      if (!formData.durationHours) {
+      if (!isDurationValid(formData.durationHours)) {
         updatedFormErrors.add(FormKeys.durationHours);
       }
       setFormErrors(updatedFormErrors);
@@ -309,7 +313,7 @@ export default function CreateProposalPage() {
     [Status.IsRetry]: <CreateProposalButton cta="Retry" />,
   };
 
-  console.log(JSON.stringify(formData));
+  // console.log(JSON.stringify(formData));
 
   return (
     <div className="ml-16">
@@ -318,7 +322,7 @@ export default function CreateProposalPage() {
         <TextField
           id={FormKeys.tokenName}
           select
-          label={formPlaceholders.tokenName}
+          label={formLabels.tokenName}
           disabled={isPendingTokenNames}
           value={formData.tokenName}
           onChange={(e) =>
@@ -357,7 +361,7 @@ export default function CreateProposalPage() {
       <div className="mb-6">
         <TextField
           id={FormKeys.title}
-          label={formPlaceholders.title}
+          label={formLabels.title}
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           error={formErrors.has(FormKeys.title) && !formData.title}
@@ -373,7 +377,7 @@ export default function CreateProposalPage() {
       <div className="mb-8">
         <TextField
           id={FormKeys.description}
-          label={formPlaceholders.description}
+          label={formLabels.description}
           multiline
           rows={4}
           value={formData.description}
@@ -391,15 +395,30 @@ export default function CreateProposalPage() {
       </div>
 
       <div>
-        <label htmlFor="duration">duration in hours</label>
-        <input
+        <TextField
+          id={FormKeys.durationHours}
+          label={formLabels.durationHours}
           type="number"
-          id="duration"
+          sx={{ width: "350px" }}
           value={formData.durationHours}
-          onChange={(e) =>
-            setFormData({ ...formData, durationHours: e.target.value })
+          onChange={(e) => {
+            const value = e.target.value;
+            const updatedFormErrors = new Set(formErrors);
+            if (!isDurationValid(value)) {
+              updatedFormErrors.add(FormKeys.durationHours);
+              setFormErrors(updatedFormErrors);
+            } else {
+              updatedFormErrors.delete(FormKeys.durationHours);
+              setFormErrors(updatedFormErrors);
+            }
+            setFormData({ ...formData, durationHours: value });
+          }}
+          error={formErrors.has(FormKeys.durationHours)}
+          helperText={
+            formErrors.has(FormKeys.durationHours)
+              ? "Duration must be equal or greather than 1 hour"
+              : undefined
           }
-          className="text-black"
         />
       </div>
 
