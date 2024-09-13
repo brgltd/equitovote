@@ -342,187 +342,198 @@ export default function CreateProposalPage() {
 
   return (
     <div className="ml-16">
-      <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
-      <div className="flex flex-row mb-8">
-        <div className="mr-16">
-          <div className="mb-4 flex flex-row items-center">
-            <TextField
-              id={FormKeys.tokenName}
-              select
-              label={formLabels.tokenName}
-              value={formData.tokenName}
-              onChange={(e) => {
-                const updatedFormErrors = new Set(formErrors);
-                updatedFormErrors.delete(FormKeys.tokenName);
-                setFormErrors(updatedFormErrors);
-                setFormData({ ...formData, tokenName: e.target.value });
-              }}
-              error={formErrors.has(FormKeys.tokenName)}
-              helperText={
-                formErrors.has(FormKeys.tokenName)
-                  ? formErrorMessages.tokenName
-                  : undefined
-              }
-              sx={{ width: "350px" }}
-            >
-              {isPendingTokenNames ? (
-                <div className="flex flex-row items-center justify-center">
-                  <MenuItem
-                    key="token-names-loading"
-                    value="token-names-loading"
-                  >
-                    <CircularProgress />
-                  </MenuItem>
-                </div>
-              ) : (
-                (tokenNamesOption || []).map((option: OptionString) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))
-              )}
-            </TextField>
-          </div>
-          <div className="mb-8">
-            You DAO token not present?{" "}
-            <Link
-              href="add-new-token"
-              className="underline hover:text-blue-300 transition-colors"
-            >
-              Add New Token
-            </Link>
-          </div>
+      <div className="flex flex-row justify-center">
+        <div>
+          <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
+          <div className="flex flex-col md:flex-row mb-8">
+            <div className="mr-20">
+              <div className="mb-4 flex flex-row items-center">
+                <TextField
+                  id={FormKeys.tokenName}
+                  select
+                  label={formLabels.tokenName}
+                  value={formData.tokenName}
+                  onChange={(e) => {
+                    const updatedFormErrors = new Set(formErrors);
+                    updatedFormErrors.delete(FormKeys.tokenName);
+                    setFormErrors(updatedFormErrors);
+                    setFormData({ ...formData, tokenName: e.target.value });
+                  }}
+                  error={formErrors.has(FormKeys.tokenName)}
+                  helperText={
+                    formErrors.has(FormKeys.tokenName)
+                      ? formErrorMessages.tokenName
+                      : undefined
+                  }
+                  sx={{ width: "350px" }}
+                >
+                  {isPendingTokenNames ? (
+                    <div className="flex flex-row items-center justify-center">
+                      <MenuItem
+                        key="token-names-loading"
+                        value="token-names-loading"
+                      >
+                        <CircularProgress />
+                      </MenuItem>
+                    </div>
+                  ) : (
+                    (tokenNamesOption || []).map((option: OptionString) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))
+                  )}
+                </TextField>
+              </div>
+              <div className="mb-8">
+                You DAO token not present?{" "}
+                <Link
+                  href="add-new-token"
+                  className="underline hover:text-blue-300 transition-colors"
+                >
+                  Add New Token
+                </Link>
+              </div>
 
-          <div className="mb-8">
-            <TextField
-              id={FormKeys.title}
-              label={formLabels.title}
-              value={formData.title}
-              onChange={(e) => {
-                const updatedFormErrors = new Set(formErrors);
-                updatedFormErrors.delete(FormKeys.title);
-                setFormErrors(updatedFormErrors);
-                setFormData({ ...formData, title: e.target.value });
-              }}
-              error={formErrors.has(FormKeys.title)}
-              helperText={
-                formErrors.has(FormKeys.title)
-                  ? formErrorMessages.title
-                  : undefined
-              }
-              sx={{ width: "350px" }}
-            />
-          </div>
+              <div className="mb-8">
+                <TextField
+                  id={FormKeys.title}
+                  label={formLabels.title}
+                  value={formData.title}
+                  onChange={(e) => {
+                    const updatedFormErrors = new Set(formErrors);
+                    updatedFormErrors.delete(FormKeys.title);
+                    setFormErrors(updatedFormErrors);
+                    setFormData({ ...formData, title: e.target.value });
+                  }}
+                  error={formErrors.has(FormKeys.title)}
+                  helperText={
+                    formErrors.has(FormKeys.title)
+                      ? formErrorMessages.title
+                      : undefined
+                  }
+                  sx={{ width: "350px" }}
+                />
+              </div>
 
-          <div className="mb-8">
-            <TextField
-              id={FormKeys.description}
-              label={formLabels.description}
-              multiline
-              rows={4}
-              value={formData.description}
-              onChange={(e) => {
-                const updatedFormErrors = new Set(formErrors);
-                updatedFormErrors.delete(FormKeys.description);
-                setFormErrors(updatedFormErrors);
-                setFormData({ ...formData, description: e.target.value });
-              }}
-              error={formErrors.has(FormKeys.description)}
-              helperText={
-                formErrors.has(FormKeys.description)
-                  ? formErrorMessages.description
-                  : undefined
-              }
-              sx={{ width: "350px" }}
-            />
-          </div>
+              <div className="mb-8">
+                <TextField
+                  id={FormKeys.description}
+                  label={formLabels.description}
+                  multiline
+                  rows={4}
+                  value={formData.description}
+                  onChange={(e) => {
+                    const updatedFormErrors = new Set(formErrors);
+                    updatedFormErrors.delete(FormKeys.description);
+                    setFormErrors(updatedFormErrors);
+                    setFormData({ ...formData, description: e.target.value });
+                  }}
+                  error={formErrors.has(FormKeys.description)}
+                  helperText={
+                    formErrors.has(FormKeys.description)
+                      ? formErrorMessages.description
+                      : undefined
+                  }
+                  sx={{ width: "350px" }}
+                />
+              </div>
 
-          <div>
-            <TextField
-              id={FormKeys.durationHours}
-              label={formLabels.durationHours}
-              type="number"
-              sx={{ width: "350px" }}
-              value={formData.durationHours}
-              onChange={(e) => {
-                const durationHours = e.target.value;
-                const updatedFormErrors = new Set(formErrors);
-                if (!isDurationValid(durationHours)) {
-                  updatedFormErrors.add(FormKeys.durationHours);
-                  setFormErrors(updatedFormErrors);
-                } else {
-                  updatedFormErrors.delete(FormKeys.durationHours);
-                  setFormErrors(updatedFormErrors);
-                }
-                setFormData({ ...formData, durationHours: durationHours });
-              }}
-              error={formErrors.has(FormKeys.durationHours)}
-              helperText={
-                formErrors.has(FormKeys.durationHours)
-                  ? formErrorMessages.durationHours
-                  : undefined
-              }
-            />
+              <div>
+                <TextField
+                  id={FormKeys.durationHours}
+                  label={formLabels.durationHours}
+                  type="number"
+                  sx={{ width: "350px" }}
+                  value={formData.durationHours}
+                  onChange={(e) => {
+                    const durationHours = e.target.value;
+                    const updatedFormErrors = new Set(formErrors);
+                    if (!isDurationValid(durationHours)) {
+                      updatedFormErrors.add(FormKeys.durationHours);
+                      setFormErrors(updatedFormErrors);
+                    } else {
+                      updatedFormErrors.delete(FormKeys.durationHours);
+                      setFormErrors(updatedFormErrors);
+                    }
+                    setFormData({ ...formData, durationHours: durationHours });
+                  }}
+                  error={formErrors.has(FormKeys.durationHours)}
+                  helperText={
+                    formErrors.has(FormKeys.durationHours)
+                      ? formErrorMessages.durationHours
+                      : undefined
+                  }
+                />
+              </div>
+            </div>
+
+            <ul className="space-y-4 text-gray-400 text-sm md:mt-0 mt-8">
+              <li>
+                <Tooltip
+                  placement="right"
+                  title="Equito Network source chain fee"
+                >
+                  <div className="flex flex-row items-center">
+                    <span className="mr-2">Source Chain Fee: </span>
+                    {isPendingSourceFee ? (
+                      <FeeSkeleton />
+                    ) : (
+                      formattedSourceChainFee
+                    )}
+                  </div>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip
+                  placement="right"
+                  title="Equito network destination chain fee"
+                >
+                  <div className="flex flex-row items-center">
+                    <span className="mr-2">Destination Chain Fee:</span>
+                    {isPendingDestinationFee ? (
+                      <FeeSkeleton />
+                    ) : (
+                      formattedDestinationChainFee
+                    )}
+                  </div>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip
+                  placement="right"
+                  title="Equito Vote protocol fee for creating proposals"
+                >
+                  <div className="flex flex-row items-center">
+                    <span className="mr-2">Create Proposal Fee:</span>
+                    {isPendingCreateProposalFee ? (
+                      <FeeSkeleton />
+                    ) : (
+                      formattedCreateProposalFee
+                    )}
+                  </div>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip placement="right" title="Total fee across both chains">
+                  <div className="flex flex-row items-center">
+                    <span className="mr-2">Total Cross Chain Fee:</span>
+                    {isPendingSourceFee ||
+                    isPendingDestinationFee ||
+                    isPendingCreateProposalFee ? (
+                      <FeeSkeleton />
+                    ) : (
+                      formattedTotalUserFee
+                    )}
+                  </div>
+                </Tooltip>
+              </li>
+            </ul>
           </div>
+          <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
+          {statusRenderer[status]}
         </div>
-
-        <ul className="space-y-4 text-gray-400 text-sm">
-          <li>
-            <Tooltip placement="right" title="Equito Network source chain fee">
-              <div className="flex flex-row items-center">
-                <span className="mr-2">Source Chain Fee: </span>
-                {isPendingSourceFee ? <FeeSkeleton /> : formattedSourceChainFee}
-              </div>
-            </Tooltip>
-          </li>
-          <li>
-            <Tooltip
-              placement="right"
-              title="Equito network destination chain fee"
-            >
-              <div className="flex flex-row items-center">
-                <span className="mr-2">Destination Chain Fee:</span>
-                {isPendingDestinationFee ? (
-                  <FeeSkeleton />
-                ) : (
-                  formattedDestinationChainFee
-                )}
-              </div>
-            </Tooltip>
-          </li>
-          <li>
-            <Tooltip
-              placement="right"
-              title="Equito Vote protocol fee for creating proposals"
-            >
-              <div className="flex flex-row items-center">
-                <span className="mr-2">Create Proposal Fee:</span>
-                {isPendingCreateProposalFee ? (
-                  <FeeSkeleton />
-                ) : (
-                  formattedCreateProposalFee
-                )}
-              </div>
-            </Tooltip>
-          </li>
-          <li>
-            <Tooltip placement="right" title="Total fee paid on both chains">
-              <div className="flex flex-row items-center">
-                <span className="mr-2">Total Cross Chain Fee:</span>
-                {isPendingSourceFee ||
-                isPendingDestinationFee ||
-                isPendingCreateProposalFee ? (
-                  <FeeSkeleton />
-                ) : (
-                  formattedTotalUserFee
-                )}
-              </div>
-            </Tooltip>
-          </li>
-        </ul>
       </div>
-      <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
-      {statusRenderer[status]}
     </div>
   );
 }
