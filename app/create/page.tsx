@@ -313,8 +313,6 @@ export default function CreateProposalPage() {
     [Status.IsRetry]: <CreateProposalButton cta="Retry" />,
   };
 
-  // console.log(JSON.stringify(formData));
-
   return (
     <div className="ml-16">
       <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
@@ -325,12 +323,15 @@ export default function CreateProposalPage() {
           label={formLabels.tokenName}
           disabled={isPendingTokenNames}
           value={formData.tokenName}
-          onChange={(e) =>
-            setFormData({ ...formData, tokenName: e.target.value })
-          }
-          error={formErrors.has(FormKeys.tokenName) && !formData.tokenName}
+          onChange={(e) => {
+            const updatedFormErrors = new Set(formErrors);
+            updatedFormErrors.delete(FormKeys.tokenName);
+            setFormErrors(updatedFormErrors);
+            setFormData({ ...formData, tokenName: e.target.value });
+          }}
+          error={formErrors.has(FormKeys.tokenName)}
           helperText={
-            formErrors.has(FormKeys.tokenName) && !formData.tokenName
+            formErrors.has(FormKeys.tokenName)
               ? "Please select a token"
               : undefined
           }
@@ -363,12 +364,15 @@ export default function CreateProposalPage() {
           id={FormKeys.title}
           label={formLabels.title}
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          error={formErrors.has(FormKeys.title) && !formData.title}
+          onChange={(e) => {
+            const updatedFormErrors = new Set(formErrors);
+            updatedFormErrors.delete(FormKeys.title);
+            setFormErrors(updatedFormErrors);
+            setFormData({ ...formData, title: e.target.value });
+          }}
+          error={formErrors.has(FormKeys.title)}
           helperText={
-            formErrors.has(FormKeys.title) && !formData.title
-              ? "Please enter a title"
-              : undefined
+            formErrors.has(FormKeys.title) ? "Please enter a title" : undefined
           }
           sx={{ width: "350px" }}
         />
@@ -381,12 +385,15 @@ export default function CreateProposalPage() {
           multiline
           rows={4}
           value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          error={formErrors.has(FormKeys.description) && !formData.description}
+          onChange={(e) => {
+            const updatedFormErrors = new Set(formErrors);
+            updatedFormErrors.delete(FormKeys.description);
+            setFormErrors(updatedFormErrors);
+            setFormData({ ...formData, description: e.target.value });
+          }}
+          error={formErrors.has(FormKeys.description)}
           helperText={
-            formErrors.has(FormKeys.description) && !formData.description
+            formErrors.has(FormKeys.description)
               ? "Please enter a description"
               : undefined
           }
