@@ -28,11 +28,32 @@ enum FormKeys {
 }
 
 interface FormData {
-  [FormKeys.title]: string;
-  [FormKeys.description]: string;
-  [FormKeys.durationHours]: string;
-  [FormKeys.tokenName]: string;
+  title: string;
+  description: string;
+  durationHours: string;
+  tokenName: string;
 }
+
+const defaultFormData: FormData = {
+  title: "",
+  description: "",
+  durationHours: "",
+  tokenName: "",
+};
+
+const formLabels: FormData = {
+  title: "Title",
+  description: "Description",
+  durationHours: "Duration in Hours",
+  tokenName: "Token Name",
+};
+
+const formErrorMessages: FormData = {
+  title: "Please enter a title",
+  description: "Please enter a description",
+  durationHours: "Duration must be equal or greather than 1 hour",
+  tokenName: "Please select a token",
+};
 
 interface OptionString {
   label?: string | undefined;
@@ -47,27 +68,6 @@ interface CreateProposalArgs {
   tokenName?: string;
   originChainSelector?: number;
 }
-
-const defaultFormData: FormData = {
-  [FormKeys.title]: "",
-  [FormKeys.description]: "",
-  [FormKeys.durationHours]: "",
-  [FormKeys.tokenName]: "",
-};
-
-const formLabels: FormData = {
-  [FormKeys.title]: "Title",
-  [FormKeys.description]: "Description",
-  [FormKeys.durationHours]: "Duration in Hours",
-  [FormKeys.tokenName]: "Token Name",
-};
-
-const formErrorMessages: FormData = {
-  title: "Please enter a title",
-  description: "Please enter a description",
-  durationHours: "Duration must be equal or greather than 1 hour",
-  tokenName: "Please select a token",
-};
 
 function isDurationValid(duration: string) {
   return Number(duration) >= 1;
@@ -366,7 +366,7 @@ export default function CreateProposalPage() {
         </Link>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-8">
         <TextField
           id={FormKeys.title}
           label={formLabels.title}
@@ -416,16 +416,16 @@ export default function CreateProposalPage() {
           sx={{ width: "350px" }}
           value={formData.durationHours}
           onChange={(e) => {
-            const value = e.target.value;
+            const durationHours = e.target.value;
             const updatedFormErrors = new Set(formErrors);
-            if (!isDurationValid(value)) {
+            if (!isDurationValid(durationHours)) {
               updatedFormErrors.add(FormKeys.durationHours);
               setFormErrors(updatedFormErrors);
             } else {
               updatedFormErrors.delete(FormKeys.durationHours);
               setFormErrors(updatedFormErrors);
             }
-            setFormData({ ...formData, durationHours: value });
+            setFormData({ ...formData, durationHours: durationHours });
           }}
           error={formErrors.has(FormKeys.durationHours)}
           helperText={
