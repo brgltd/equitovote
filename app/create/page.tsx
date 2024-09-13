@@ -21,16 +21,16 @@ import { Button } from "@/components/button";
 const equitoVoteAbi = equitoVote.abi;
 
 enum FormKeys {
-  title = "title",
-  description = "description",
-  durationHours = "durationHours",
+  Title = "title",
+  Description = "description",
+  DurationHours = "durationHours",
   TokenName = "tokenName",
 }
 
 interface FormData {
-  [FormKeys.title]: string;
-  [FormKeys.description]: string;
-  [FormKeys.durationHours]: string;
+  [FormKeys.Title]: string;
+  [FormKeys.Description]: string;
+  [FormKeys.DurationHours]: string;
   [FormKeys.TokenName]: string;
 }
 
@@ -353,9 +353,9 @@ export default function HomePage() {
           label="Title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          error={formErrors.has(FormKeys.title) && !formData.title}
+          error={formErrors.has(FormKeys.Title) && !formData.title}
           helperText={
-            formErrors.has(FormKeys.title) && !formData.title
+            formErrors.has(FormKeys.Title) && !formData.title
               ? "Please select a title"
               : undefined
           }
