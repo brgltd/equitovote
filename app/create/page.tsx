@@ -135,13 +135,14 @@ export default function CreateProposalPage() {
     chainId: destinationChain.definition.id,
   });
 
-  const { data: createProposalFee } = useReadContract({
+  const { data: createProposalFeeData } = useReadContract({
     address: sourceChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "protocolFee",
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
+  const createProposalFee = createProposalFeeData as bigint;
 
   const { data: tokenNamesLength } = useReadContract({
     address: destinationChain.equitoVoteContractV2,
@@ -161,28 +162,33 @@ export default function CreateProposalPage() {
     });
   const tokenNames = tokenNamesData as string[] | undefined;
 
-  const formattedSourceChainFee = sourceFee
+  const formattedSourceChainFee = !!sourceFee
     ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const formattedDestinationChainFee = destinationFee
+  const formattedDestinationChainFee = !!destinationFee
     ? `${Number(formatUnits(destinationFee, 18)).toFixed(8)} ${
         destinationChain.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
-  const formattedCreateProposalFee = createProposalFee
-    ? `${Number(formatUnits(createProposalFee as bigint, 18)).toFixed(8)} ${
+  const formattedCreateProposalFee = !!createProposalFee
+    ? `${Number(formatUnits(createProposalFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
     : "unavailable";
 
+  const formattedTotalUserFee =
+    !!sourceFee && !!destinationFee && !!createProposalFee
+      ? `${Number(formatUnits(sourceFee + destinationFee + createProposalFee, 18)).toFixed(8)} ${
+          sourceChain?.definition?.nativeCurrency?.symbol
+        }`
+      : "unavailable";
+
   const totalCreateProposalFee =
-    sourceFee && createProposalFee
-      ? sourceFee + (createProposalFee as bigint)
-      : BigInt(0);
+    sourceFee && createProposalFee ? sourceFee + createProposalFee : BigInt(0);
 
   const tokenNamesOption = useMemo(
     () => tokenNames?.map((name) => ({ value: name, label: name })),
@@ -323,129 +329,131 @@ export default function CreateProposalPage() {
   return (
     <div className="ml-16">
       <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
-      <div className="mb-4 flex flex-row items-center">
-        <TextField
-          id={FormKeys.tokenName}
-          select
-          label={formLabels.tokenName}
-          disabled={isPendingTokenNames}
-          value={formData.tokenName}
-          onChange={(e) => {
-            const updatedFormErrors = new Set(formErrors);
-            updatedFormErrors.delete(FormKeys.tokenName);
-            setFormErrors(updatedFormErrors);
-            setFormData({ ...formData, tokenName: e.target.value });
-          }}
-          error={formErrors.has(FormKeys.tokenName)}
-          helperText={
-            formErrors.has(FormKeys.tokenName)
-              ? formErrorMessages.tokenName
-              : undefined
-          }
-          sx={{ width: "350px" }}
-        >
-          {(tokenNamesOption || []).map((option: OptionString) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-        {isPendingTokenNames && (
-          <div className="ml-8">
-            <CircularProgress size={30} />
+      <div className="flex flex-row">
+        <div className="mr-16">
+          <div className="mb-4 flex flex-row items-center">
+            <TextField
+              id={FormKeys.tokenName}
+              select
+              label={formLabels.tokenName}
+              disabled={isPendingTokenNames}
+              value={formData.tokenName}
+              onChange={(e) => {
+                const updatedFormErrors = new Set(formErrors);
+                updatedFormErrors.delete(FormKeys.tokenName);
+                setFormErrors(updatedFormErrors);
+                setFormData({ ...formData, tokenName: e.target.value });
+              }}
+              error={formErrors.has(FormKeys.tokenName)}
+              helperText={
+                formErrors.has(FormKeys.tokenName)
+                  ? formErrorMessages.tokenName
+                  : undefined
+              }
+              sx={{ width: "350px" }}
+            >
+              {(tokenNamesOption || []).map((option: OptionString) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            {isPendingTokenNames && (
+              <div className="ml-8">
+                <CircularProgress size={30} />
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      <div className="mb-8">
-        You DAO token not present?{" "}
-        <Link
-          href="add-new-token"
-          className="underline hover:text-blue-300 transition-colors"
-        >
-          Add New Token
-        </Link>
-      </div>
+          <div className="mb-8">
+            You DAO token not present?{" "}
+            <Link
+              href="add-new-token"
+              className="underline hover:text-blue-300 transition-colors"
+            >
+              Add New Token
+            </Link>
+          </div>
 
-      <div className="mb-8">
-        <TextField
-          id={FormKeys.title}
-          label={formLabels.title}
-          value={formData.title}
-          onChange={(e) => {
-            const updatedFormErrors = new Set(formErrors);
-            updatedFormErrors.delete(FormKeys.title);
-            setFormErrors(updatedFormErrors);
-            setFormData({ ...formData, title: e.target.value });
-          }}
-          error={formErrors.has(FormKeys.title)}
-          helperText={
-            formErrors.has(FormKeys.title) ? formErrorMessages.title : undefined
-          }
-          sx={{ width: "350px" }}
-        />
+          <div className="mb-8">
+            <TextField
+              id={FormKeys.title}
+              label={formLabels.title}
+              value={formData.title}
+              onChange={(e) => {
+                const updatedFormErrors = new Set(formErrors);
+                updatedFormErrors.delete(FormKeys.title);
+                setFormErrors(updatedFormErrors);
+                setFormData({ ...formData, title: e.target.value });
+              }}
+              error={formErrors.has(FormKeys.title)}
+              helperText={
+                formErrors.has(FormKeys.title)
+                  ? formErrorMessages.title
+                  : undefined
+              }
+              sx={{ width: "350px" }}
+            />
+          </div>
+
+          <div className="mb-8">
+            <TextField
+              id={FormKeys.description}
+              label={formLabels.description}
+              multiline
+              rows={4}
+              value={formData.description}
+              onChange={(e) => {
+                const updatedFormErrors = new Set(formErrors);
+                updatedFormErrors.delete(FormKeys.description);
+                setFormErrors(updatedFormErrors);
+                setFormData({ ...formData, description: e.target.value });
+              }}
+              error={formErrors.has(FormKeys.description)}
+              helperText={
+                formErrors.has(FormKeys.description)
+                  ? formErrorMessages.description
+                  : undefined
+              }
+              sx={{ width: "350px" }}
+            />
+          </div>
+
+          <div>
+            <TextField
+              id={FormKeys.durationHours}
+              label={formLabels.durationHours}
+              type="number"
+              sx={{ width: "350px" }}
+              value={formData.durationHours}
+              onChange={(e) => {
+                const durationHours = e.target.value;
+                const updatedFormErrors = new Set(formErrors);
+                if (!isDurationValid(durationHours)) {
+                  updatedFormErrors.add(FormKeys.durationHours);
+                  setFormErrors(updatedFormErrors);
+                } else {
+                  updatedFormErrors.delete(FormKeys.durationHours);
+                  setFormErrors(updatedFormErrors);
+                }
+                setFormData({ ...formData, durationHours: durationHours });
+              }}
+              error={formErrors.has(FormKeys.durationHours)}
+              helperText={
+                formErrors.has(FormKeys.durationHours)
+                  ? formErrorMessages.durationHours
+                  : undefined
+              }
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>Source Chain Fee: {formattedSourceChainFee}</div>
+          <div>Destination Chain Fee: {formattedDestinationChainFee}</div>
+          <div>Create Proposal Fee: {formattedCreateProposalFee}</div>
+          <div>Total Fee: {formattedTotalUserFee}</div>
+        </div>
       </div>
-
-      <div className="mb-8">
-        <TextField
-          id={FormKeys.description}
-          label={formLabels.description}
-          multiline
-          rows={4}
-          value={formData.description}
-          onChange={(e) => {
-            const updatedFormErrors = new Set(formErrors);
-            updatedFormErrors.delete(FormKeys.description);
-            setFormErrors(updatedFormErrors);
-            setFormData({ ...formData, description: e.target.value });
-          }}
-          error={formErrors.has(FormKeys.description)}
-          helperText={
-            formErrors.has(FormKeys.description)
-              ? formErrorMessages.description
-              : undefined
-          }
-          sx={{ width: "350px" }}
-        />
-      </div>
-
-      <div>
-        <TextField
-          id={FormKeys.durationHours}
-          label={formLabels.durationHours}
-          type="number"
-          sx={{ width: "350px" }}
-          value={formData.durationHours}
-          onChange={(e) => {
-            const durationHours = e.target.value;
-            const updatedFormErrors = new Set(formErrors);
-            if (!isDurationValid(durationHours)) {
-              updatedFormErrors.add(FormKeys.durationHours);
-              setFormErrors(updatedFormErrors);
-            } else {
-              updatedFormErrors.delete(FormKeys.durationHours);
-              setFormErrors(updatedFormErrors);
-            }
-            setFormData({ ...formData, durationHours: durationHours });
-          }}
-          error={formErrors.has(FormKeys.durationHours)}
-          helperText={
-            formErrors.has(FormKeys.durationHours)
-              ? formErrorMessages.durationHours
-              : undefined
-          }
-        />
-      </div>
-
-      {/* Equito messaging fee */}
-      <div>source chain fee: {formattedSourceChainFee}</div>
-      <div>destination chain fee: {formattedDestinationChainFee}</div>
-
-      {/* Creating a proposal fee */}
-      <div>
-        EquitoVote fee: {formattedCreateProposalFee} (fee is only charged on
-        proposal creation)
-      </div>
-
       {statusRenderer[status]}
     </div>
   );
