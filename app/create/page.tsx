@@ -62,6 +62,13 @@ const formLabels: FormData = {
   [FormKeys.tokenName]: "Token Name",
 };
 
+const formErrorMessages: FormData = {
+  title: "Please enter a title",
+  description: "Please enter a description",
+  durationHours: "Duration must be equal or greather than 1 hour",
+  tokenName: "Please select a token",
+};
+
 function isDurationValid(duration: string) {
   return Number(duration) >= 1;
 }
@@ -332,7 +339,7 @@ export default function CreateProposalPage() {
           error={formErrors.has(FormKeys.tokenName)}
           helperText={
             formErrors.has(FormKeys.tokenName)
-              ? "Please select a token"
+              ? formErrorMessages.tokenName
               : undefined
           }
           sx={{ width: "350px" }}
@@ -372,7 +379,7 @@ export default function CreateProposalPage() {
           }}
           error={formErrors.has(FormKeys.title)}
           helperText={
-            formErrors.has(FormKeys.title) ? "Please enter a title" : undefined
+            formErrors.has(FormKeys.title) ? formErrorMessages.title : undefined
           }
           sx={{ width: "350px" }}
         />
@@ -394,7 +401,7 @@ export default function CreateProposalPage() {
           error={formErrors.has(FormKeys.description)}
           helperText={
             formErrors.has(FormKeys.description)
-              ? "Please enter a description"
+              ? formErrorMessages.description
               : undefined
           }
           sx={{ width: "350px" }}
@@ -423,7 +430,7 @@ export default function CreateProposalPage() {
           error={formErrors.has(FormKeys.durationHours)}
           helperText={
             formErrors.has(FormKeys.durationHours)
-              ? "Duration must be equal or greather than 1 hour"
+              ? formErrorMessages.durationHours
               : undefined
           }
         />
