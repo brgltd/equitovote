@@ -468,7 +468,7 @@ export default function CreateProposalPage() {
 
         <ul className="space-y-4 text-gray-400 text-sm">
           <li>
-            <Tooltip placement="right" title="Equito network source chain fee">
+            <Tooltip placement="right" title="Equito Network source chain fee">
               <div className="flex flex-row items-center">
                 <span className="mr-2">Source Chain Fee: </span>
                 {isPendingSourceFee ? <FeeSkeleton /> : formattedSourceChainFee}
@@ -480,7 +480,7 @@ export default function CreateProposalPage() {
               placement="right"
               title="Equito network destination chain fee"
             >
-              <div className="flex flex-row">
+              <div className="flex flex-row items-center">
                 <span className="mr-2">Destination Chain Fee:</span>
                 {isPendingDestinationFee ? (
                   <FeeSkeleton />
@@ -495,7 +495,7 @@ export default function CreateProposalPage() {
               placement="right"
               title="Equito Vote protocol fee for creating proposals"
             >
-              <div className="flex flex-row">
+              <div className="flex flex-row items-center">
                 <span className="mr-2">Create Proposal Fee:</span>
                 {isPendingCreateProposalFee ? (
                   <FeeSkeleton />
@@ -507,7 +507,7 @@ export default function CreateProposalPage() {
           </li>
           <li>
             <Tooltip placement="right" title="Total fee paid on both chains">
-              <div className="flex flex-row">
+              <div className="flex flex-row items-center">
                 <span className="mr-2">Total Cross Chain Fee:</span>
                 {isPendingSourceFee ||
                 isPendingDestinationFee ||
