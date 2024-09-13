@@ -8,7 +8,7 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { CircularProgress, MenuItem, TextField } from "@mui/material";
+import { Button, CircularProgress, MenuItem, TextField } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -16,6 +16,7 @@ import { Status } from "@/types";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import { ButtonLink } from "@/components/button-link";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -283,8 +284,8 @@ export default function HomePage() {
 
   return (
     <div className="ml-16">
-      <h2 className="mb-6 text-xl font-semibold">Create New Proposal</h2>
-      <div className="mb-6 flex flex-row items-center">
+      <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
+      <div className="mb-4 flex flex-row items-center">
         {/* <select
           value={formData.tokenName}
           onChange={(e) =>
@@ -307,7 +308,7 @@ export default function HomePage() {
           id="select"
           select
           label="Token Name"
-          sx={{ width: "300px" }}
+          sx={{ width: "350px" }}
           // error
           // helperText="Please select your currency"
           disabled={isPendingTokenNames}
@@ -324,6 +325,15 @@ export default function HomePage() {
           </div>
         )}
       </div>
+      <div className="mb-8">
+        You DAO token not present?{" "}
+        <Link
+          href="add-new-token"
+          className="underline hover:text-blue-300 transition-colors"
+        >
+          Add New Token
+        </Link>
+      </div>
 
       <div className="mb-6">
         {/* <label htmlFor="title">title</label>
@@ -339,7 +349,7 @@ export default function HomePage() {
           id="title"
           label="Title"
           // helperText="Please enter title"
-          sx={{ width: "300px" }}
+          sx={{ width: "350px" }}
         />
       </div>
 
