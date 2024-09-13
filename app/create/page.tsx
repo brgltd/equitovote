@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { addHours } from "date-fns";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
+import { MenuItem, TextField } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -14,23 +16,6 @@ import { Status } from "@/types";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
-import Link from "next/link";
-import { MenuItem, TextField } from "@mui/material";
-
-const currencies = [
-  {
-    value: "EUR",
-    label: "€",
-  },
-  {
-    value: "BTC",
-    label: "฿",
-  },
-  {
-    value: "JPY",
-    label: "¥",
-  },
-];
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -48,6 +33,11 @@ interface CreateProposalArgs {
   description: string;
   tokenName?: string;
   originChainSelector?: number;
+}
+
+interface OptionString {
+  label: string;
+  value: string;
 }
 
 const defaultFormData: FormData = {
@@ -165,6 +155,20 @@ export default function HomePage() {
     sourceFee && createProposalFee
       ? sourceFee + (createProposalFee as bigint)
       : BigInt(0);
+
+  const tokenNamesOption = useMemo(
+    () => tokenNames?.map((name) => ({ value: name, label: name })),
+    [tokenNames],
+  );
+
+  const tokenNamesOption2 = useMemo(
+    () => [
+      { ...tokenNamesOption?.[0] },
+      { value: "Option 2", label: "Option 2" },
+      { value: "Option 3", label: "Option 3" },
+    ],
+    [tokenNamesOption],
+  );
 
   useEffect(() => {
     proposalTitleRef.current?.focus();
@@ -286,9 +290,9 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      <h2>Create New Proposal</h2>
-      <div>
+    <div className="ml-16">
+      <h2 className="mb-6">Create New Proposal</h2>
+      <div className="mb-6">
         {/* <select
           value={formData.tokenName}
           onChange={(e) =>
@@ -308,14 +312,15 @@ export default function HomePage() {
         </div> */}
 
         <TextField
-          // error
-          id="outlined-select-currency"
+          id="select"
           select
-          label="Select a Token"
-          // defaultValue="EUR"
-          helperText="Please select your currency"
+          label="Token Name"
+          sx={{ width: "300px" }}
+          // error
+          // helperText="Please select your currency"
         >
-          {currencies.map((option: any) => (
+          {/* @ts-ignore */}
+          {tokenNamesOption2?.map((option: OptionString) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -323,7 +328,7 @@ export default function HomePage() {
         </TextField>
       </div>
 
-      <div>
+      <div className="mb-6">
         {/* <label htmlFor="title">title</label>
         <input
           id="title"
@@ -334,9 +339,10 @@ export default function HomePage() {
         /> */}
         <TextField
           // error
-          id="create-proposal-title"
+          id="title"
           label="Title"
           // helperText="Please enter title"
+          sx={{ width: "300px" }}
         />
       </div>
 
