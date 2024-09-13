@@ -8,7 +8,13 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { CircularProgress, MenuItem, Skeleton, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  MenuItem,
+  Skeleton,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
@@ -451,35 +457,57 @@ export default function CreateProposalPage() {
         </div>
 
         <ul className="space-y-4 text-gray-400 text-sm">
-          <li className="flex flex-row items-center">
-            <span className="mr-2">Source Chain Fee: </span>
-            {isPendingSourceFee ? <FeeSkeleton /> : formattedSourceChainFee}
+          <li>
+            <Tooltip placement="right" title="Equito network source chain fee">
+              <div className="flex flex-row items-center">
+                <span className="mr-2">Source Chain Fee: </span>
+                {isPendingSourceFee ? <FeeSkeleton /> : formattedSourceChainFee}
+              </div>
+            </Tooltip>
           </li>
-          <li className="flex flex-row">
-            <span className="mr-2">Destination Chain Fee:</span>
-            {isPendingDestinationFee ? (
-              <FeeSkeleton />
-            ) : (
-              formattedDestinationChainFee
-            )}
+          <li>
+            <Tooltip
+              placement="right"
+              title="Equito network destination chain fee"
+            >
+              <div className="flex flex-row">
+                <span className="mr-2">Destination Chain Fee:</span>
+                {isPendingDestinationFee ? (
+                  <FeeSkeleton />
+                ) : (
+                  formattedDestinationChainFee
+                )}
+              </div>
+            </Tooltip>
           </li>
-          <li className="flex flex-row">
-            <span className="mr-2">Create Proposal Fee:</span>
-            {isPendingCreateProposalFee ? (
-              <FeeSkeleton />
-            ) : (
-              formattedCreateProposalFee
-            )}
+          <li>
+            <Tooltip
+              placement="right"
+              title="Equito Vote protocol fee for creating proposals"
+            >
+              <div className="flex flex-row">
+                <span className="mr-2">Create Proposal Fee:</span>
+                {isPendingCreateProposalFee ? (
+                  <FeeSkeleton />
+                ) : (
+                  formattedCreateProposalFee
+                )}
+              </div>
+            </Tooltip>
           </li>
-          <li className="flex flex-row">
-            <span className="mr-2">Total Fee:</span>
-            {isPendingSourceFee ||
-            isPendingDestinationFee ||
-            isPendingCreateProposalFee ? (
-              <FeeSkeleton />
-            ) : (
-              formattedTotalUserFee
-            )}
+          <li>
+            <Tooltip placement="right" title="Total fee paid on both chains">
+              <div className="flex flex-row">
+                <span className="mr-2">Total Cross Chain Fee:</span>
+                {isPendingSourceFee ||
+                isPendingDestinationFee ||
+                isPendingCreateProposalFee ? (
+                  <FeeSkeleton />
+                ) : (
+                  formattedTotalUserFee
+                )}
+              </div>
+            </Tooltip>
           </li>
         </ul>
       </div>
