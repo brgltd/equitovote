@@ -353,7 +353,7 @@ export default function CreateProposalPage() {
     <div className="ml-16">
       <div className="flex flex-row justify-center">
         <div>
-          <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
+          <h1 className="mb-8 text-xl font-semibold">Create New Proposal</h1>
           <div className="flex flex-col md:flex-row mb-8">
             <div className="mr-12 md:mr-24">
               <div className="mb-4 flex flex-row items-center">

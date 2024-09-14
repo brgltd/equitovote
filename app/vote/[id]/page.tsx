@@ -19,6 +19,7 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
+import { Tooltip } from "@mui/material";
 
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
@@ -189,7 +190,7 @@ export default function VotePage({ params }: VoteProps) {
   });
   const amountDelegatedTokens = amountDelegatedTokensData as bigint | undefined;
 
-  const { data: amountUserVotesData, error } = useReadContract({
+  const { data: amountUserVotesData } = useReadContract({
     address: sourceChain?.equitoVoteContractV2,
     abi: equitoVoteAbi,
     functionName: "userVotes",
@@ -406,48 +407,67 @@ export default function VotePage({ params }: VoteProps) {
     <div>
       <div>
         <div>
+          <h1 className="mb-4 text-2xl font-semibold">
+            {activeProposal.title}
+          </h1>
+          <div className="mb-8">{activeProposal.description}</div>
           <div>
-            Created at: {formatTimestamp(activeProposal.startTimestamp)}
+            <div>Proposal Info</div>
+            <div>
+              Status:{" "}
+              {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
+                ? "Active"
+                : "Completed"}
+            </div>
+            <div>
+              Created at: {formatTimestamp(activeProposal.startTimestamp)}
+            </div>
+            <div>
+              Finishes at: {formatTimestamp(activeProposal.endTimestamp)}
+            </div>
+            <div>Created on: {activeProposal.originChainSelector}</div>
+            <div>Voting Available on:</div>
           </div>
-          <div>Finishes at: {formatTimestamp(activeProposal.endTimestamp)}</div>
+          <hr />
           <div>
-            {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
-              ? "Completed"
-              : "Active"}
+            <div>Token Info</div>
+            <div>DAO Token Name {activeProposal.tokenName}</div>
+            <div>
+              Your token balance: {formatBalance(userTokenBalance, decimals)}
+            </div>
+            <div>
+              Delegated Tokens Amount:{" "}
+              {formatBalance(amountDelegatedTokens, decimals)}
+            </div>
+            <div>Casted Votes Amount: {formatBigInt(amountUserVotes)}</div>
+            <div>Voting Power Left: xyz</div>
+            <div>
+              <button
+                onClick={onClickDelegate}
+                disabled={!tokenAddress || isDelegating}
+              >
+                Delegate Tokens
+              </button>
+              {isDelegating && <div>delegation in progress...</div>}
+            </div>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              ref={amountRef}
+              className="text-black"
+            />
           </div>
-          <div>numVotesYes {activeProposal.numVotesYes}</div>
-          <div>numVotesNo {activeProposal.numVotesNo}</div>
-          <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
-          <div>title {activeProposal.title}</div>
-          <div>description {activeProposal.description}</div>
-          <div>startBlockNumber {activeProposal.startBlockNumber}</div>
-          <div>tokenName {activeProposal.tokenName}</div>
-          <div>originalChainSelector {activeProposal.originChainSelector}</div>
+          <hr />
+          <div>
+            <div>Votes Distribution</div>
+            <div>numVotesYes {activeProposal.numVotesYes}</div>
+            <div>numVotesNo {activeProposal.numVotesNo}</div>
+            <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
+          </div>
         </div>
         <hr />
-        <div>token balance: {formatBalance(userTokenBalance, decimals)}</div>
-        <div>
-          amount delegated tokens:{" "}
-          {formatBalance(amountDelegatedTokens, decimals)}
-        </div>
-        <div>amount user votes: {formatBigInt(amountUserVotes)}</div>
-        <div>
-          <button
-            onClick={onClickDelegate}
-            disabled={!tokenAddress || isDelegating}
-          >
-            Delegate Tokens
-          </button>
-          {isDelegating && <div>delegation in progress...</div>}
-        </div>
         <hr />
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          ref={amountRef}
-          className="text-black"
-        />
         <button
           onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
           className="block"
