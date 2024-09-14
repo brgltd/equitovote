@@ -41,8 +41,13 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
-    // Very small value to simulate a protocol fee for creating proposals during the hackathon
+    // Protocol fee for creating proposals, very small value to simulate on
+    // the hackathon.
     uint256 public createProposalFee = 0.000001e18;
+
+    // Protocol fee for voting on proposals, very small value to simulate on
+    // the hackathon.
+    uint256 public voteOnProposalFee = 0.0000001e18;
 
     bytes32[] public proposalIds;
 
@@ -77,7 +82,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         VoteOption voteOption
     );
 
-    event CreateProposalFeeUpdated(uint256 newProtocolFee);
+    event CreateProposalFeeUpdated(uint256 newCreateProposaFee);
+
+    event VoteOnProposalFeeUpdated(uint256 newVoteOnProposalFee);
 
     event TokenDataUpdated(
         string indexed tokenName,
@@ -220,11 +227,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
             emptyNewProposal
         );
 
-        bytes32 messageHash = router.sendMessage{value: msg.value}(
-            receiver,
-            destinationChainSelector,
-            messageData
-        );
+        bytes32 messageHash = router.sendMessage{
+            value: msg.value - createProposalFee
+        }(receiver, destinationChainSelector, messageData);
 
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
     }
@@ -260,9 +265,18 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- external mutative admin functions ---
 
-    function setCreateProposalFee(uint256 newCreateProposalFee) external onlyOwner {
+    function setCreateProposalFee(
+        uint256 newCreateProposalFee
+    ) external onlyOwner {
         createProposalFee = newCreateProposalFee;
         emit CreateProposalFeeUpdated(newCreateProposalFee);
+    }
+
+    function setVoteOnProposalFee(
+        uint256 newVoteOnProposalFee
+    ) external onlyOwner {
+        newVoteOnProposalFee = newVoteOnProposalFee;
+        emit VoteOnProposalFeeUpdated(newVoteOnProposalFee);
     }
 
     function updateTokenData(
