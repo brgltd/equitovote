@@ -42,7 +42,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     // --- state variables ---
 
     // Very small value to simulate a protocol fee for creating proposals during the hackathon
-    uint256 public protocolFee = 0.000001e18;
+    uint256 public createProposalFee = 0.000001e18;
 
     bytes32[] public proposalIds;
 
@@ -77,7 +77,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         VoteOption voteOption
     );
 
-    event ProtocolFeeUpdated(uint256 newProtocolFee);
+    event CreateProposalFeeUpdated(uint256 newProtocolFee);
 
     event TokenDataUpdated(
         string indexed tokenName,
@@ -164,7 +164,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         );
 
         bytes32 messageHash = router.sendMessage{
-            value: msg.value - protocolFee
+            value: msg.value - createProposalFee
         }(
             peers[destinationChainSelector],
             destinationChainSelector,
@@ -260,9 +260,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
     // --- external mutative admin functions ---
 
-    function setProtocolFee(uint256 newProtocolFee) external onlyOwner {
-        protocolFee = newProtocolFee;
-        emit ProtocolFeeUpdated(newProtocolFee);
+    function setCreateProposalFee(uint256 newCreateProposalFee) external onlyOwner {
+        createProposalFee = newCreateProposalFee;
+        emit CreateProposalFeeUpdated(newCreateProposalFee);
     }
 
     function updateTokenData(
