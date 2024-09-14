@@ -75,7 +75,7 @@ function formatBalance(
     : Number(formatUnits(input, decimals)).toFixed(4);
 }
 
-export default function Vote({ params }: VoteProps) {
+export default function VotePage({ params }: VoteProps) {
   const { id: proposalId } = params;
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
@@ -93,6 +93,8 @@ export default function Vote({ params }: VoteProps) {
     destinationRouter,
     destinationChain,
   } = useEquitoVote();
+
+  const sourceRouterAddress = sourceRouter?.data;
 
   const fromRouterAddress = sourceRouter?.data;
   const toRouterAddress = destinationRouter?.data;
@@ -224,6 +226,20 @@ export default function Vote({ params }: VoteProps) {
     chainId: destinationChain.definition.id,
   });
 
+  const { data: voteOnProposalFeeData } = useReadContract({
+    address: sourceChain?.equitoVoteContractV2,
+    abi: equitoVoteAbi,
+    functionName: "voteOnProposalFee",
+    query: { enabled: !!sourceRouterAddress },
+    chainId: sourceChain?.definition.id,
+  });
+  const voteOnProposalFee = voteOnProposalFeeData as bigint;
+
+  const totalVoteOnProposalFee =
+    !!sourceFee && !!voteOnProposalFee
+      ? sourceFee + voteOnProposalFee
+      : BigInt(0);
+
   const isVoteButtonEnabled = useMemo(
     () => !!tokenAddress && !!amount,
     [tokenAddress, amount],
@@ -271,7 +287,7 @@ export default function Vote({ params }: VoteProps) {
         isGetPastVotesEnabled,
       ],
       chainId: sourceChain?.definition.id,
-      value: sourceFee,
+      value: totalVoteOnProposalFee,
     });
     return waitForTransactionReceipt(config, {
       hash,

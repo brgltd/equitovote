@@ -145,7 +145,7 @@ export default function CreateProposalPage() {
     useReadContract({
       address: sourceChain?.equitoVoteContractV2,
       abi: equitoVoteAbi,
-      functionName: "protocolFee",
+      functionName: "createProposalFee",
       query: { enabled: !!sourceRouterAddress },
       chainId: sourceChain?.definition.id,
     });
@@ -195,7 +195,9 @@ export default function CreateProposalPage() {
       : "Unavailable";
 
   const totalCreateProposalFee =
-    sourceFee && createProposalFee ? sourceFee + createProposalFee : BigInt(0);
+    !!sourceFee && !!createProposalFee
+      ? sourceFee + createProposalFee
+      : BigInt(0);
 
   const tokenNamesOption = useMemo(
     () => tokenNames?.map((name) => ({ value: name, label: name })),
