@@ -8,16 +8,16 @@ import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { Address, formatUnits, parseEventLogs } from "viem";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
-import { CircularProgress, MenuItem, TextField, Tooltip } from "@mui/material";
 import { config } from "@/utils/wagmi";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { Status } from "@/types";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Chain } from "@/utils/chains";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import { CircularProgress, MenuItem, TextField, Tooltip } from "@mui/material";
 import { Button } from "@/components/button";
 import { FeeSkeleton } from "@/components/fee-skeleton";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -57,8 +57,8 @@ const formErrorMessages: FormData = {
 };
 
 interface OptionString {
-  label?: string | undefined;
-  value?: string | undefined;
+  label: string;
+  value: string;
 }
 
 interface CreateProposalArgs {
@@ -487,7 +487,7 @@ export default function CreateProposalPage() {
               <li>
                 <Tooltip
                   placement="right"
-                  title="Equito network destination chain fee"
+                  title="Equito Network destination chain fee"
                 >
                   <div className="flex flex-row items-center">
                     <span className="mr-2">Destination Chain Fee:</span>
