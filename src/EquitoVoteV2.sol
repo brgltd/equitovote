@@ -163,10 +163,6 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
 
         bytes memory messageData = abi.encode(
             OperationType.CreateProposal,
-            bytes32(0),
-            0,
-            VoteOption.Abstain,
-            address(0),
             newProposal
         );
 
@@ -216,15 +212,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         uint256 normalizedNumVotes = numVotes /
             10 ** IERC20Metadata(tokenAddress).decimals();
 
-        Proposal memory emptyNewProposal;
-
         bytes memory messageData = abi.encode(
             OperationType.VoteOnProposal,
             proposalId,
             normalizedNumVotes,
             voteOption,
-            tokenAddress,
-            emptyNewProposal
+            tokenAddress
         );
 
         bytes32 messageHash = router.sendMessage{
@@ -437,21 +430,25 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         EquitoMessage calldata message,
         bytes calldata messageData
     ) internal override {
-        (
-            OperationType operationType,
-            bytes32 proposalId,
-            uint256 numVotes,
-            VoteOption voteOption,
-            address tokenAddress,
-            Proposal memory newProposal
-        ) = abi.decode(
-                messageData,
-                (OperationType, bytes32, uint256, VoteOption, address, Proposal)
-            );
+        OperationType operationType = abi.decode(messageData, (OperationType));
         if (operationType == OperationType.CreateProposal) {
+            (, Proposal memory newProposal) = abi.decode(
+                messageData,
+                (OperationType, Proposal)
+            );
             _createProposal(newProposal);
             emit CreateProposalMessageReceived(newProposal.id);
         } else if (operationType == OperationType.VoteOnProposal) {
+            (
+                ,
+                bytes32 proposalId,
+                uint256 numVotes,
+                VoteOption voteOption,
+                address tokenAddress
+            ) = abi.decode(
+                    messageData,
+                    (OperationType, bytes32, uint256, VoteOption, address)
+                );
             _voteOnProposal(
                 proposalId,
                 numVotes,
