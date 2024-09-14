@@ -15,6 +15,7 @@
     "@equito-sdk/core": "^0.1.4",
     "@equito-sdk/evm": "^0.1.4",
     "@equito-sdk/viem": "^0.1.4",
+    "@mui/icons-material": "^6.1.0",
     "@mui/material": "^6.1.0",
     "@mui/material-nextjs": "^6.1.0",
     "@rainbow-me/rainbowkit": "^2.1.4",

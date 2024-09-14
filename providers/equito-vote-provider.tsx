@@ -23,6 +23,10 @@ type EquitoVoteContext =
       destinationRouter: UseQueryResult<Address, Error>;
       isClient: boolean;
       userAddress: Address | undefined;
+      isToastOpen: boolean;
+      setIsToastOpen: Dispatch<SetStateAction<boolean>>;
+      toastMessage: string;
+      setToastMessage: Dispatch<SetStateAction<string>>;
     }
   | undefined;
 
@@ -31,6 +35,8 @@ const equitoVoteContext = createContext<EquitoVoteContext>(undefined);
 export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
   const [sourceChain, setSourceChain] = useState<Chain>(null!);
   const [isClient, setIsClient] = useState(false);
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const { address: userAddress } = useAccount();
 
@@ -60,6 +66,10 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
         destinationRouter,
         isClient,
         userAddress,
+        isToastOpen,
+        setIsToastOpen,
+        toastMessage,
+        setToastMessage,
       }}
     >
       {children}

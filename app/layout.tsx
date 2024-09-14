@@ -18,6 +18,7 @@ import { Navbar } from "@/components/navbar";
 import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
+import { Toast } from "@/components/toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -66,6 +67,7 @@ export default function RootLayout({
                             {children}
                           </div>
                         </div>
+                        <Toast />
                       </ThemeProvider>
                     </AppRouterCacheProvider>
                   </EquitoVoteProvider>

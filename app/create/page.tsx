@@ -103,8 +103,14 @@ export default function CreateProposalPage() {
 
   const { switchChainAsync } = useSwitchChain();
 
-  const { sourceChain, sourceRouter, destinationRouter, destinationChain } =
-    useEquitoVote();
+  const {
+    sourceChain,
+    sourceRouter,
+    destinationRouter,
+    destinationChain,
+    setIsToastOpen,
+    setToastMessage,
+  } = useEquitoVote();
 
   const sourceRouterAddress = sourceRouter?.data;
   const destinationRouterAddress = destinationRouter?.data;
@@ -304,7 +310,14 @@ export default function CreateProposalPage() {
       setStatus(Status.IsStart);
     } catch (error) {
       setStatus(Status.IsRetry);
-      console.log(error);
+      const isUserRejection = error
+        ?.toString()
+        ?.includes("User rejected the request");
+      if (!isUserRejection) {
+        setToastMessage("Error occurred creating proposal. Please try again.");
+        setIsToastOpen(true);
+      }
+      console.error(error);
     }
   };
 
@@ -530,7 +543,17 @@ export default function CreateProposalPage() {
               </li>
             </ul>
           </div>
-          <Button onClick={onClickCreateProposal}>SUBMIT PROPOSAL</Button>
+          <Button
+            onClick={onClickCreateProposal}
+            isDisabled={
+              isPendingSourceFee ||
+              isPendingDestinationFee ||
+              isPendingCreateProposalFee ||
+              isPendingTokenNames
+            }
+          >
+            SUBMIT PROPOSAL
+          </Button>
           {statusRenderer[status]}
         </div>
       </div>
