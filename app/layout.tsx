@@ -61,12 +61,7 @@ export default function RootLayout({
                       <ThemeProvider theme={darkTheme}>
                         <CssBaseline />
                         <div className="flex flex-row justify-center">
-                          {/* <div className="max-w-screen-2xl border"> */}
-                          <div
-                            // style={{ maxWidth: 1500, border: "1px solid red" }}
-                            // style={{ border: "1px solid red" }}
-                            style={{ width: 1300 }}
-                          >
+                          <div style={{ width: "1300px" }}>
                             <Navbar />
                             {children}
                           </div>

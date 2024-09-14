@@ -346,7 +346,7 @@ export default function CreateProposalPage() {
         <div>
           <h2 className="mb-8 text-xl font-semibold">Create New Proposal</h2>
           <div className="flex flex-col md:flex-row mb-8">
-            <div className="mr-20">
+            <div className="mr-12 md:mr-24">
               <div className="mb-4 flex flex-row items-center">
                 <TextField
                   id={FormKeys.tokenName}
@@ -502,7 +502,7 @@ export default function CreateProposalPage() {
               <li>
                 <Tooltip
                   placement="right"
-                  title="Equito Vote protocol fee for creating proposals"
+                  title="Equito Vote Protocol fee for creating proposals"
                 >
                   <div className="flex flex-row items-center">
                     <span className="mr-2">Create Proposal Fee:</span>
