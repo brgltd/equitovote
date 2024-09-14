@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { addHours } from "date-fns";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
@@ -96,8 +96,6 @@ export default function CreateProposalPage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
-
-  const proposalTitleRef = useRef<HTMLInputElement>(null);
 
   const { writeContractAsync } = useWriteContract();
 
@@ -203,10 +201,6 @@ export default function CreateProposalPage() {
     () => tokenNames?.map((name) => ({ value: name, label: name })),
     [tokenNames],
   );
-
-  useEffect(() => {
-    proposalTitleRef.current?.focus();
-  }, []);
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
@@ -457,7 +451,6 @@ export default function CreateProposalPage() {
                   id={FormKeys.durationHours}
                   label={formLabels.durationHours}
                   type="number"
-                  sx={{ width: "350px" }}
                   value={formData.durationHours}
                   onChange={(e) => {
                     const durationHours = e.target.value;
@@ -477,6 +470,7 @@ export default function CreateProposalPage() {
                       ? formErrorMessages.durationHours
                       : undefined
                   }
+                  sx={{ width: "350px" }}
                 />
               </div>
             </div>
