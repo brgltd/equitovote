@@ -118,7 +118,7 @@ export default function HomePage() {
                 className="flex flex-row justify-center"
               >
                 <div
-                  className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex md:flex-row md:justify-between flex-col p-4 mx-4 mb-10"
+                  className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex md:flex-row md:justify-between flex-col p-4 mb-10"
                   style={{ width: "100%", maxWidth: "1200px" }}
                 >
                   <div>

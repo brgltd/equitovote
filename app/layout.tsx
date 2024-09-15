@@ -62,7 +62,7 @@ export default function RootLayout({
                       <ThemeProvider theme={darkTheme}>
                         <CssBaseline />
                         <div className="flex flex-row justify-center">
-                          <div style={{ width: "1300px" }}>
+                          <div className="mx-12" style={{ width: "1200px" }}>
                             <Navbar />
                             {children}
                           </div>
