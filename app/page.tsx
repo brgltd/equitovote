@@ -33,6 +33,13 @@ function buildGetProposalsSliceArgs(
   return proposalsLength < end ? [start, proposalsLength] : [start, end];
 }
 
+function getPaginationCount(proposalsLength: number | undefined) {
+  if (!proposalsLength) {
+    return 1;
+  }
+  return Math.ceil(proposalsLength / PAGINATION_SIZE);
+}
+
 export default function HomePage() {
   const [pageNumber, setPageNumber] = useState(1);
 
@@ -54,9 +61,9 @@ export default function HomePage() {
     isPending: isPendingProposals,
     isError: isErrorFetchingProposals,
     error: errorFetchingProposals,
-    refetch,
-    isRefetching,
-    isRefetchError,
+    refetch: refetchProposals,
+    isRefetching: isRefetchingProposals,
+    isRefetchError: isErrorRefetchingProposals,
   } = useReadContract({
     address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
@@ -71,21 +78,17 @@ export default function HomePage() {
     [proposals],
   );
 
-  const mock = Array.isArray(normalizedProposals)
-    ? Array.from({ length: 3 }).map((item) => normalizedProposals[0])
-    : [];
-
   const onChangePageNumber = (event: ChangeEvent<unknown>, value: number) => {
     setPageNumber(value);
-    refetch();
+    refetchProposals();
   };
 
-  if (isErrorFetchingProposals || isRefetchError) {
+  if (isErrorFetchingProposals || isErrorRefetchingProposals) {
     console.error(errorFetchingProposals);
     return <div>error</div>;
   }
 
-  if (isPendingProposals || isRefetching) {
+  if (isPendingProposals || isRefetchingProposals) {
     return <div>loading</div>;
   }
 
@@ -96,8 +99,7 @@ export default function HomePage() {
   return (
     <div>
       <ul>
-        {/* {normalizedProposals.map((item) => { */}
-        {mock.map((item, i) => {
+        {normalizedProposals.map((item) => {
           const isActive = verifyIsProposalActive(item as FormattedProposal);
           const originChainImg =
             supportedChainsMapBySelector[item.originChainSelector]?.img;
@@ -106,13 +108,12 @@ export default function HomePage() {
           // Rendering origin chain as the first one available.
           // Should not result in a performance hit since there can be
           // ~20 chains maximum.
-          const rearrangedChains = rearrangeSupportedChains(
+          const rearrangedSupportedChains = rearrangeSupportedChains(
             supportedChains,
             item.originChainSelector,
           );
           return (
-            // <li key={item.id}>
-            <li key={i}>
+            <li key={item.id}>
               <Link
                 href={`/vote/${item.id}`}
                 className="flex flex-row justify-center"
@@ -160,7 +161,7 @@ export default function HomePage() {
                     <div className="flex sm:flex-row flex-col sm:items-center">
                       <div className="md:mb-0 mb-2">Voting available on</div>
                       <div className="flex flex-row">
-                        {rearrangedChains.map((chain) => (
+                        {rearrangedSupportedChains.map((chain) => (
                           <img
                             src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
                             width={32}
@@ -178,15 +179,15 @@ export default function HomePage() {
           );
         })}
       </ul>
-      <div className="mb-16">
-        <Pagination
-          // count={!!proposalsLength ? Number(proposalsLength) + 9 : undefined}
-          // count={10}
-          count={!!proposalsLength ? proposalsLengthNumber : undefined}
-          page={pageNumber}
-          onChange={onChangePageNumber}
-        />
-      </div>
+      {!!proposalsLengthNumber && proposalsLengthNumber > PAGINATION_SIZE && (
+        <div className="mb-16">
+          <Pagination
+            count={getPaginationCount(proposalsLengthNumber)}
+            page={pageNumber}
+            onChange={onChangePageNumber}
+          />
+        </div>
+      )}
     </div>
   );
 }
