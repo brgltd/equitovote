@@ -28,7 +28,7 @@ export default function HomePage() {
 
   const {
     data: proposals,
-    isLoading: isLoadingProposals,
+    isPending: isPendingProposals,
     isError: isErrorFetchingProposals,
     error: errorFetchingProposals,
   } = useReadContract({
@@ -50,7 +50,7 @@ export default function HomePage() {
     return <div>error</div>;
   }
 
-  if (isLoadingProposals) {
+  if (isPendingProposals) {
     return <div>loading</div>;
   }
 
@@ -66,8 +66,14 @@ export default function HomePage() {
           supportedChainsMapBySelector[item.originChainSelector]?.img;
         return (
           <li key={item.id}>
-            <Link href={`/vote/${item.id}`}>
-              <div className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex flex-row justify-between p-4">
+            <Link
+              href={`/vote/${item.id}`}
+              className="flex flex-row justify-center"
+            >
+              <div
+                className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex md:flex-row md:justify-between flex-col p-4 ml-12 mr-12"
+                style={{ width: "100%", maxWidth: "1200px" }}
+              >
                 <div>
                   <div className="text-xl font-semibold mb-2">{item.title}</div>
                   <div className="mb-2">{item.description}</div>
@@ -81,7 +87,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex flex-col justify-between">
                   <div>
-                    <div className="flex flex-row items-center justify-end mb-4">
+                    <div className="flex flex-row items-center md:justify-end mb-4 md:mt-0 mt-4">
                       Proposal Created on
                       <img
                         src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
@@ -91,17 +97,19 @@ export default function HomePage() {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-row items-center">
-                    <div>Voting available on</div>
-                    {supportedChains.map((chain) => (
-                      <img
-                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
-                        width={32}
-                        height={32}
-                        className="rounded-full ml-2"
-                        key={chain.definition.id}
-                      />
-                    ))}
+                  <div className="flex sm:flex-row flex-col sm:items-center">
+                    <div className="md:mb-0 mb-2">Voting available on</div>
+                    <div className="flex flex-row">
+                      {supportedChains.map((chain) => (
+                        <img
+                          src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
+                          width={32}
+                          height={32}
+                          className="rounded-full ml-2"
+                          key={chain.definition.id}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
