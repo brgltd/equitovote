@@ -101,6 +101,31 @@ export const blastChain = {
   img: 28480,
   definition: blastSepolia,
   pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
+  // TODO: deploy equitovote on blast
+};
+
+export const baseChain = {
+  chainSelector: 1007,
+  name: "Base Sepolia",
+  img: 9195,
+  definition: baseSepolia,
+  pingPongContract: "0xbC2ca9a5364DBd68d2c8Fb091E662Da952697B50" as Address,
+};
+
+export const lineaChain = {
+  chainSelector: 1014,
+  name: "Linea Sepolia",
+  img: 27657,
+  definition: lineaSepolia,
+  pingPongContract: "0x974e51Bb569fD476bb570c03E227cA4723cA2091" as Address,
+};
+
+export const scrollChain = {
+  chainSelector: 1020,
+  name: "Scroll Sepolia",
+  img: 26998,
+  definition: scrollSepolia,
+  pingPongContract: "0x496883645073B0e10C0D200C4f860024118C5e86" as Address,
 };
 
 export const chains: Chain[] = [
@@ -128,13 +153,7 @@ export const chains: Chain[] = [
     pingPongContract: "0x79c440ABA2bB23D44fEB21bF1Cc6a37E0657E7Fd",
   },
   optimismChain,
-  {
-    chainSelector: 1007,
-    name: "Base Sepolia",
-    img: 9195,
-    definition: baseSepolia,
-    pingPongContract: "0xbC2ca9a5364DBd68d2c8Fb091E662Da952697B50",
-  },
+  baseChain,
   {
     chainSelector: 1008,
     name: "Fantom Testnet",
@@ -163,13 +182,7 @@ export const chains: Chain[] = [
     definition: rolluxTestnet,
     pingPongContract: "0xFCe87EADF6498139C980606663f775d7E44C135f",
   },
-  {
-    chainSelector: 1014,
-    name: "Linea Sepolia",
-    img: 27657,
-    definition: lineaSepolia,
-    pingPongContract: "0x974e51Bb569fD476bb570c03E227cA4723cA2091",
-  },
+  lineaChain,
   {
     chainSelector: 1015,
     name: "Oasis Emerald Testnet",
@@ -199,13 +212,7 @@ export const chains: Chain[] = [
     definition: gnosisChiado,
     pingPongContract: "0x80b97071EAC4214345bb2580bbED3eee78a1CfD2",
   },
-  {
-    chainSelector: 1020,
-    name: "Scroll Sepolia",
-    img: 26998,
-    definition: scrollSepolia,
-    pingPongContract: "0x496883645073B0e10C0D200C4f860024118C5e86",
-  },
+  scrollChain,
   {
     chainSelector: 1021,
     name: "Mantle Sepolia",
@@ -226,6 +233,10 @@ export const supportedChains: Chain[] = [
   ethereumChain,
   arbitrumChain,
   optimismChain,
+  // blastChain,
+  // baseChain,
+  // lineaChain,
+  // scrollChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(

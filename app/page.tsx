@@ -81,18 +81,6 @@ export default function HomePage() {
                 </div>
                 <div className="flex flex-col justify-between">
                   <div>
-                    <div className="flex flex-row items-center mb-4">
-                      <div>Voting available on</div>
-                      {supportedChains.map((chain) => (
-                        <img
-                          src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
-                          width={32}
-                          height={32}
-                          className="rounded-full ml-2"
-                          key={chain.definition.id}
-                        />
-                      ))}
-                    </div>
                     <div className="flex flex-row items-center justify-end mb-4">
                       Proposal Created on
                       <img
@@ -103,7 +91,18 @@ export default function HomePage() {
                       />
                     </div>
                   </div>
-                  <div className="ml-auto hover-glow">Open Proposal</div>
+                  <div className="flex flex-row items-center">
+                    <div>Voting available on</div>
+                    {supportedChains.map((chain) => (
+                      <img
+                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
+                        width={32}
+                        height={32}
+                        className="rounded-full ml-2"
+                        key={chain.definition.id}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </Link>
