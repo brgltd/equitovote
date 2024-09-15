@@ -89,11 +89,22 @@ export default function HomePage() {
                 style={{ width: "100%", maxWidth: "1200px" }}
               >
                 <div>
-                  <div className="text-xl font-semibold mb-2">{item.title}</div>
-                  <div className="mb-2">{item.description}</div>
+                  <div
+                    className="text-xl font-semibold mb-2"
+                    style={{ width: "100%", maxWidth: "800px" }}
+                  >
+                    {item.title}
+                  </div>
+                  <div
+                    className="mb-2"
+                    style={{ width: "100%", maxWidth: "800px" }}
+                  >
+                    {item.description}
+                  </div>
                   <div className="mb-2">
                     {startDate} - {endDate}
                   </div>
+                  <div className="mb-2">DAO Token: {item.tokenName}</div>
                   <div className="flex flex-row items-center">
                     <div
                       className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
