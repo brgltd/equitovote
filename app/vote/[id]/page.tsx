@@ -6,6 +6,7 @@ import {
   buildProposalFromArray,
   placeholderProposal,
   verifyIsGetPastVotesEnabled,
+  verifyIsProposalActive,
 } from "@/utils/helpers";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
@@ -131,6 +132,11 @@ export default function VotePage({ params }: VoteProps) {
   const formattedProposal: FormattedProposal = useMemo(
     () => buildProposalFromArray(proposal, true),
     [proposal],
+  );
+
+  const isProposalActive = useMemo(
+    () => verifyIsProposalActive(formattedProposal),
+    [formattedProposal],
   );
 
   const isProposalLoaded = useMemo(
@@ -440,7 +446,7 @@ export default function VotePage({ params }: VoteProps) {
               {formatBalance(amountDelegatedTokens, decimals)}
             </div>
             <div>Casted Votes Amount: {formatBigInt(amountUserVotes)}</div>
-            <div>Voting Power Left: xyz</div>
+            <div>Voting Power: xyz</div>
             <div>
               <button
                 onClick={onClickDelegate}

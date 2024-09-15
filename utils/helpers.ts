@@ -69,3 +69,9 @@ export function buildProposalFromArray(
 export function verifyIsGetPastVotesEnabled() {
   return process.env.NEXT_PUBLIC_IS_GET_PAST_VOTES_ENABLED_ENABLED === "true";
 }
+
+export function verifyIsProposalActive(proposal: FormattedProposal) {
+  console.log(proposal.endTimestamp);
+  console.log(Math.floor(Date.now() / 1000));
+  return proposal.endTimestamp > Math.floor(Date.now() / 1000);
+}

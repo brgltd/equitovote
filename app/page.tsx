@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useReadContract } from "wagmi";
-import { formatProposals } from "@/utils/helpers";
-import { ProposalResponse } from "@/types";
+import { formatProposals, verifyIsProposalActive } from "@/utils/helpers";
+import { FormattedProposal, ProposalResponse } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
+import { ethereumChain, supportedChains } from "@/utils/chains";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -53,26 +54,54 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      {normalizedProposals.map((item) => (
-        <div key={item.id}>
-          <div>
-            <div>startTimestamp {item.startTimestamp}</div>
-            <div>endTimestamp {item.endTimestamp}</div>
-            <div>numVotesYes {item.numVotesYes}</div>
-            <div>numVotesNo {item.numVotesNo}</div>
-            <div>numVotesAbstain {item.numVotesAbstain}</div>
-            <div>title {item.title}</div>
-            <div>description {item.description}</div>
-            <div>id {item.id}</div>
-            <div>startBlockNumber {item.startBlockNumber}</div>
-            <div>token name {item.tokenName}</div>
-            <div>Proposal Created On: {item.originChainSelector}</div>
-            <div>Voting Available On: [1001, 1004, 1006]</div>
-            <Link href={`/vote/${item.id}`}>Vote</Link>
-          </div>
-        </div>
-      ))}
-    </div>
+    <ul>
+      {normalizedProposals.map((item) => {
+        const isActive = !verifyIsProposalActive(item as FormattedProposal);
+        return (
+          <li key={item.id}>
+            <Link href={`/vote/${item.id}`}>
+              <div className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex flex-row justify-between p-4">
+                <div>
+                  <div className="text-xl font-semibold mb-2">{item.title}</div>
+                  <div className="mb-2">{item.description}</div>
+                  <div className="mb-2">12 Sep 5:00 PM - 17 Sep 5:00 PM</div>
+                  <div className="flex flex-row items-center">
+                    <div
+                      className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
+                    />{" "}
+                    {isActive ? "Live" : "Completed"}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <div className="flex flex-row items-center mb-4">
+                      <div>Voting available on</div>
+                      {supportedChains.map((chain) => (
+                        <img
+                          src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
+                          width={32}
+                          height={32}
+                          className="rounded-full ml-2"
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-row items-center justify-end mb-4">
+                      Proposal Created on
+                      <img
+                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${ethereumChain.img}.png`}
+                        width={32}
+                        height={32}
+                        className="rounded-full ml-2"
+                      />
+                    </div>
+                  </div>
+                  <div className="ml-auto">Open Proposal</div>
+                </div>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
