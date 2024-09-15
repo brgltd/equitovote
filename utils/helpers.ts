@@ -1,5 +1,6 @@
 import { FormattedProposal, ProposalDataItem, ProposalResponse } from "@/types";
 import { format } from "date-fns";
+import { Chain, SupportedChainsMap } from "./chains";
 
 // Order is important for this object
 export const placeholderProposal: FormattedProposal = {
@@ -86,4 +87,29 @@ export function formatTimestamp(
     return format(timestampSeconds * 1000, "dd MMM yyyy hh:mm a");
   }
   return format(timestampSeconds * 1000, "dd MMM yyyy HH:mm");
+}
+
+export function rearrangeChainMap(
+  chainMap: SupportedChainsMap,
+  target: number,
+) {
+  const chainMapCopy = { ...chainMap };
+  delete chainMapCopy[target];
+  return { ...chainMap[target], ...chainMapCopy };
+}
+
+export function rearrangeSupportedChains(
+  chains: Chain[],
+  chainSelectorTarget: number,
+) {
+  const target = chains.find(
+    (item) => chainSelectorTarget === item.chainSelector,
+  );
+  if (!target) {
+    return chains;
+  }
+  const filteredChains = chains.filter(
+    (item) => chainSelectorTarget !== item.chainSelector,
+  );
+  return [target, ...filteredChains];
 }

@@ -6,6 +6,7 @@ import { useReadContract } from "wagmi";
 import {
   formatProposals,
   formatTimestamp,
+  rearrangeSupportedChains,
   verifyIsProposalActive,
 } from "@/utils/helpers";
 import { FormattedProposal, ProposalResponse } from "@/types";
@@ -70,6 +71,13 @@ export default function HomePage() {
           supportedChainsMapBySelector[item.originChainSelector]?.img;
         const startDate = formatTimestamp(item.startTimestamp);
         const endDate = formatTimestamp(item.endTimestamp);
+        // Rendering origin chain as the first one available.
+        // Should not result in a performance hit since there would be
+        // 20 chains maximum.
+        const rearrangedChains = rearrangeSupportedChains(
+          supportedChains,
+          item.originChainSelector,
+        );
         return (
           <li key={item.id}>
             <Link
@@ -108,7 +116,7 @@ export default function HomePage() {
                   <div className="flex sm:flex-row flex-col sm:items-center">
                     <div className="md:mb-0 mb-2">Voting available on</div>
                     <div className="flex flex-row">
-                      {supportedChains.map((chain) => (
+                      {rearrangedChains.map((chain) => (
                         <img
                           src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
                           width={32}
