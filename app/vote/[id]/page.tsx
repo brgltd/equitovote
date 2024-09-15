@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import {
   buildProposalFromArray,
+  formatTimestamp,
   placeholderProposal,
   verifyIsGetPastVotesEnabled,
   verifyIsProposalActive,
@@ -56,12 +57,6 @@ function buildUpdatedProposal(
     updatedProposal.numVotesAbstain += amountNumber;
   }
   return updatedProposal;
-}
-
-function formatTimestamp(timestampSeconds: number) {
-  return !timestampSeconds
-    ? ""
-    : format(timestampSeconds * 1000, "dd MMM yyyy hh:mm aaaa");
 }
 
 function formatBigInt(input: bigint | undefined) {

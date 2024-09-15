@@ -1,4 +1,5 @@
 import { FormattedProposal, ProposalDataItem, ProposalResponse } from "@/types";
+import { format } from "date-fns";
 
 // Order is important for this object
 export const placeholderProposal: FormattedProposal = {
@@ -72,4 +73,17 @@ export function verifyIsGetPastVotesEnabled() {
 
 export function verifyIsProposalActive(proposal: FormattedProposal) {
   return proposal.endTimestamp > Math.floor(Date.now() / 1000);
+}
+
+export function formatTimestamp(
+  timestampSeconds: number,
+  isUSformatEnabled = true,
+) {
+  if (!timestampSeconds) {
+    return "";
+  }
+  if (isUSformatEnabled) {
+    return format(timestampSeconds * 1000, "dd MMM yyyy hh:mm a");
+  }
+  return format(timestampSeconds * 1000, "dd MMM yyyy HH:mm");
 }

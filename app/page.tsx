@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useReadContract } from "wagmi";
-import { formatProposals, verifyIsProposalActive } from "@/utils/helpers";
+import {
+  formatProposals,
+  formatTimestamp,
+  verifyIsProposalActive,
+} from "@/utils/helpers";
 import { FormattedProposal, ProposalResponse } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
@@ -64,6 +68,8 @@ export default function HomePage() {
         const isActive = !verifyIsProposalActive(item as FormattedProposal);
         const originChainImg =
           supportedChainsMapBySelector[item.originChainSelector]?.img;
+        const startDate = formatTimestamp(item.startTimestamp);
+        const endDate = formatTimestamp(item.endTimestamp);
         return (
           <li key={item.id}>
             <Link
@@ -77,7 +83,9 @@ export default function HomePage() {
                 <div>
                   <div className="text-xl font-semibold mb-2">{item.title}</div>
                   <div className="mb-2">{item.description}</div>
-                  <div className="mb-2">12 Sep 5:00 PM - 17 Sep 5:00 PM</div>
+                  <div className="mb-2">
+                    {startDate} - {endDate}
+                  </div>
                   <div className="flex flex-row items-center">
                     <div
                       className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
