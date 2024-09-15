@@ -85,7 +85,7 @@ export default function HomePage() {
 
   if (isErrorFetchingProposals || isErrorRefetchingProposals) {
     console.error(errorFetchingProposals);
-    return <div>error</div>;
+    return <div>Error occurred fetching proposals</div>;
   }
 
   if (isPendingProposals || isRefetchingProposals) {
@@ -128,14 +128,12 @@ export default function HomePage() {
                       style={{ width: "100%", maxWidth: "800px" }}
                     >
                       {item.title}
-                      {/* Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been */}
                     </div>
                     <div
                       className="mb-2"
                       style={{ width: "100%", maxWidth: "800px" }}
                     >
                       {item.description}
-                      {/* the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into */}
                     </div>
                     <div className="mb-2">
                       {startDate} - {endDate}

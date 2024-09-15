@@ -1,6 +1,6 @@
+import { Skeleton } from "@mui/material";
 import { supportedChains } from "@/utils/chains";
 import { PAGINATION_SIZE } from "@/utils/helpers";
-import { Skeleton } from "@mui/material";
 
 export function ProposalsSkeleton() {
   return (
