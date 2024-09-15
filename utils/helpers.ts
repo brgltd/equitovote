@@ -71,7 +71,5 @@ export function verifyIsGetPastVotesEnabled() {
 }
 
 export function verifyIsProposalActive(proposal: FormattedProposal) {
-  console.log(proposal.endTimestamp);
-  console.log(Math.floor(Date.now() / 1000));
   return proposal.endTimestamp > Math.floor(Date.now() / 1000);
 }

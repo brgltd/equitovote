@@ -7,7 +7,12 @@ import { formatProposals, verifyIsProposalActive } from "@/utils/helpers";
 import { FormattedProposal, ProposalResponse } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
-import { ethereumChain, supportedChains } from "@/utils/chains";
+import {
+  ethereumChain,
+  supportedChains,
+  supportedChainsMap,
+  supportedChainsMapBySelector,
+} from "@/utils/chains";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -57,6 +62,8 @@ export default function HomePage() {
     <ul>
       {normalizedProposals.map((item) => {
         const isActive = !verifyIsProposalActive(item as FormattedProposal);
+        const originChainImg =
+          supportedChainsMapBySelector[item.originChainSelector]?.img;
         return (
           <li key={item.id}>
             <Link href={`/vote/${item.id}`}>
@@ -82,20 +89,21 @@ export default function HomePage() {
                           width={32}
                           height={32}
                           className="rounded-full ml-2"
+                          key={chain.definition.id}
                         />
                       ))}
                     </div>
                     <div className="flex flex-row items-center justify-end mb-4">
                       Proposal Created on
                       <img
-                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${ethereumChain.img}.png`}
+                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
                         width={32}
                         height={32}
                         className="rounded-full ml-2"
                       />
                     </div>
                   </div>
-                  <div className="ml-auto">Open Proposal</div>
+                  <div className="ml-auto hover-glow">Open Proposal</div>
                 </div>
               </div>
             </Link>

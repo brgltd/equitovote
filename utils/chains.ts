@@ -236,6 +236,14 @@ export const supportedChainsMap = supportedChains.reduce(
   {},
 );
 
+export const supportedChainsMapBySelector = supportedChains.reduce(
+  (acc: SupportedChainsMap, curr) => {
+    acc[curr.chainSelector] = curr;
+    return acc;
+  },
+  {},
+);
+
 export type Chain = {
   chainSelector: number;
   name: string;
