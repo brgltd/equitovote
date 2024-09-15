@@ -101,7 +101,6 @@ export const blastChain = {
   img: 28480,
   definition: blastSepolia,
   pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
-  // TODO: deploy equitovote on blast
 };
 
 export const baseChain = {
@@ -233,10 +232,6 @@ export const supportedChains: Chain[] = [
   ethereumChain,
   arbitrumChain,
   optimismChain,
-  // blastChain,
-  // baseChain,
-  // lineaChain,
-  // scrollChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(
