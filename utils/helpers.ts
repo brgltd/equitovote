@@ -2,6 +2,8 @@ import { FormattedProposal, ProposalDataItem, ProposalResponse } from "@/types";
 import { format } from "date-fns";
 import { Chain, SupportedChainsMap } from "./chains";
 
+export const PAGINATION_SIZE = 3;
+
 // Order is important for this object
 export const placeholderProposal: FormattedProposal = {
   startTimestamp: 0,

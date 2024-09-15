@@ -6,6 +6,7 @@ import { useReadContract } from "wagmi";
 import {
   formatProposals,
   formatTimestamp,
+  PAGINATION_SIZE,
   rearrangeSupportedChains,
   verifyIsProposalActive,
 } from "@/utils/helpers";
@@ -14,10 +15,9 @@ import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 import { Pagination } from "@mui/material";
+import { ProposalsSkeleton } from "@/components/proposals-skeleton";
 
 const equitoVoteAbi = equitoVote.abi;
-
-const PAGINATION_SIZE = 3;
 
 function buildGetProposalsSliceArgs(
   pageNumber: number,
@@ -89,11 +89,11 @@ export default function HomePage() {
   }
 
   if (isPendingProposals || isRefetchingProposals) {
-    return <div>loading</div>;
+    return <ProposalsSkeleton />;
   }
 
   if (!normalizedProposals.length) {
-    return <div>no proposal created</div>;
+    return <div>No proposal available</div>;
   }
 
   return (
@@ -128,12 +128,14 @@ export default function HomePage() {
                       style={{ width: "100%", maxWidth: "800px" }}
                     >
                       {item.title}
+                      {/* Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been */}
                     </div>
                     <div
                       className="mb-2"
                       style={{ width: "100%", maxWidth: "800px" }}
                     >
                       {item.description}
+                      {/* the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into */}
                     </div>
                     <div className="mb-2">
                       {startDate} - {endDate}
