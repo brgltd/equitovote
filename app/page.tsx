@@ -20,7 +20,7 @@ import { ProposalsSkeleton } from "@/components/proposals-skeleton";
 
 const equitoVoteAbi = equitoVote.abi;
 
-function buildGetProposalsSliceArgs(
+function buildProposalRetrievalArgs(
   pageNumber: number,
   proposalsLength: number | undefined,
 ) {
@@ -83,8 +83,8 @@ export default function HomePage() {
   } = useReadContract({
     address: destinationChain.equitoVoteContractV2,
     abi: equitoVoteAbi,
-    functionName: "getProposalsSlice",
-    args: buildGetProposalsSliceArgs(pageNumber, proposalsLengthNumber),
+    functionName: "getSlicedReversedProposals",
+    args: buildProposalRetrievalArgs(pageNumber, proposalsLengthNumber),
     // args: [0, 4],
     query: { enabled: isValidData(proposalsLength) },
     chainId: destinationChain.definition.id,
