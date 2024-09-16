@@ -27,9 +27,26 @@ function buildGetProposalsSliceArgs(
   if (!proposalsLength) {
     return [0, 0];
   }
-  const start = (pageNumber - 1) * PAGINATION_SIZE;
-  const end = start + PAGINATION_SIZE;
-  return proposalsLength < end ? [start, proposalsLength] : [start, end];
+  // const start = (pageNumber - 1) * PAGINATION_SIZE;
+  // const end = start + PAGINATION_SIZE;
+  // return proposalsLength < end ? [start, proposalsLength] : [start, end];
+
+  // proposalsLength = 9
+
+  // pageNumber = 1
+  // [8, 5]
+
+  // pageNumber = 2
+  // [5, 2]
+
+  // pageNumber = 3
+  // [2, -1]
+
+  const proposalLastIndex = proposalsLength - 1;
+  const pageNumberZeroIndexed = pageNumber - 1;
+  const start = proposalLastIndex - pageNumberZeroIndexed * PAGINATION_SIZE;
+  const end = start - PAGINATION_SIZE;
+  return end < -1 ? [start, -1] : [start, end];
 }
 
 function getPaginationCount(proposalsLength: number | undefined) {
@@ -68,6 +85,7 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
     args: buildGetProposalsSliceArgs(pageNumber, proposalsLengthNumber),
+    // args: [0, 4],
     query: { enabled: isValidData(proposalsLength) },
     chainId: destinationChain.definition.id,
   });

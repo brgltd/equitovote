@@ -64,9 +64,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     // --- events ---
 
     event CreateProposalMessageSent(
+        bytes32 indexed proposalId,
         uint256 indexed destinationChainSelector,
-        bytes32 messageHash,
-        bytes32 proposalId
+        bytes32 messageHash
     );
 
     event VoteOnProposalMessageSent(
@@ -175,9 +175,9 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         );
 
         emit CreateProposalMessageSent(
+            id,
             destinationChainSelector,
-            messageHash,
-            id
+            messageHash
         );
     }
 
@@ -394,6 +394,24 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     /// @param endIndex The end index, non inclusive.
     /// @return An array with proposal data.
     function getProposalsSlice(
+        int256 startIndex,
+        int256 endIndex
+    ) external view returns (Proposal[] memory) {
+        Proposal[] memory slicedProposals = new Proposal[](
+            uint256(startIndex - endIndex)
+        );
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        uint256 i;
+        for (int256 j = startIndex; j < endIndex; j = uncheckedDec(j)) {
+            slicedProposals[i] = proposals[proposalIdsCopy[uint256(j)]];
+            unchecked {
+                ++i;
+            }
+        }
+        return slicedProposals;
+    }
+
+    function getProposalsSlice2(
         uint256 startIndex,
         uint256 endIndex
     ) external view returns (Proposal[] memory) {
@@ -401,12 +419,8 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
             endIndex - startIndex
         );
         bytes32[] memory proposalIdsCopy = proposalIds;
-        uint256 i;
-        for (uint256 j = startIndex; j < endIndex; j = uncheckedInc(j)) {
-            slicedProposals[i] = proposals[proposalIdsCopy[j]];
-            unchecked {
-                ++i;
-            }
+        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
+            slicedProposals[i] = proposals[proposalIdsCopy[i]];
         }
         return slicedProposals;
     }
@@ -531,6 +545,15 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     function uncheckedInc(uint256 i) private pure returns (uint256) {
         unchecked {
             return ++i;
+        }
+    }
+
+    /// @notice Unchecked decrement to save gas in for loops.
+    /// @param i The value to be decremented.
+    /// @return The decremented value.
+    function uncheckedDec(int256 i) private pure returns (int256) {
+        unchecked {
+            return --i;
         }
     }
 }
