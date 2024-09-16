@@ -252,6 +252,8 @@ export default function VotePage({ params }: VoteProps) {
   const originChainImg =
     supportedChainsMapBySelector[originChainSelector as number]?.img;
 
+  const isActive = !verifyIsProposalActive(activeProposal);
+
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
     [originChainSelector],
@@ -422,69 +424,78 @@ export default function VotePage({ params }: VoteProps) {
             {activeProposal.title}
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
-          <div>
-            <div className="flex flex-row items-center mb-3">
-              <div className="w-40">Proposal Created on</div>
-              <img
-                src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
-                width={32}
-                height={32}
-                className="rounded-full ml-2"
-              />
+          <div className="mb-8">
+            <div className="text-xl font-semibold mb-2">Proposal Info</div>
+            <div className="flex flex-row items-center justify-between">
+              <div>
+                Status:{" "}
+                <div className="flex flex-row items-center">
+                  <div
+                    className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
+                  />{" "}
+                  {isActive ? "Live" : "Completed"}
+                </div>
+              </div>
+              <div>
+                Start Date
+                <div>{formatTimestamp(activeProposal.startTimestamp)}</div>
+              </div>
+              <div>
+                End Date
+                <div>{formatTimestamp(activeProposal.endTimestamp)}</div>
+              </div>
+              <div>
+                <div>Chains</div>
+                <div>
+                  {/* <div className="flex flex-row items-center mb-3">
+                    <div className="w-40">Proposal Created on</div>
+                    <img
+                      src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
+                      width={32}
+                      height={32}
+                      className="rounded-full ml-2"
+                    />
+                  </div> */}
+                </div>
+                <div className="flex sm:flex-row flex-col sm:items-center">
+                  <div className="md:mb-0 mb-2 w-40">Voting available on</div>
+                  <div className="flex flex-row">
+                    {rearrangedSupportedChains.map((chain) => (
+                      <img
+                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
+                        width={32}
+                        height={32}
+                        className="rounded-full ml-2"
+                        key={chain.definition.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex sm:flex-row flex-col sm:items-center mb-6">
-            <div className="md:mb-0 mb-2 w-40">Voting available on</div>
-            <div className="flex flex-row">
-              {rearrangedSupportedChains.map((chain) => (
-                <img
-                  src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
-                  width={32}
-                  height={32}
-                  className="rounded-full ml-2"
-                  key={chain.definition.id}
-                />
-              ))}
-            </div>
-          </div>
           <div>
-            <div className="text-xl font-semibold">Proposal Info</div>
-            <div>
-              Status:{" "}
-              {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
-                ? "Active"
-                : "Completed"}
-            </div>
-            <div>
-              Created at: {formatTimestamp(activeProposal.startTimestamp)}
-            </div>
-            <div>
-              Finishes at: {formatTimestamp(activeProposal.endTimestamp)}
-            </div>
-            <div>Created on: {activeProposal.originChainSelector}</div>
-            <div>Voting Available on:</div>
-          </div>
-          <hr />
-          <div>
-            <div>Token Info</div>
-            <div>DAO Token Name {activeProposal.tokenName}</div>
-            <div>
-              Your token balance: {formatBalance(userTokenBalance, decimals)}
-            </div>
-            <div>
-              Delegated Tokens Amount:{" "}
-              {formatBalance(amountDelegatedTokens, decimals)}
-            </div>
-            <div>Casted Votes Amount: {formatBigInt(amountUserVotes)}</div>
-            <div>Voting Power: xyz</div>
-            <div>
-              <button
-                onClick={onClickDelegate}
-                disabled={!tokenAddress || isDelegating}
-              >
-                Delegate Tokens
-              </button>
-              {isDelegating && <div>delegation in progress...</div>}
+            <div className="text-xl font-semibold mb-2">Token Info</div>
+            <div className="flex flex-row items-center justify-between">
+              <div>Token Name {activeProposal.tokenName}</div>
+              <div>
+                Your Token Balance: {formatBalance(userTokenBalance, decimals)}
+              </div>
+              <div>
+                Delegated Tokens Amount:{" "}
+                {formatBalance(amountDelegatedTokens, decimals)}
+              </div>
+              <div>Casted Votes Amount: {formatBigInt(amountUserVotes)}</div>
+              <div>
+                <hr />
+                <button
+                  onClick={onClickDelegate}
+                  disabled={!tokenAddress || isDelegating}
+                >
+                  Delegate Tokens
+                </button>
+                {isDelegating && <div>delegation in progress...</div>}
+              </div>
             </div>
           </div>
           <hr />
@@ -496,7 +507,7 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         </div>
         <hr />
-        <hr />
+        <div>Voting Power: xyz</div>
         <input
           type="number"
           value={amount}
