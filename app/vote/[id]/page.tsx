@@ -28,6 +28,8 @@ const erc20VotesAbi = erc20Votes.abi;
 
 const isGetPastVotesEnabled = verifyIsGetPastVotesEnabled();
 
+const ZERO_TOKEN_TEXT = "N/A";
+
 enum VoteOption {
   Yes = 0,
   No = 1,
@@ -57,10 +59,6 @@ function buildUpdatedProposal(
     updatedProposal.numVotesAbstain += amountNumber;
   }
   return updatedProposal;
-}
-
-function formatBigInt(input: bigint | undefined) {
-  return !input ? "N/A" : Number(input);
 }
 
 function formatBalance(
@@ -426,21 +424,27 @@ export default function VotePage({ params }: VoteProps) {
           <div className="mb-8">{activeProposal.description}</div>
           <div className="mb-8">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
-            <div className="flex flex-row items-center justify-between">
+            {/* <div className="flex flex-row items-center justify-between"> */}
+            <div className="flex flex-row items-center">
               <div>
-                Status:{" "}
-                <div className="flex flex-row items-center">
-                  <div
-                    className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
-                  />{" "}
-                  {isActive ? "Live" : "Completed"}
+                {/* <div className="mr-28"> */}
+                <div className="w-48">
+                  Status
+                  <div className="flex flex-row items-center">
+                    <div
+                      className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
+                    />{" "}
+                    {isActive ? "Live" : "Completed"}
+                  </div>
                 </div>
               </div>
-              <div>
+              {/* <div className="mr-28"> */}
+              <div className="w-60">
                 Start Date
                 <div>{formatTimestamp(activeProposal.startTimestamp)}</div>
               </div>
-              <div>
+              {/* <div className="mr-28"> */}
+              <div className="w-60">
                 End Date
                 <div>{formatTimestamp(activeProposal.endTimestamp)}</div>
               </div>
@@ -476,25 +480,34 @@ export default function VotePage({ params }: VoteProps) {
           </div>
           <div>
             <div className="text-xl font-semibold mb-2">Token Info</div>
-            <div className="flex flex-row items-center justify-between">
-              <div>Token Name {activeProposal.tokenName}</div>
-              <div>
-                Your Token Balance: {formatBalance(userTokenBalance, decimals)}
+            <div className="flex flex-row items-center">
+              <div className="w-48">
+                Token Name
+                <div>{activeProposal.tokenName}</div>
+              </div>
+              <div className="w-60">
+                Your Token Balance{" "}
+                <div>
+                  {userTokenBalance
+                    ? formatBalance(userTokenBalance, decimals)
+                    : ZERO_TOKEN_TEXT}
+                </div>
+              </div>
+              <div className="w-60">
+                Your Delegated Amount
+                <div>
+                  {amountDelegatedTokens
+                    ? formatBalance(amountDelegatedTokens, decimals)
+                    : ZERO_TOKEN_TEXT}
+                </div>
               </div>
               <div>
-                Delegated Tokens Amount:{" "}
-                {formatBalance(amountDelegatedTokens, decimals)}
-              </div>
-              <div>Casted Votes Amount: {formatBigInt(amountUserVotes)}</div>
-              <div>
-                <hr />
-                <button
-                  onClick={onClickDelegate}
-                  disabled={!tokenAddress || isDelegating}
-                >
-                  Delegate Tokens
-                </button>
-                {isDelegating && <div>delegation in progress...</div>}
+                Your Votes Amount
+                <div>
+                  {amountUserVotes
+                    ? formatBalance(amountUserVotes, decimals)
+                    : ZERO_TOKEN_TEXT}
+                </div>
               </div>
             </div>
           </div>
@@ -505,6 +518,17 @@ export default function VotePage({ params }: VoteProps) {
             <div>numVotesNo {activeProposal.numVotesNo}</div>
             <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
           </div>
+        </div>
+        <hr />
+        <div>
+          <hr />
+          <button
+            onClick={onClickDelegate}
+            disabled={!tokenAddress || isDelegating}
+          >
+            Delegate Tokens
+          </button>
+          {isDelegating && <div>delegation in progress...</div>}
         </div>
         <hr />
         <div>Voting Power: xyz</div>
