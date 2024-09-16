@@ -106,6 +106,7 @@ export default function CreateProposalPage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
+  const [proposalId, setProposalId] = useState<string>("");
 
   const { writeContractAsync } = useWriteContract();
 
@@ -257,6 +258,14 @@ export default function CreateProposalPage() {
       console.log("createProposalReceipt");
       console.log(createProposalReceipt);
 
+      const proposalId =
+        createProposalReceipt?.logs?.[createProposalReceipt?.logs?.length - 1]
+          ?.topics?.[1];
+
+      setProposalId(proposalId || "");
+
+      console.log("proposalId", proposalId);
+
       const logs = parseEventLogs({
         abi: routerAbi,
         logs: createProposalReceipt.logs,
@@ -316,7 +325,7 @@ export default function CreateProposalPage() {
       console.log("executionMessage");
       console.log(executionMessage);
 
-      setStatus(Status.IsStart);
+      setStatus(Status.IsCompleted);
     } catch (error) {
       setStatus(Status.IsRetry);
       const isUserRejection = error
@@ -335,35 +344,48 @@ export default function CreateProposalPage() {
     [Status.IsExecutingBaseTxOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4 text-sm">Creating Proposal on Source Chain</div>
+        <div className="ml-4">Creating Proposal on Source Chain</div>
       </div>
     ),
     // Same message as next step since it's executing quickly
     [Status.IsRetrievingBlockOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4 text-sm">Generating Proof on Source Chain</div>
+        <div className="ml-4">Generating Proof on Source Chain</div>
       </div>
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4 text-sm">Generating Proof on Source Chain</div>
+        <div className="ml-4">Generating Proof on Source Chain</div>
       </div>
     ),
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4 text-sm">
-          Executing Message on Destination Chain
-        </div>
+        <div className="ml-4">Executing Message on Destination Chain</div>
       </div>
     ),
     [Status.IsRetry]: <></>,
+    [Status.IsCompleted]: (
+      <div className="mt-4">
+        <span className="mr-2">Proposal Created Successfully.</span>
+        <Link
+          // We should have proposalId from the event logs and the link
+          // should point to the new proposal page.
+          // But in any case if we don't, then link goes to homepage
+          // where the newly created proposal would be on the top.
+          href={proposalId ? `/vote/${proposalId}` : "/"}
+          className="underline hover:text-blue-300 transition-colors"
+        >
+          Open Proposal{proposalId ? "" : "s"}
+        </Link>
+      </div>
+    ),
   };
 
   return (
-    <div className="ml-16">
+    <div className="ml-16 mb-40">
       <div className="flex flex-row justify-center">
         <div>
           <h1 className="mb-8 text-xl font-semibold">Create New Proposal</h1>

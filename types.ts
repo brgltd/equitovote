@@ -31,4 +31,5 @@ export enum Status {
   IsGeneratingProofOnSourceChain = "IS_GENERATING_PROOF_ON_SOURCE_CHAIN",
   IsExecutingMessageOnDestinationChain = "IS_EXECUTING_MESSAGE_ON_DESTINATION_CHAIN",
   IsRetry = "IS_RETRY",
+  IsCompleted = "IS_COMPLETED",
 }
