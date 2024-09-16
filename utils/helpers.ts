@@ -115,3 +115,7 @@ export function rearrangeSupportedChains(
   );
   return [target, ...filteredChains];
 }
+
+export function isDataValid(data: unknown) {
+  return !!data || data === 0 || data === BigInt(0);
+}

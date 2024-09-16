@@ -6,6 +6,7 @@ import { useReadContract } from "wagmi";
 import {
   formatProposals,
   formatTimestamp,
+  isDataValid,
   PAGINATION_SIZE,
   rearrangeSupportedChains,
   verifyIsProposalActive,
@@ -24,7 +25,7 @@ function buildGetProposalsSliceArgs(
   proposalsLength: number | undefined,
 ) {
   if (!proposalsLength) {
-    return [0, PAGINATION_SIZE];
+    return [0, 0];
   }
   // Material UI page number starts with 1.
   // `getProposalsSlice` uses inclusive start and non-inclusive end.
@@ -69,7 +70,7 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
     args: buildGetProposalsSliceArgs(pageNumber, proposalsLengthNumber),
-    query: { enabled: !!proposalsLength },
+    query: { enabled: isDataValid(proposalsLength) },
     chainId: destinationChain.definition.id,
   });
 
