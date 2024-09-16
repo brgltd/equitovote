@@ -64,10 +64,11 @@ function buildUpdatedProposal(
 function formatBalance(
   input: bigint | undefined,
   decimals: number | undefined,
+  precision = 2,
 ) {
   return !input || !decimals
-    ? "N/A"
-    : Number(formatUnits(input, decimals)).toFixed(4);
+    ? ZERO_TOKEN_TEXT
+    : Number(formatUnits(input, decimals)).toFixed(precision);
 }
 
 export default function VotePage({ params }: VoteProps) {
@@ -257,6 +258,10 @@ export default function VotePage({ params }: VoteProps) {
     [originChainSelector],
   );
 
+  const amountUserVotesNumber = Number(
+    formatBalance(amountUserVotes, decimals, 0),
+  );
+
   useEffect(() => {
     setActiveProposal(formattedProposal);
   }, [formattedProposal]);
@@ -422,12 +427,16 @@ export default function VotePage({ params }: VoteProps) {
             {activeProposal.title}
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
+          {!!amountUserVotesNumber && (
+            <div className="mb-8 italic">
+              You've voted with {amountUserVotesNumber} token
+              {amountUserVotesNumber !== 1 ? "s" : ""} on this proposal
+            </div>
+          )}
           <div className="mb-8">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
-            {/* <div className="flex flex-row items-center justify-between"> */}
             <div className="flex flex-row items-center">
               <div>
-                {/* <div className="mr-28"> */}
                 <div className="w-48">
                   Status
                   <div className="flex flex-row items-center">
@@ -462,7 +471,8 @@ export default function VotePage({ params }: VoteProps) {
                   </div> */}
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center">
-                  <div className="md:mb-0 mb-2 w-40">Voting available on</div>
+                  {/* <div className="md:mb-0 mb-2 w-40">Voting available on</div> */}
+                  <div className="md:mb-0 mb-2">Voting available on</div>
                   <div className="flex flex-row">
                     {rearrangedSupportedChains.map((chain) => (
                       <img
@@ -487,27 +497,16 @@ export default function VotePage({ params }: VoteProps) {
               </div>
               <div className="w-60">
                 Your Token Balance{" "}
-                <div>
-                  {userTokenBalance
-                    ? formatBalance(userTokenBalance, decimals)
-                    : ZERO_TOKEN_TEXT}
-                </div>
+                <div>{formatBalance(userTokenBalance, decimals)}</div>
               </div>
               <div className="w-60">
                 Your Delegated Amount
-                <div>
-                  {amountDelegatedTokens
-                    ? formatBalance(amountDelegatedTokens, decimals)
-                    : ZERO_TOKEN_TEXT}
-                </div>
+                <div>{formatBalance(amountDelegatedTokens, decimals)}</div>
               </div>
               <div>
-                Your Votes Amount
-                <div>
-                  {amountUserVotes
-                    ? formatBalance(amountUserVotes, decimals)
-                    : ZERO_TOKEN_TEXT}
-                </div>
+                Your Voting Power
+                {/* <div>{formatBalance(amountUserVotes, decimals)}</div> */}
+                <div>1000.00</div>
               </div>
             </div>
           </div>
