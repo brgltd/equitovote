@@ -46,7 +46,9 @@ function buildProposalRetrievalArgs(
   const pageNumberZeroIndexed = pageNumber - 1;
   const start = proposalLastIndex - pageNumberZeroIndexed * PAGINATION_SIZE;
   const end = start - PAGINATION_SIZE;
-  return end < -1 ? [start, -1] : [start, end];
+  const r = end < -1 ? [start, -1] : [start, end];
+  console.log(r);
+  return r;
 }
 
 function getPaginationCount(proposalsLength: number | undefined) {
@@ -85,7 +87,10 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "getSlicedReversedProposals",
     args: buildProposalRetrievalArgs(pageNumber, proposalsLengthNumber),
-    // args: [0, 4],
+    // functionName: "getSlicedReversedProposals",
+    // args: [0, 0],
+    // functionName: "getProposalsSlice",
+    // args: [0, 1],
     query: { enabled: isValidData(proposalsLength) },
     chainId: destinationChain.definition.id,
   });

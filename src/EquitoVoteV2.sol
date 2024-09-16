@@ -393,25 +393,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     /// @param startIndex The start index, inclusive.
     /// @param endIndex The end index, non inclusive.
     /// @return An array with proposal data.
-    function getSlicedReversedProposals(
-        int256 startIndex,
-        int256 endIndex
-    ) external view returns (Proposal[] memory) {
-        Proposal[] memory slicedProposals = new Proposal[](
-            uint256(startIndex - endIndex)
-        );
-        bytes32[] memory proposalIdsCopy = proposalIds;
-        uint256 i;
-        for (int256 j = startIndex; j < endIndex; j = uncheckedDec(j)) {
-            slicedProposals[i] = proposals[proposalIdsCopy[uint256(j)]];
-            unchecked {
-                ++i;
-            }
-        }
-        return slicedProposals;
-    }
-
-    function getProposalsSlice(
+    function getSlicedProposals(
         uint256 startIndex,
         uint256 endIndex
     ) external view returns (Proposal[] memory) {
@@ -421,6 +403,29 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         bytes32[] memory proposalIdsCopy = proposalIds;
         for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
             slicedProposals[i] = proposals[proposalIdsCopy[i]];
+        }
+        return slicedProposals;
+    }
+
+    /// @notice Build up an array of proposals in reverse order.
+    /// @param startIndex The start index, inclusive.
+    /// @param endIndex The end index, non inclusive.
+    /// @return An array with proposal data.
+    /// @dev Used to show newest proposals first with pagination.
+    function getSlicedReversedProposals(
+        int256 startIndex,
+        int256 endIndex
+    ) external view returns (Proposal[] memory) {
+        Proposal[] memory slicedProposals = new Proposal[](
+            uint256(startIndex - endIndex)
+        );
+        bytes32[] memory proposalIdsCopy = proposalIds;
+        uint256 i;
+        for (int256 j = startIndex; j > endIndex; j = uncheckedDec(j)) {
+            slicedProposals[i] = proposals[proposalIdsCopy[uint256(j)]];
+            unchecked {
+                ++i;
+            }
         }
         return slicedProposals;
     }
