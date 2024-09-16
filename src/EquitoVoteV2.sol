@@ -401,8 +401,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
             endIndex - startIndex
         );
         bytes32[] memory proposalIdsCopy = proposalIds;
-        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
-            slicedProposals[i] = proposals[proposalIdsCopy[i]];
+        uint256 i;
+        for (uint256 j = startIndex; j < endIndex; j = uncheckedInc(j)) {
+            slicedProposals[i] = proposals[proposalIdsCopy[j]];
+            unchecked {
+                ++i;
+            }
         }
         return slicedProposals;
     }

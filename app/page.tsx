@@ -27,10 +27,8 @@ function buildGetProposalsSliceArgs(
   if (!proposalsLength) {
     return [0, 0];
   }
-  // Material UI page number starts with 1.
-  // `getProposalsSlice` uses inclusive start and non-inclusive end.
-  const start = pageNumber - 1;
-  const end = pageNumber - 1 + PAGINATION_SIZE;
+  const start = (pageNumber - 1) * PAGINATION_SIZE;
+  const end = start + PAGINATION_SIZE;
   return proposalsLength < end ? [start, proposalsLength] : [start, end];
 }
 
