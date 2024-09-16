@@ -18,6 +18,8 @@ import { CircularProgress, MenuItem, TextField, Tooltip } from "@mui/material";
 import { Button } from "@/components/button";
 import { FeeSkeleton } from "@/components/fee-skeleton";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import { isArrayNotEmpty, isValidData } from "@/utils/helpers";
+import { isArray } from "util";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -92,6 +94,14 @@ function buildCreateProposalArgs(
   };
 }
 
+function SelectEmpty() {
+  return (
+    <MenuItem key="token-names-empty" value="token-names-empty">
+      No tokens available
+    </MenuItem>
+  );
+}
+
 export default function CreateProposalPage() {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
@@ -164,7 +174,7 @@ export default function CreateProposalPage() {
       abi: equitoVoteAbi,
       functionName: "getTokenNamesSlice",
       args: [0, tokenNamesLength],
-      query: { enabled: !!tokenNamesLength },
+      query: { enabled: isValidData(tokenNamesLength) },
       chainId: destinationChain.definition.id,
     });
   const tokenNames = tokenNamesData as string[] | undefined;
@@ -385,6 +395,8 @@ export default function CreateProposalPage() {
                         <CircularProgress />
                       </MenuItem>
                     </div>
+                  ) : !isArrayNotEmpty(tokenNamesOption as any) ? (
+                    <SelectEmpty />
                   ) : (
                     (tokenNamesOption || []).map((option: OptionString) => (
                       <MenuItem key={option.value} value={option.value}>

@@ -6,7 +6,7 @@ import { useReadContract } from "wagmi";
 import {
   formatProposals,
   formatTimestamp,
-  isDataValid,
+  isValidData,
   PAGINATION_SIZE,
   rearrangeSupportedChains,
   verifyIsProposalActive,
@@ -70,7 +70,7 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "getProposalsSlice",
     args: buildGetProposalsSliceArgs(pageNumber, proposalsLengthNumber),
-    query: { enabled: isDataValid(proposalsLength) },
+    query: { enabled: isValidData(proposalsLength) },
     chainId: destinationChain.definition.id,
   });
 

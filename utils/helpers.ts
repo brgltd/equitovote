@@ -116,6 +116,10 @@ export function rearrangeSupportedChains(
   return [target, ...filteredChains];
 }
 
-export function isDataValid(data: unknown) {
+export function isValidData<T>(data: T) {
   return !!data || data === 0 || data === BigInt(0);
+}
+
+export function isArrayNotEmpty<T>(data: T[]) {
+  return Array.isArray(data) && !!data.length;
 }
