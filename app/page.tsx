@@ -8,7 +8,7 @@ import {
   formatTimestamp,
   isValidData,
   PAGINATION_SIZE,
-  rearrangeSupportedChains,
+  rearrangeChains,
   verifyIsProposalActive,
 } from "@/utils/helpers";
 import { FormattedProposal, ProposalResponse } from "@/types";
@@ -113,7 +113,7 @@ export default function HomePage() {
           // Rendering origin chain as the first one available.
           // Should not result in a performance hit since there can be
           // ~20 chains maximum.
-          const rearrangedSupportedChains = rearrangeSupportedChains(
+          const rearrangedSupportedChains = rearrangeChains(
             supportedChains,
             item.originChainSelector,
           );

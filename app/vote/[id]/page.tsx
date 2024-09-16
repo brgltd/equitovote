@@ -6,6 +6,7 @@ import {
   buildProposalFromArray,
   formatTimestamp,
   placeholderProposal,
+  rearrangeChains,
   verifyIsGetPastVotesEnabled,
   verifyIsProposalActive,
 } from "@/utils/helpers";
@@ -20,6 +21,7 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
+import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
@@ -240,16 +242,20 @@ export default function VotePage({ params }: VoteProps) {
       ? sourceFee + voteOnProposalFee
       : BigInt(0);
 
-  // console.log(totalVoteOnProposalFee);
-
   const isVoteButtonEnabled = useMemo(
     () => !!tokenAddress && !!amount,
     [tokenAddress, amount],
   );
 
-  useEffect(() => {
-    amountRef.current?.focus();
-  }, []);
+  const originChainSelector = activeProposal?.originChainSelector;
+
+  const originChainImg =
+    supportedChainsMapBySelector[originChainSelector as number]?.img;
+
+  const rearrangedSupportedChains = useMemo(
+    () => rearrangeChains(supportedChains, originChainSelector as number, true),
+    [originChainSelector],
+  );
 
   useEffect(() => {
     setActiveProposal(formattedProposal);
@@ -396,6 +402,7 @@ export default function VotePage({ params }: VoteProps) {
       <div>executing message on destination chain</div>
     ),
     [Status.IsRetry]: <div>waiting for action</div>,
+    [Status.IsCompleted]: <></>,
   };
 
   if (isLoadingProposal) {
@@ -411,12 +418,37 @@ export default function VotePage({ params }: VoteProps) {
     <div>
       <div>
         <div>
-          <h1 className="mb-4 text-2xl font-semibold">
+          <h1 className="mb-4 text-3xl font-semibold">
             {activeProposal.title}
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
           <div>
-            <div>Proposal Info</div>
+            <div className="flex flex-row items-center mb-3">
+              <div className="w-40">Proposal Created on</div>
+              <img
+                src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
+                width={32}
+                height={32}
+                className="rounded-full ml-2"
+              />
+            </div>
+          </div>
+          <div className="flex sm:flex-row flex-col sm:items-center mb-6">
+            <div className="md:mb-0 mb-2 w-40">Voting available on</div>
+            <div className="flex flex-row">
+              {rearrangedSupportedChains.map((chain) => (
+                <img
+                  src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${chain.img}.png`}
+                  width={32}
+                  height={32}
+                  className="rounded-full ml-2"
+                  key={chain.definition.id}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-xl font-semibold">Proposal Info</div>
             <div>
               Status:{" "}
               {activeProposal.endTimestamp > Math.floor(Date.now() / 1000)
@@ -454,13 +486,6 @@ export default function VotePage({ params }: VoteProps) {
               </button>
               {isDelegating && <div>delegation in progress...</div>}
             </div>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              ref={amountRef}
-              className="text-black"
-            />
           </div>
           <hr />
           <div>
@@ -472,6 +497,13 @@ export default function VotePage({ params }: VoteProps) {
         </div>
         <hr />
         <hr />
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          ref={amountRef}
+          className="text-black"
+        />
         <button
           onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
           className="block"

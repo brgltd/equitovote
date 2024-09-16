@@ -411,7 +411,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     /// @param startIndex The start index, inclusive.
     /// @param endIndex The end index, non inclusive.
     /// @return An array with proposal data.
-    /// @dev Used to show newest proposals first with pagination.
+    /// @dev Used to display the newest proposals first with pagination.
     function getSlicedReversedProposals(
         int256 startIndex,
         int256 endIndex
@@ -436,8 +436,12 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     ) external view returns (string[] memory) {
         string[] memory slicedTokenNames = new string[](endIndex - startIndex);
         string[] memory tokenNamesCopy = tokenNames;
-        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
-            slicedTokenNames[i] = tokenNamesCopy[i];
+        uint256 i;
+        for (uint256 j = startIndex; j < endIndex; j = uncheckedInc(j)) {
+            slicedTokenNames[i] = tokenNamesCopy[j];
+            unchecked {
+                ++i;
+            }
         }
         return slicedTokenNames;
     }

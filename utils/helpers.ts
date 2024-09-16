@@ -100,9 +100,10 @@ export function rearrangeChainMap(
   return { ...chainMap[target], ...chainMapCopy };
 }
 
-export function rearrangeSupportedChains(
+export function rearrangeChains(
   chains: Chain[],
   chainSelectorTarget: number,
+  shouldAppend = false,
 ) {
   const target = chains.find(
     (item) => chainSelectorTarget === item.chainSelector,
@@ -113,6 +114,9 @@ export function rearrangeSupportedChains(
   const filteredChains = chains.filter(
     (item) => chainSelectorTarget !== item.chainSelector,
   );
+  if (shouldAppend) {
+    return [...filteredChains, target];
+  }
   return [target, ...filteredChains];
 }
 
