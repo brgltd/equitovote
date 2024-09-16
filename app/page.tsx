@@ -27,28 +27,11 @@ function buildProposalRetrievalArgs(
   if (!proposalsLength) {
     return [0, 0];
   }
-  // const start = (pageNumber - 1) * PAGINATION_SIZE;
-  // const end = start + PAGINATION_SIZE;
-  // return proposalsLength < end ? [start, proposalsLength] : [start, end];
-
-  // proposalsLength = 9
-
-  // pageNumber = 1
-  // [8, 5]
-
-  // pageNumber = 2
-  // [5, 2]
-
-  // pageNumber = 3
-  // [2, -1]
-
   const proposalLastIndex = proposalsLength - 1;
   const pageNumberZeroIndexed = pageNumber - 1;
   const start = proposalLastIndex - pageNumberZeroIndexed * PAGINATION_SIZE;
   const end = start - PAGINATION_SIZE;
-  const r = end < -1 ? [start, -1] : [start, end];
-  console.log(r);
-  return r;
+  return end < -1 ? [start, -1] : [start, end];
 }
 
 function getPaginationCount(proposalsLength: number | undefined) {

@@ -85,7 +85,6 @@ contract EquitoVoteTest is Test {
         createProposalAndExecuteMessage(0, titleInput);
         EquitoVoteV2.Proposal[] memory proposals = equitoVote
             .getSlicedReversedProposals(0, -1);
-        console.log("proposals", proposals[0].title);
         assertEq(proposals[0].title, titleInput);
     }
 
