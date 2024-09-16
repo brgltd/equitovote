@@ -11,7 +11,6 @@ import {
 } from "@/utils/helpers";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
-import { format } from "date-fns";
 import { config } from "@/utils/wagmi";
 import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { routerAbi } from "@equito-sdk/evm";
@@ -21,7 +20,6 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
-import { Tooltip } from "@mui/material";
 
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
@@ -242,6 +240,8 @@ export default function VotePage({ params }: VoteProps) {
       ? sourceFee + voteOnProposalFee
       : BigInt(0);
 
+  // console.log(totalVoteOnProposalFee);
+
   const isVoteButtonEnabled = useMemo(
     () => !!tokenAddress && !!amount,
     [tokenAddress, amount],
@@ -304,6 +304,9 @@ export default function VotePage({ params }: VoteProps) {
       await switchChainAsync({ chainId: sourceChain?.definition.id });
 
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
+
+      console.log("voteOnProposalReceipt");
+      console.log(voteOnProposalReceipt);
 
       const logs = parseEventLogs({
         abi: routerAbi,

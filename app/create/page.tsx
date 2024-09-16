@@ -254,6 +254,9 @@ export default function CreateProposalPage() {
       await switchChainAsync({ chainId: sourceChain.definition.id });
       const createProposalReceipt = await createProposal();
 
+      console.log("createProposalReceipt");
+      console.log(createProposalReceipt);
+
       const logs = parseEventLogs({
         abi: routerAbi,
         logs: createProposalReceipt.logs,
@@ -395,7 +398,7 @@ export default function CreateProposalPage() {
                         <CircularProgress />
                       </MenuItem>
                     </div>
-                  ) : !isArrayNotEmpty(tokenNamesOption as any) ? (
+                  ) : !isArrayNotEmpty(tokenNamesOption as OptionString[]) ? (
                     <SelectEmpty />
                   ) : (
                     (tokenNamesOption || []).map((option: OptionString) => (

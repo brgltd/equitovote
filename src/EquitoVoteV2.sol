@@ -221,7 +221,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         );
 
         bytes32 messageHash = router.sendMessage{
-            value: msg.value - createProposalFee
+            value: msg.value - voteOnProposalFee
         }(receiver, destinationChainSelector, messageData);
 
         emit VoteOnProposalMessageSent(destinationChainSelector, messageHash);
