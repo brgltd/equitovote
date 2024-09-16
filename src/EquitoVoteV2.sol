@@ -393,7 +393,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
     /// @param startIndex The start index, inclusive.
     /// @param endIndex The end index, non inclusive.
     /// @return An array with proposal data.
-    function getProposalsSlice(
+    function getSlicedReversedProposals(
         int256 startIndex,
         int256 endIndex
     ) external view returns (Proposal[] memory) {
