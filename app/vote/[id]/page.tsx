@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import {
   buildProposalFromArray,
@@ -76,13 +76,14 @@ export default function VotePage({ params }: VoteProps) {
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [amountToVote, setAmountToVote] = useState("");
+  const [isDelegating, setIsDelegating] = useState(false);
+
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
   const [activeAmountUserVotes, setActiveAmountUserVotes] = useState("");
   const [activeVotingPower, setActiveVotingPower] = useState("");
-  const [isDelegating, setIsDelegating] = useState(false);
-
-  const amountRef = useRef<HTMLInputElement>(null);
+  const [activeAmountDelegatedTokens, setActiveAmountDelegatedTokens] =
+    useState("");
 
   const {
     sourceChain,
@@ -128,11 +129,6 @@ export default function VotePage({ params }: VoteProps) {
   const formattedProposal: FormattedProposal = useMemo(
     () => buildProposalFromArray(proposal, true),
     [proposal],
-  );
-
-  const isProposalActive = useMemo(
-    () => verifyIsProposalActive(formattedProposal),
-    [formattedProposal],
   );
 
   const isProposalLoaded = useMemo(
@@ -243,17 +239,17 @@ export default function VotePage({ params }: VoteProps) {
       ? sourceFee + voteOnProposalFee
       : BigInt(0);
 
-  const isVoteButtonEnabled = useMemo(
-    () => !!tokenAddress && !!amountToVote,
-    [tokenAddress, amountToVote],
-  );
-
   const originChainSelector = activeProposal?.originChainSelector;
 
   const originChainImg =
     supportedChainsMapBySelector[originChainSelector as number]?.img;
 
   const isActive = verifyIsProposalActive(activeProposal);
+
+  const isVoteButtonEnabled = useMemo(
+    () => !!tokenAddress && !!amountToVote,
+    [tokenAddress, amountToVote],
+  );
 
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
@@ -265,14 +261,18 @@ export default function VotePage({ params }: VoteProps) {
   }, [formattedProposal]);
 
   useEffect(() => {
+    setActiveAmountDelegatedTokens(() =>
+      formatBalance(amountDelegatedTokens, decimals),
+    );
+  }, [amountUserVotes, decimals]);
+
+  useEffect(() => {
     setActiveAmountUserVotes(() => formatBalance(amountUserVotes, decimals, 0));
   }, [amountUserVotes, decimals]);
 
   // useEffect(() => {
-  //   setActiveAmountUserVotes(
-  //     `${Number(activeAmountUserVotes) + Number(amountToVote)}`,
-  //   );
-  // }, [amountToVote]);
+  //   setActiveAmountUserVotes(() => formatBalance(amountUserVotes, decimals, 0));
+  // }, [activeAmountUserVotes]);
 
   const onClickDelegate = async () => {
     setIsDelegating(true);
@@ -288,6 +288,7 @@ export default function VotePage({ params }: VoteProps) {
         hash,
         chainId: sourceChain?.definition.id,
       });
+      setActiveAmountDelegatedTokens(formatBalance(userTokenBalance, decimals));
     } catch (error) {
       console.error(error);
     }
@@ -394,7 +395,7 @@ export default function VotePage({ params }: VoteProps) {
       setActiveProposal(updatedActiveProposal);
 
       setActiveAmountUserVotes(
-        `${Number(activeAmountUserVotes) + Number(amountToVote)}`,
+        `${Number(activeAmountUserVotes) || 0 + Number(amountToVote)}`,
       );
 
       setStatus(Status.IsCompleted);
@@ -513,11 +514,11 @@ export default function VotePage({ params }: VoteProps) {
               </div>
               <div className="w-60">
                 <div className="mb-1">Your Delegated Amount</div>
-                <div>{formatBalance(amountDelegatedTokens, decimals)}</div>
+                <div>{activeAmountDelegatedTokens}</div>
               </div>
               <div>
                 <div className="mb-1">Your Voting Power</div>
-                {/* <div>{formatBalance(amountUserVotes, decimals)}</div> */}
+                <div>{activeVotingPower}</div>
               </div>
             </div>
           </div>
@@ -546,7 +547,6 @@ export default function VotePage({ params }: VoteProps) {
           type="number"
           value={amountToVote}
           onChange={(e) => setAmountToVote(e.target.value)}
-          ref={amountRef}
           className="text-black"
         />
         <button
