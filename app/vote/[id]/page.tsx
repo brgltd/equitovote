@@ -668,7 +668,7 @@ export default function VotePage({ params }: VoteProps) {
                 width: "250px",
               }}
             />
-            <Tooltip placement="bottom" title="Vote for YES">
+            <Tooltip placement="top" title="Vote for YES">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
                 className="mx-4"
@@ -686,7 +686,7 @@ export default function VotePage({ params }: VoteProps) {
                 </div>
               </button>
             </Tooltip>
-            <Tooltip placement="bottom" title="Vote for NO">
+            <Tooltip placement="top" title="Vote for NO">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.No)}
                 className="mr-4"
@@ -704,7 +704,7 @@ export default function VotePage({ params }: VoteProps) {
                 </div>
               </button>
             </Tooltip>
-            <Tooltip placement="bottom" title="Vote for ABSTAIN">
+            <Tooltip placement="top" title="Vote for ABSTAIN">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
                 disabled={!isVotingEnabled}
