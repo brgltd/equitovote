@@ -77,6 +77,21 @@ function formatBalance(
     : Number(formatUnits(input, decimals)).toFixed(precision);
 }
 
+function getInputErrorMessage(inputText: string, votingPower: string) {
+  if (!inputText) {
+    return "";
+  }
+  const inputNumber = Number(inputText);
+  const votingPowerNumber = Number(votingPower);
+  if (votingPower === ZERO_TOKEN_TEXT || inputNumber > votingPowerNumber) {
+    return "Lack of voting power";
+  }
+  if (inputNumber < 1) {
+    return "Vote amount must be equal or greather than 1";
+  }
+  return "";
+}
+
 export default function VotePage({ params }: VoteProps) {
   const { id: proposalId } = params;
 
@@ -249,6 +264,11 @@ export default function VotePage({ params }: VoteProps) {
   const hasVotingPower =
     !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
 
+  const isVotingEnabled =
+    status === Status.IsStart ||
+    status === Status.IsCompleted ||
+    status === Status.IsRetry;
+
   const originChainSelector = activeProposal?.originChainSelector;
 
   const balanceMinusDelegation =
@@ -325,9 +345,12 @@ export default function VotePage({ params }: VoteProps) {
   };
 
   const onClickVoteOnProposal = async (voteOption: VoteOption) => {
+    if (!amountToVote) {
+      setInputErrorMessage("Please enter input amount");
+      return;
+    }
     try {
       setStatus(Status.IsExecutingBaseTxOnSourceChain);
-
       await switchChainAsync({ chainId: sourceChain?.definition.id });
 
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
@@ -595,29 +618,28 @@ export default function VotePage({ params }: VoteProps) {
               onChange={(e) => {
                 const value = e.target.value;
                 setInputErrorMessage(
-                  value === "" || Number(value) <= Number(activeVotingPower)
-                    ? ""
-                    : "Lack of voting power",
+                  getInputErrorMessage(value, activeVotingPower),
                 );
                 setAmountToVote(value);
               }}
               error={!!inputErrorMessage}
               helperText={inputErrorMessage}
-              // disabled={!hasVotingPower}
               sx={{
                 width: "250px",
-                // cursor: hasVotingPower ? "not-allowed" : "not-allowed",
               }}
             />
             <Tooltip placement="bottom" title="Vote for YES">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
                 className="mx-4"
+                disabled={!isVotingEnabled}
               >
                 <div
                   className={cn(
                     "flex flex-row items-center justify-center w-14 h-14 bg-green-500 rounded-lg",
-                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                    hasVotingPower && isVotingEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed",
                   )}
                 >
                   <ThumbUp fontSize="large" />
@@ -628,11 +650,14 @@ export default function VotePage({ params }: VoteProps) {
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.No)}
                 className="mr-4"
+                disabled={!isVotingEnabled}
               >
                 <div
                   className={cn(
                     "flex flex-row items-center justify-center w-14 h-14 bg-red-500 rounded-lg",
-                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                    hasVotingPower && isVotingEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed",
                   )}
                 >
                   <ThumbDown fontSize="large" />
@@ -640,11 +665,16 @@ export default function VotePage({ params }: VoteProps) {
               </button>
             </Tooltip>
             <Tooltip placement="bottom" title="Vote for ABSTAIN">
-              <button onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}>
+              <button
+                onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
+                disabled={!isVotingEnabled}
+              >
                 <div
                   className={cn(
                     "flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 rounded-lg",
-                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                    hasVotingPower && isVotingEnabled
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed",
                   )}
                 >
                   <AcUnitIcon fontSize="large" />
