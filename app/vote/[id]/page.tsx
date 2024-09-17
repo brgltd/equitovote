@@ -251,7 +251,7 @@ export default function VotePage({ params }: VoteProps) {
   const originChainImg =
     supportedChainsMapBySelector[originChainSelector as number]?.img;
 
-  const isActive = !verifyIsProposalActive(activeProposal);
+  const isActive = verifyIsProposalActive(activeProposal);
 
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
@@ -438,7 +438,7 @@ export default function VotePage({ params }: VoteProps) {
             <div className="flex flex-row items-center">
               <div>
                 <div className="w-48">
-                  Status
+                  <div className="mb-2">Status</div>
                   <div className="flex flex-row items-center">
                     <div
                       className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
@@ -447,14 +447,12 @@ export default function VotePage({ params }: VoteProps) {
                   </div>
                 </div>
               </div>
-              {/* <div className="mr-28"> */}
               <div className="w-60">
-                Start Date
+                <div className="mb-2">Start Date</div>
                 <div>{formatTimestamp(activeProposal.startTimestamp)}</div>
               </div>
-              {/* <div className="mr-28"> */}
               <div className="w-60">
-                End Date
+                <div className="mb-2">End Date</div>
                 <div>{formatTimestamp(activeProposal.endTimestamp)}</div>
               </div>
               <div>
@@ -492,15 +490,15 @@ export default function VotePage({ params }: VoteProps) {
             <div className="text-xl font-semibold mb-2">Token Info</div>
             <div className="flex flex-row items-center">
               <div className="w-48">
-                Token Name
+                <div className="mb-2">Token Name</div>
                 <div>{activeProposal.tokenName}</div>
               </div>
               <div className="w-60">
-                Your Token Balance{" "}
+                <div className="mb-2">Your Token Balance </div>
                 <div>{formatBalance(userTokenBalance, decimals)}</div>
               </div>
               <div className="w-60">
-                Your Delegated Amount
+                <div className="mb-2">Your Delegated Amount</div>
                 <div>{formatBalance(amountDelegatedTokens, decimals)}</div>
               </div>
               <div>
