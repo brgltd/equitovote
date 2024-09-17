@@ -28,6 +28,7 @@ import ThumbUp from "@mui/icons-material/ThumbUp";
 import ThumbDown from "@mui/icons-material/ThumbDown";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { cn } from "@/utils/cn";
+import { VoteSkeleton } from "@/components/vote-skeleton";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -469,7 +470,7 @@ export default function VotePage({ params }: VoteProps) {
   };
 
   if (isLoadingProposal) {
-    return <div>loading</div>;
+    return <VoteSkeleton />;
   }
 
   if (isErrorFetchingProposals) {

@@ -43,7 +43,6 @@ export function ProposalsSkeleton() {
                       width={100}
                       height={16}
                     />
-                    {/* <div className="mx-2">-</div> */}
                     <div className="mx-2" />
                     <Skeleton
                       variant="rectangular"
