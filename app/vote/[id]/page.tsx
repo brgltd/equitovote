@@ -278,6 +278,9 @@ export default function VotePage({ params }: VoteProps) {
     status === Status.IsCompleted ||
     status === Status.IsRetry;
 
+  const isPendingTokenData =
+    isPendingAmountDelegatedTokens || isPendingUserTokenBalance;
+
   const originChainSelector = activeProposal?.originChainSelector;
 
   const balanceMinusDelegation =
@@ -577,9 +580,7 @@ export default function VotePage({ params }: VoteProps) {
               </div>
               <div>
                 <div className="mb-1">Your Voting Power</div>
-                {(isPendingUserTokenBalance ||
-                  isPendingAmountDelegatedTokens) &&
-                userAddress ? (
+                {isPendingTokenData && userAddress ? (
                   <Skeleton
                     variant="rectangular"
                     animation="wave"
@@ -648,12 +649,6 @@ export default function VotePage({ params }: VoteProps) {
 
         <div>
           <div className="text-xl font-semibold mb-2">Vote Options</div>
-          {!hasVotingPower && (
-            <div className="italic">
-              You must have voting power in {activeProposal.tokenName} tokens to
-              be able to vote
-            </div>
-          )}
           <div className="flex flex-row items-start mt-4">
             <TextField
               id="amountToVote"
@@ -732,10 +727,20 @@ export default function VotePage({ params }: VoteProps) {
 
         {!!activeAmountUserVotes &&
           activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
-          isVotingEnabled && (
-            <div className="my-4 italic">
+          isVotingEnabled &&
+          !isPendingTokenData && (
+            <div className="mt-4 italic">
               You've already voted with {activeAmountUserVotes} token
               {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
+            </div>
+          )}
+
+        {!hasVotingPower &&
+          activeAmountUserVotes === ZERO_TOKEN_TEXT &&
+          (!isPendingTokenData || !userAddress) && (
+            <div className="mt-4 italic">
+              You must have voting power in {activeProposal.tokenName} tokens to
+              be able to vote
             </div>
           )}
       </div>
