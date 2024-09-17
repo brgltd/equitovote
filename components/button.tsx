@@ -5,11 +5,11 @@ import { lightTheme } from "@/app/layout";
 export function Button({
   onClick,
   children,
-  isDisabled,
+  isDisabled = false,
 }: {
   onClick: <T>(...args: T[]) => void | Promise<void>;
   children: ReactNode;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 }) {
   return (
     <div className={`${isDisabled ? "cursor-not-allowed" : ""} w-max`}>

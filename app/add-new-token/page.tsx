@@ -7,26 +7,34 @@ import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
-import { Address, parseUnits } from "viem";
+import { Address, isAddress, parseUnits } from "viem";
+import { CircularProgress, TextField } from "@mui/material";
+import { Button } from "@/components/button";
 
 const equitoVoteAbi = equitoVote.abi;
 
-// const defaultFormData = {
-//   tokenName: "",
-//   ethereumAddress: "",
-//   arbitrumAddress: "",
-//   optimismAddress: "",
-// };
+enum FormKeys {
+  tokenName = "tokenName",
+  ethereumAddress = "ethereumAddress",
+  arbitrumAddress = "arbitrumAddress",
+  optimismAddress = "optimismAddress",
+}
 
 const defaultFormData = {
-  tokenName: "VoteSphere",
-  ethereumAddress: "0x2ee891078cc2a08c31e494f19E36F772806b1613",
-  arbitrumAddress: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA",
-  optimismAddress: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e",
+  tokenName: "",
+  ethereumAddress: "",
+  arbitrumAddress: "",
+  optimismAddress: "",
 };
+
+function isOnlyAlphanumeric(text: string) {
+  return /^[a-zA-Z0-9]+$/.test(text);
+}
 
 export default function SetTokenDataPage() {
   const [formData, setFormData] = useState(defaultFormData);
+  const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
+  const [isAddingToken, setIsAddingToken] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
 
@@ -35,6 +43,29 @@ export default function SetTokenDataPage() {
   const { destinationChain } = useEquitoVote();
 
   const onClickSetTokenData = async () => {
+    const newFormErrors = new Set<FormKeys>();
+    let isFormDataValid = true;
+    if (!isOnlyAlphanumeric(formData.tokenName)) {
+      newFormErrors.add(FormKeys.tokenName);
+      isFormDataValid = false;
+    }
+    if (!isAddress(formData.ethereumAddress)) {
+      newFormErrors.add(FormKeys.ethereumAddress);
+      isFormDataValid = false;
+    }
+    if (!isAddress(formData.arbitrumAddress)) {
+      newFormErrors.add(FormKeys.arbitrumAddress);
+      isFormDataValid = false;
+    }
+    if (!isAddress(formData.optimismAddress)) {
+      newFormErrors.add(FormKeys.optimismAddress);
+      isFormDataValid = false;
+    }
+    setFormErrors(newFormErrors);
+    if (!isFormDataValid) {
+      return;
+    }
+    setIsAddingToken(true);
     try {
       await switchChainAsync({ chainId: destinationChain.definition.id });
       const hash = await writeContractAsync({
@@ -63,70 +94,125 @@ export default function SetTokenDataPage() {
     } catch (error) {
       console.error(error);
     }
+    setIsAddingToken(false);
   };
 
   return (
     <div>
-      <div>
-        <label htmlFor="token-name">token name</label>
-        <input
-          type="text"
+      <h1 className="text-xl font-bold mb-8">Add new DAO Token</h1>
+      <div className="mb-8">
+        <TextField
           id="token-name"
+          label="Token Name"
           value={formData.tokenName}
-          onChange={(e) =>
-            setFormData({ ...formData, tokenName: e.target.value })
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (value !== "" && !isOnlyAlphanumeric(value)) {
+              newFormErrors.add(FormKeys.tokenName);
+            } else {
+              newFormErrors.delete(FormKeys.tokenName);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, tokenName: value });
+          }}
+          error={formErrors.has(FormKeys.tokenName)}
+          helperText={
+            formErrors.has(FormKeys.tokenName)
+              ? "Please enter a valid token name"
+              : ""
           }
-          className="text-black"
+          sx={{ width: 250 }}
         />
       </div>
 
-      <div>
-        <label htmlFor="ethereum-address">ethereum address</label>
-        <input
-          type="text"
-          id="ethereum-address"
+      <div className="mb-8">
+        <TextField
+          id={FormKeys.ethereumAddress}
+          label="Ethereum Address"
           value={formData.ethereumAddress}
-          onChange={(e) =>
-            setFormData({ ...formData, ethereumAddress: e.target.value })
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (!isAddress(value)) {
+              newFormErrors.add(FormKeys.ethereumAddress);
+            } else {
+              newFormErrors.delete(FormKeys.ethereumAddress);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, ethereumAddress: value });
+          }}
+          error={formErrors.has(FormKeys.ethereumAddress)}
+          helperText={
+            formErrors.has(FormKeys.ethereumAddress)
+              ? "Please enter a valid address"
+              : ""
           }
-          className="text-black"
+          sx={{ width: 350 }}
         />
       </div>
 
-      <div>
-        <label htmlFor="arbitrum address">arbitrum address</label>
-        <input
-          type="text"
+      <div className="mb-8">
+        <TextField
           id="arbitrum-address"
+          label="Arbitrum Address"
           value={formData.arbitrumAddress}
-          onChange={(e) =>
-            setFormData({ ...formData, arbitrumAddress: e.target.value })
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (!isAddress(value)) {
+              newFormErrors.add(FormKeys.arbitrumAddress);
+            } else {
+              newFormErrors.delete(FormKeys.arbitrumAddress);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, arbitrumAddress: value });
+          }}
+          error={formErrors.has(FormKeys.arbitrumAddress)}
+          helperText={
+            formErrors.has(FormKeys.arbitrumAddress)
+              ? "Please enter a valid address"
+              : ""
           }
-          className="text-black"
+          sx={{ width: 350 }}
         />
       </div>
 
-      <div>
-        <label htmlFor="optimism-address">optimism address</label>
-        <input
-          type="text"
+      <div className="mb-8">
+        <TextField
           id="optimism-address"
+          label="Optimism Address"
           value={formData.optimismAddress}
-          onChange={(e) =>
-            setFormData({ ...formData, optimismAddress: e.target.value })
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (!isAddress(value)) {
+              newFormErrors.add(FormKeys.optimismAddress);
+            } else {
+              newFormErrors.delete(FormKeys.optimismAddress);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, optimismAddress: value });
+          }}
+          error={formErrors.has(FormKeys.optimismAddress)}
+          helperText={
+            formErrors.has(FormKeys.optimismAddress)
+              ? "Please enter a valid address"
+              : ""
           }
-          className="text-black"
+          sx={{ width: 350 }}
         />
       </div>
 
-      <div>
-        <button
-          onClick={onClickSetTokenData}
-          disabled={!Object.values(formData).every(Boolean)}
-        >
-          Add Token
-        </button>
-      </div>
+      <Button onClick={onClickSetTokenData}>Add Token</Button>
+      {isAddingToken && (
+        <div className="flex flex-row items-center mt-2">
+          <div>
+            <CircularProgress size={20} />
+          </div>
+          <div className="ml-4">Delegation in Progress</div>
+        </div>
+      )}
     </div>
   );
 }
