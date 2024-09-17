@@ -243,9 +243,12 @@ export default function VotePage({ params }: VoteProps) {
       ? sourceFee + voteOnProposalFee
       : BigInt(0);
 
-  const originChainSelector = activeProposal?.originChainSelector;
+  const isProposalActive = verifyIsProposalActive(activeProposal);
 
-  const isActive = verifyIsProposalActive(activeProposal);
+  const hasVotingPower =
+    !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
+
+  const originChainSelector = activeProposal?.originChainSelector;
 
   const balanceMinusDelegation =
     Number(userTokenBalance) - Number(amountDelegatedTokens);
@@ -468,10 +471,10 @@ export default function VotePage({ params }: VoteProps) {
                     <div
                       className={cn(
                         "mr-2 w-4 h-4 rounded-full",
-                        isActive ? "bg-green-600" : "bg-stone-600",
+                        isProposalActive ? "bg-green-600" : "bg-stone-600",
                       )}
                     />{" "}
-                    {isActive ? "Live" : "Completed"}
+                    {isProposalActive ? "Live" : "Completed"}
                   </div>
                 </div>
               </div>
@@ -580,19 +583,17 @@ export default function VotePage({ params }: VoteProps) {
         )}
 
         <div>
-          <div className="text-xl font-semibold mb-3">Vote Options</div>
-          {/* <div
-            className={cn(
-              "flex flex-row items-center cursor-not-allowed",
-              !activeVotingPower || activeVotingPower === ZERO_TOKEN_TEXT
-                ? "cursor-not-allowed border"
-                : "cursor-not-allowed border",
-            )}
-          > */}
-          <div className="flex flex-row items-center">
+          <div className="text-xl font-semibold mb-2">Vote Options</div>
+          {!hasVotingPower && (
+            <div className="italic">
+              You must have voting power in {activeProposal.tokenName} tokens to
+              be able to vote
+            </div>
+          )}
+          <div className="flex flex-row items-center mt-4">
             <TextField
               id="amountToVote"
-              label="Amount to Vote"
+              label="Amount"
               value={amountToVote}
               onChange={(e) => setAmountToVote(e.target.value)}
               // error={formErrors.has(FormKeys.title)}
@@ -601,14 +602,23 @@ export default function VotePage({ params }: VoteProps) {
               //     ? formErrorMessages.title
               //     : undefined
               // }
-              sx={{ width: "250px" }}
+              // disabled={!hasVotingPower}
+              sx={{
+                width: "250px",
+                // cursor: hasVotingPower ? "not-allowed" : "not-allowed",
+              }}
             />
             <Tooltip placement="bottom" title="Vote for YES">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
                 className="mx-4"
               >
-                <div className="flex flex-row items-center justify-center w-14 h-14 bg-green-500 cursor-pointer rounded-lg">
+                <div
+                  className={cn(
+                    "flex flex-row items-center justify-center w-14 h-14 bg-green-500 rounded-lg",
+                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                  )}
+                >
                   <ThumbUp fontSize="large" />
                 </div>
               </button>
@@ -618,14 +628,24 @@ export default function VotePage({ params }: VoteProps) {
                 onClick={() => onClickVoteOnProposal(VoteOption.No)}
                 className="mr-4"
               >
-                <div className="flex flex-row items-center justify-center w-14 h-14 bg-red-500 cursor-pointer rounded-lg">
+                <div
+                  className={cn(
+                    "flex flex-row items-center justify-center w-14 h-14 bg-red-500 rounded-lg",
+                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                  )}
+                >
                   <ThumbDown fontSize="large" />
                 </div>
               </button>
             </Tooltip>
             <Tooltip placement="bottom" title="Vote for ABSTAIN">
               <button onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}>
-                <div className="flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 cursor-pointer rounded-lg">
+                <div
+                  className={cn(
+                    "flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 rounded-lg",
+                    hasVotingPower ? "cursor-pointer" : "cursor-not-allowed",
+                  )}
+                >
                   <AcUnitIcon fontSize="large" />
                 </div>
               </button>
