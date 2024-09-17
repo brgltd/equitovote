@@ -384,12 +384,12 @@ export default function CreateProposalPage() {
   };
 
   return (
-    <div className="ml-16 mb-40">
-      <div className="flex flex-row justify-center">
+    <div className="mb-40">
+      <div>
         <div>
           <h1 className="mb-8 text-xl font-semibold">Create New Proposal</h1>
           <div className="flex flex-col md:flex-row mb-8">
-            <div className="mr-12 md:mr-24">
+            <div className="mr-12 md:mr-16">
               <div className="mb-4 flex flex-row items-center">
                 <TextField
                   id={FormKeys.tokenName}
