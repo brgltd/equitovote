@@ -495,15 +495,6 @@ export default function VotePage({ params }: VoteProps) {
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
 
-          {!!activeAmountUserVotes &&
-            activeAmountUserVotes !== ZERO_TOKEN_TEXT && (
-              <div className="mb-8 italic">
-                You've voted with {activeAmountUserVotes} token
-                {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this
-                proposal
-              </div>
-            )}
-
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
             <div className="flex flex-row items-center">
@@ -738,6 +729,15 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         </div>
         <div>{statusRenderer[status]}</div>
+
+        {!!activeAmountUserVotes &&
+          activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
+          isVotingEnabled && (
+            <div className="my-4 italic">
+              You've already voted with {activeAmountUserVotes} token
+              {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
+            </div>
+          )}
       </div>
     </div>
   );
