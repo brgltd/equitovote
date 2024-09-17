@@ -17,6 +17,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 import { Pagination } from "@mui/material";
 import { ProposalsSkeleton } from "@/components/proposals-skeleton";
+import { cn } from "@/utils/cn";
 
 const equitoVoteAbi = equitoVote.abi;
 
@@ -146,7 +147,10 @@ export default function HomePage() {
                     <div className="mb-2">DAO Token: {item.tokenName}</div>
                     <div className="flex flex-row items-center">
                       <div
-                        className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
+                        className={cn(
+                          "mr-2 w-4 h-4 rounded-full bg",
+                          isActive ? "bg-green-600" : "bg-stone-600",
+                        )}
                       />{" "}
                       {isActive ? "Live" : "Completed"}
                     </div>

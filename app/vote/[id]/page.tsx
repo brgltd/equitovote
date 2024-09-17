@@ -27,6 +27,7 @@ import { CircularProgress, TextField, Tooltip } from "@mui/material";
 import ThumbUp from "@mui/icons-material/ThumbUp";
 import ThumbDown from "@mui/icons-material/ThumbDown";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
+import { cn } from "@/utils/cn";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -465,7 +466,10 @@ export default function VotePage({ params }: VoteProps) {
                   <div className="mb-1">Status</div>
                   <div className="flex flex-row items-center">
                     <div
-                      className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
+                      className={cn(
+                        "mr-2 w-4 h-4 rounded-full",
+                        isActive ? "bg-green-600" : "bg-stone-600",
+                      )}
                     />{" "}
                     {isActive ? "Live" : "Completed"}
                   </div>
@@ -577,6 +581,14 @@ export default function VotePage({ params }: VoteProps) {
 
         <div>
           <div className="text-xl font-semibold mb-3">Vote Options</div>
+          {/* <div
+            className={cn(
+              "flex flex-row items-center cursor-not-allowed",
+              !activeVotingPower || activeVotingPower === ZERO_TOKEN_TEXT
+                ? "cursor-not-allowed border"
+                : "cursor-not-allowed border",
+            )}
+          > */}
           <div className="flex flex-row items-center">
             <TextField
               id="amountToVote"
