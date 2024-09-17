@@ -438,19 +438,34 @@ export default function VotePage({ params }: VoteProps) {
   const statusRenderer = {
     [Status.IsStart]: <></>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
-      <div>submitting vote on source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4">Creating Proposal on Source Chain</div>
+      </div>
     ),
+    // Same message as next step since it's executing quickly
     [Status.IsRetrievingBlockOnSourceChain]: (
-      <div>is retrieving block from source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4">Generating Proof on Source Chain</div>
+      </div>
     ),
     [Status.IsGeneratingProofOnSourceChain]: (
-      <div>generating proof source chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4">Generating Proof on Source Chain</div>
+      </div>
     ),
     [Status.IsExecutingMessageOnDestinationChain]: (
-      <div>executing message on destination chain</div>
+      <div className="flex flex-row items-center mt-4">
+        <CircularProgress size={20} />
+        <div className="ml-4">Executing Message on Destination Chain</div>
+      </div>
     ),
     [Status.IsRetry]: <></>,
-    [Status.IsCompleted]: <></>,
+    [Status.IsCompleted]: (
+      <div className="mt-4">Vote Operation Finished Successfully</div>
+    ),
   };
 
   if (isLoadingProposal) {
@@ -572,8 +587,7 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         </div>
 
-        {/* {balanceMinusDelegation > 0 && ( */}
-        {balanceMinusDelegation === 0 && (
+        {balanceMinusDelegation > 0 && (
           <div className="mb-6 w-max">
             <div className="text-xl font-semibold mb-2">Delegation Info</div>
             <Tooltip
