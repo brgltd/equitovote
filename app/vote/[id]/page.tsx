@@ -21,11 +21,7 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
-import {
-  Chain,
-  supportedChains,
-  supportedChainsMapBySelector,
-} from "@/utils/chains";
+import { supportedChains } from "@/utils/chains";
 import { Button } from "@/components/button";
 import { CircularProgress, Skeleton, TextField, Tooltip } from "@mui/material";
 import ThumbUp from "@mui/icons-material/ThumbUp";
@@ -82,9 +78,16 @@ function formatBalance(
     : Number(formatUnits(input, decimals)).toFixed(precision);
 }
 
-function getInputErrorMessage(inputText: string, votingPower: string) {
+function getInputErrorMessage(
+  inputText: string,
+  votingPower: string,
+  isProposalActive: boolean,
+) {
   if (!inputText) {
     return "";
+  }
+  if (!isProposalActive) {
+    return "Proposal is completed";
   }
   const inputNumber = Number(inputText);
   const votingPowerNumber = Number(votingPower);
@@ -95,6 +98,24 @@ function getInputErrorMessage(inputText: string, votingPower: string) {
     return "Vote amount must be equal or greather than 1";
   }
   return "";
+}
+
+function computeDecision(proposal: FormattedProposal) {
+  const registry = [
+    { id: "YES", amount: proposal.numVotesYes },
+    { id: "NO", amount: proposal.numVotesNo },
+    { id: "ABSTAIN", amount: proposal.numVotesAbstain },
+  ];
+  registry.sort((a, b) => b.amount - a.amount);
+  if (
+    registry[0].amount == registry[1].amount &&
+    registry[0].amount == registry[2].amount
+  ) {
+    return "tie between YES, NO and ABSTAIN";
+  } else if (registry[0].amount == registry[1].amount) {
+    return `tie between ${registry[0].id} and ${registry[1].id}`;
+  }
+  return registry[0].id;
 }
 
 export default function VotePage({ params }: VoteProps) {
@@ -273,10 +294,16 @@ export default function VotePage({ params }: VoteProps) {
   const hasVotingPower =
     !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
 
+  // const isVotingEnabled =
+  //   status === Status.IsStart ||
+  //   status === Status.IsCompleted ||
+  //   status === Status.IsRetry;
+
   const isVotingEnabled =
-    status === Status.IsStart ||
-    status === Status.IsCompleted ||
-    status === Status.IsRetry;
+    isProposalActive &&
+    (status === Status.IsStart ||
+      status === Status.IsCompleted ||
+      status === Status.IsRetry);
 
   const isPendingTokenData =
     isPendingAmountDelegatedTokens || isPendingUserTokenBalance;
@@ -289,6 +316,11 @@ export default function VotePage({ params }: VoteProps) {
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
     [originChainSelector],
+  );
+
+  const decision = useMemo(
+    () => computeDecision(formattedProposal),
+    [formattedProposal],
   );
 
   useEffect(() => {
@@ -656,7 +688,11 @@ export default function VotePage({ params }: VoteProps) {
               onChange={(e) => {
                 const value = e.target.value;
                 setInputErrorMessage(
-                  getInputErrorMessage(value, activeVotingPower),
+                  getInputErrorMessage(
+                    value,
+                    activeVotingPower,
+                    isProposalActive,
+                  ),
                 );
                 setAmountToVote(value);
               }}
@@ -727,10 +763,6 @@ export default function VotePage({ params }: VoteProps) {
           activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
           isVotingEnabled &&
           !isPendingTokenData && (
-            // <div className="mt-4 italic">
-            //   You've voted with {activeAmountUserVotes} token
-            //   {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
-            // </div>
             <div className="mt-4 italic">
               You have a total of {activeAmountUserVotes} vote
               {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
@@ -745,6 +777,12 @@ export default function VotePage({ params }: VoteProps) {
               be able to vote
             </div>
           )}
+
+        {!isProposalActive && (
+          <div className="mt-4 italic">
+            This proposal has concluded. Final decision was: {decision}
+          </div>
+        )}
       </div>
     </div>
   );
