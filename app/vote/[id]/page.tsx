@@ -22,6 +22,8 @@ import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
+import { Button } from "@/components/button";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -241,6 +243,9 @@ export default function VotePage({ params }: VoteProps) {
 
   const isActive = verifyIsProposalActive(activeProposal);
 
+  const balanceMinusDelegation =
+    Number(userTokenBalance) - Number(amountDelegatedTokens);
+
   const isVoteButtonEnabled = useMemo(
     () => !!tokenAddress && !!amountToVote,
     [tokenAddress, amountToVote],
@@ -439,6 +444,7 @@ export default function VotePage({ params }: VoteProps) {
             {activeProposal.title}
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
+
           {!!activeAmountUserVotes &&
             activeAmountUserVotes !== ZERO_TOKEN_TEXT && (
               <div className="mb-8 italic">
@@ -447,7 +453,8 @@ export default function VotePage({ params }: VoteProps) {
                 proposal
               </div>
             )}
-          <div className="mb-8">
+
+          <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
             <div className="flex flex-row items-center">
               <div>
@@ -488,6 +495,7 @@ export default function VotePage({ params }: VoteProps) {
               </div>
             </div>
           </div>
+
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Token Info</div>
             <div className="flex flex-row items-center">
@@ -509,7 +517,8 @@ export default function VotePage({ params }: VoteProps) {
               </div>
             </div>
           </div>
-          <div>
+
+          <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Votes Distribution</div>
             <div className="text-green-500 mb-1">
               <span className="w-40 inline-block font-semibold">
@@ -533,18 +542,35 @@ export default function VotePage({ params }: VoteProps) {
             </div>
           </div>
         </div>
-        <hr />
-        <div>
-          <hr />
-          <button
-            onClick={onClickDelegate}
-            disabled={!tokenAddress || isDelegating}
-          >
-            Delegate Tokens
-          </button>
-          {isDelegating && <div>delegation in progress...</div>}
-        </div>
-        <hr />
+
+        {/* {balanceMinusDelegation > 0 && ( */}
+        {balanceMinusDelegation === 0 && (
+          <div className="mb-6 w-max">
+            <Tooltip
+              placement="right"
+              title="You must delegate your balance to adquire voting power"
+            >
+              <div className="mb-1">
+                You have {balanceMinusDelegation} undelegated tokens
+              </div>
+            </Tooltip>
+            <Button
+              onClick={onClickDelegate}
+              isDisabled={!tokenAddress || isDelegating}
+            >
+              Delegate Balance
+            </Button>
+            {isDelegating && (
+              <div className="flex flex-row items-center mt-2">
+                <div>
+                  <CircularProgress size={20} />
+                </div>
+                <div className="ml-4">Delegation in Progress</div>
+              </div>
+            )}
+          </div>
+        )}
+
         <input
           type="number"
           value={amountToVote}
