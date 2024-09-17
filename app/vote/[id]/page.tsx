@@ -68,7 +68,7 @@ function formatBalance(
 ) {
   return !input || !decimals
     ? ZERO_TOKEN_TEXT
-    : Number(formatUnits(input, decimals)).toFixed(PRECISION);
+    : Number(formatUnits(input, decimals)).toFixed(precision);
 }
 
 export default function VotePage({ params }: VoteProps) {
