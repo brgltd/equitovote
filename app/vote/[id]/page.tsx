@@ -475,9 +475,7 @@ export default function VotePage({ params }: VoteProps) {
       </div>
     ),
     [Status.IsRetry]: <></>,
-    [Status.IsCompleted]: (
-      <div className="mt-4">Vote Operation Finished Successfully</div>
-    ),
+    [Status.IsCompleted]: <></>,
   };
 
   if (isPendingProposal) {
@@ -729,8 +727,12 @@ export default function VotePage({ params }: VoteProps) {
           activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
           isVotingEnabled &&
           !isPendingTokenData && (
+            // <div className="mt-4 italic">
+            //   You've voted with {activeAmountUserVotes} token
+            //   {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
+            // </div>
             <div className="mt-4 italic">
-              You've already voted with {activeAmountUserVotes} token
+              You have a total of {activeAmountUserVotes} vote
               {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
             </div>
           )}
