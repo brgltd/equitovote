@@ -134,7 +134,7 @@ export default function VotePage({ params }: VoteProps) {
 
   const {
     data: proposalData,
-    isLoading: isLoadingProposal,
+    isPending: isPendingProposal,
     isError: isErrorFetchingProposals,
     error: errorFetchingProposals,
   } = useReadContract({
@@ -469,7 +469,7 @@ export default function VotePage({ params }: VoteProps) {
     ),
   };
 
-  if (isLoadingProposal) {
+  if (isPendingProposal) {
     return <VoteSkeleton />;
   }
 
