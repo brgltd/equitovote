@@ -485,7 +485,7 @@ export default function VotePage({ params }: VoteProps) {
     [Status.IsExecutingBaseTxOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4">Creating Proposal on Source Chain</div>
+        <div className="ml-4">Casting votes on source chain</div>
       </div>
     ),
     // Same message as next step since it's executing quickly
