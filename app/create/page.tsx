@@ -17,9 +17,8 @@ import { Chain } from "@/utils/chains";
 import { CircularProgress, MenuItem, TextField, Tooltip } from "@mui/material";
 import { Button } from "@/components/button";
 import { FeeSkeleton } from "@/components/fee-skeleton";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { isArrayNotEmpty, isValidData } from "@/utils/helpers";
-import { isArray } from "util";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 
 const equitoVoteAbi = equitoVote.abi;
 

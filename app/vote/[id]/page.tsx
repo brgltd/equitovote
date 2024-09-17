@@ -23,7 +23,10 @@ import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 import { Button } from "@/components/button";
-import { CircularProgress, Tooltip } from "@mui/material";
+import { CircularProgress, TextField, Tooltip } from "@mui/material";
+import ThumbUp from "@mui/icons-material/ThumbUp";
+import ThumbDown from "@mui/icons-material/ThumbDown";
+import AcUnitIcon from "@mui/icons-material/AcUnit";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -410,7 +413,7 @@ export default function VotePage({ params }: VoteProps) {
   };
 
   const statusRenderer = {
-    [Status.IsStart]: <div>waiting for action</div>,
+    [Status.IsStart]: <></>,
     [Status.IsExecutingBaseTxOnSourceChain]: (
       <div>submitting vote on source chain</div>
     ),
@@ -423,7 +426,7 @@ export default function VotePage({ params }: VoteProps) {
     [Status.IsExecutingMessageOnDestinationChain]: (
       <div>executing message on destination chain</div>
     ),
-    [Status.IsRetry]: <div>waiting for action</div>,
+    [Status.IsRetry]: <></>,
     [Status.IsCompleted]: <></>,
   };
 
@@ -437,7 +440,7 @@ export default function VotePage({ params }: VoteProps) {
   }
 
   return (
-    <div>
+    <div className="mb-96">
       <div>
         <div>
           <h1 className="mb-4 text-3xl font-semibold">
@@ -551,7 +554,7 @@ export default function VotePage({ params }: VoteProps) {
               placement="right"
               title="You must delegate your balance to adquire voting power"
             >
-              <div className="mb-1">
+              <div className="mb-2">
                 You have {balanceMinusDelegation} undelegated tokens
               </div>
             </Tooltip>
@@ -572,33 +575,51 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         )}
 
-        <input
-          type="number"
-          value={amountToVote}
-          onChange={(e) => setAmountToVote(e.target.value)}
-          className="text-black"
-        />
-        <button
-          onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
-          className="block"
-          disabled={!isVoteButtonEnabled}
-        >
-          Yes
-        </button>
-        <button
-          onClick={() => onClickVoteOnProposal(VoteOption.No)}
-          className="block"
-          disabled={!isVoteButtonEnabled}
-        >
-          No
-        </button>
-        <button
-          onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
-          className="block"
-          disabled={!isVoteButtonEnabled}
-        >
-          Abstain
-        </button>
+        <div>
+          <div className="text-xl font-semibold mb-3">Vote Options</div>
+          <div className="flex flex-row items-center">
+            <TextField
+              id="amountToVote"
+              label="Amount to Vote"
+              value={amountToVote}
+              onChange={(e) => setAmountToVote(e.target.value)}
+              // error={formErrors.has(FormKeys.title)}
+              // helperText={
+              //   formErrors.has(FormKeys.title)
+              //     ? formErrorMessages.title
+              //     : undefined
+              // }
+              sx={{ width: "250px" }}
+            />
+            <Tooltip placement="bottom" title="Vote for YES">
+              <button
+                onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
+                className="mx-4"
+              >
+                <div className="flex flex-row items-center justify-center w-14 h-14 bg-green-500 cursor-pointer rounded-lg">
+                  <ThumbUp fontSize="large" />
+                </div>
+              </button>
+            </Tooltip>
+            <Tooltip placement="bottom" title="Vote for NO">
+              <button
+                onClick={() => onClickVoteOnProposal(VoteOption.No)}
+                className="mr-4"
+              >
+                <div className="flex flex-row items-center justify-center w-14 h-14 bg-red-500 cursor-pointer rounded-lg">
+                  <ThumbDown fontSize="large" />
+                </div>
+              </button>
+            </Tooltip>
+            <Tooltip placement="bottom" title="Vote for ABSTAIN">
+              <button onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}>
+                <div className="flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 cursor-pointer rounded-lg">
+                  <AcUnitIcon fontSize="large" />
+                </div>
+              </button>
+            </Tooltip>
+          </div>
+        </div>
         <div>{statusRenderer[status]}</div>
       </div>
     </div>
