@@ -241,9 +241,6 @@ export default function VotePage({ params }: VoteProps) {
 
   const originChainSelector = activeProposal?.originChainSelector;
 
-  const originChainImg =
-    supportedChainsMapBySelector[originChainSelector as number]?.img;
-
   const isActive = verifyIsProposalActive(activeProposal);
 
   const isVoteButtonEnabled = useMemo(
@@ -476,19 +473,7 @@ export default function VotePage({ params }: VoteProps) {
               </div>
               <div>
                 <div>Chains</div>
-                <div>
-                  {/* <div className="flex flex-row items-center mb-3">
-                    <div className="w-40">Proposal Created on</div>
-                    <img
-                      src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
-                      width={32}
-                      height={32}
-                      className="rounded-full ml-2"
-                    />
-                  </div> */}
-                </div>
                 <div className="flex sm:flex-row flex-col sm:items-center">
-                  {/* <div className="md:mb-0 mb-2 w-40">Voting available on</div> */}
                   <div className="md:mb-0 mb-1">Voting available on</div>
                   <div className="flex flex-row">
                     {rearrangedSupportedChains.map((chain) => (
