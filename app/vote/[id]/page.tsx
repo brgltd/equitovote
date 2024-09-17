@@ -83,6 +83,7 @@ export default function VotePage({ params }: VoteProps) {
   const [status, setStatus] = useState<Status>(Status.IsStart);
   const [amountToVote, setAmountToVote] = useState("");
   const [isDelegating, setIsDelegating] = useState(false);
+  const [inputErrorMessage, setInputErrorMessage] = useState("");
 
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
@@ -252,11 +253,6 @@ export default function VotePage({ params }: VoteProps) {
 
   const balanceMinusDelegation =
     Number(userTokenBalance) - Number(amountDelegatedTokens);
-
-  const isVoteButtonEnabled = useMemo(
-    () => !!tokenAddress && !!amountToVote,
-    [tokenAddress, amountToVote],
-  );
 
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
@@ -590,18 +586,23 @@ export default function VotePage({ params }: VoteProps) {
               be able to vote
             </div>
           )}
-          <div className="flex flex-row items-center mt-4">
+          <div className="flex flex-row items-start mt-4">
             <TextField
               id="amountToVote"
               label="Amount"
+              type="number"
               value={amountToVote}
-              onChange={(e) => setAmountToVote(e.target.value)}
-              // error={formErrors.has(FormKeys.title)}
-              // helperText={
-              //   formErrors.has(FormKeys.title)
-              //     ? formErrorMessages.title
-              //     : undefined
-              // }
+              onChange={(e) => {
+                const value = e.target.value;
+                setInputErrorMessage(
+                  value === "" || Number(value) <= Number(activeVotingPower)
+                    ? ""
+                    : "Lack of voting power",
+                );
+                setAmountToVote(value);
+              }}
+              error={!!inputErrorMessage}
+              helperText={inputErrorMessage}
               // disabled={!hasVotingPower}
               sx={{
                 width: "250px",
