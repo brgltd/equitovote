@@ -488,7 +488,7 @@ export default function VotePage({ params }: VoteProps) {
               </div>
             </div>
           </div>
-          <div>
+          <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Token Info</div>
             <div className="flex flex-row items-center">
               <div className="w-48">
@@ -509,12 +509,28 @@ export default function VotePage({ params }: VoteProps) {
               </div>
             </div>
           </div>
-          <hr />
           <div>
-            <div>Votes Distribution</div>
-            <div>numVotesYes {activeProposal.numVotesYes}</div>
-            <div>numVotesNo {activeProposal.numVotesNo}</div>
-            <div>numVotesAbstain {activeProposal.numVotesAbstain}</div>
+            <div className="text-xl font-semibold mb-2">Votes Distribution</div>
+            <div className="text-green-500 mb-1">
+              <span className="w-40 inline-block font-semibold">
+                Total Votes Yes
+              </span>
+              <span className="font-bold">{activeProposal.numVotesYes}</span>
+            </div>
+            <div className="text-red-500 mb-1">
+              <span className="w-40 inline-block font-semibold">
+                Total Votes No
+              </span>
+              <span className="font-bold">{activeProposal.numVotesNo}</span>
+            </div>
+            <div className="text-yellow-300">
+              <span className="w-40 inline-block font-semibold">
+                Total Votes Abstain
+              </span>
+              <span className="font-bold">
+                {activeProposal.numVotesAbstain}
+              </span>
+            </div>
           </div>
         </div>
         <hr />
@@ -529,7 +545,6 @@ export default function VotePage({ params }: VoteProps) {
           {isDelegating && <div>delegation in progress...</div>}
         </div>
         <hr />
-        <div>Voting Power: xyz</div>
         <input
           type="number"
           value={amountToVote}
