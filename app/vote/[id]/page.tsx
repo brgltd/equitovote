@@ -94,9 +94,7 @@ export default function VotePage({ params }: VoteProps) {
   } = useEquitoVote();
 
   const sourceRouterAddress = sourceRouter?.data;
-
-  const fromRouterAddress = sourceRouter?.data;
-  const toRouterAddress = destinationRouter?.data;
+  const destinationRouterAddress = destinationRouter?.data;
 
   const { writeContractAsync } = useWriteContract();
 
@@ -208,20 +206,20 @@ export default function VotePage({ params }: VoteProps) {
   const decimals = decimalsData as number;
 
   const { data: sourceFee } = useReadContract({
-    address: fromRouterAddress,
+    address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
     args: [sourceChain?.equitoVoteContractV2 as Address],
-    query: { enabled: !!fromRouterAddress },
+    query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
 
   const { data: destinationFee } = useReadContract({
-    address: toRouterAddress,
+    address: destinationRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
     args: [destinationChain.equitoVoteContractV2 as Address],
-    query: { enabled: !!toRouterAddress },
+    query: { enabled: !!destinationRouterAddress },
     chainId: destinationChain.definition.id,
   });
 
