@@ -525,7 +525,7 @@ export default function VotePage({ params }: VoteProps) {
 
   if (isErrorFetchingProposals) {
     console.error(errorFetchingProposals);
-    return <div>error</div>;
+    return <div>Error occurred loading proposal data</div>;
   }
 
   return (
