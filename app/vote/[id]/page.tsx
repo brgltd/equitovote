@@ -75,9 +75,11 @@ export default function VotePage({ params }: VoteProps) {
   const { id: proposalId } = params;
 
   const [status, setStatus] = useState<Status>(Status.IsStart);
-  const [amount, setAmount] = useState("");
+  const [amountToVote, setAmountToVote] = useState("");
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
+  const [activeAmountUserVotes, setActiveAmountUserVotes] = useState("");
+  const [activeVotingPower, setActiveVotingPower] = useState("");
   const [isDelegating, setIsDelegating] = useState(false);
 
   const amountRef = useRef<HTMLInputElement>(null);
@@ -242,8 +244,8 @@ export default function VotePage({ params }: VoteProps) {
       : BigInt(0);
 
   const isVoteButtonEnabled = useMemo(
-    () => !!tokenAddress && !!amount,
-    [tokenAddress, amount],
+    () => !!tokenAddress && !!amountToVote,
+    [tokenAddress, amountToVote],
   );
 
   const originChainSelector = activeProposal?.originChainSelector;
@@ -258,13 +260,19 @@ export default function VotePage({ params }: VoteProps) {
     [originChainSelector],
   );
 
-  const amountUserVotesNumber = Number(
-    formatBalance(amountUserVotes, decimals, 0),
-  );
-
   useEffect(() => {
     setActiveProposal(formattedProposal);
   }, [formattedProposal]);
+
+  useEffect(() => {
+    setActiveAmountUserVotes(() => formatBalance(amountUserVotes, decimals, 0));
+  }, [amountUserVotes, decimals]);
+
+  // useEffect(() => {
+  //   setActiveAmountUserVotes(
+  //     `${Number(activeAmountUserVotes) + Number(amountToVote)}`,
+  //   );
+  // }, [amountToVote]);
 
   const onClickDelegate = async () => {
     setIsDelegating(true);
@@ -294,7 +302,7 @@ export default function VotePage({ params }: VoteProps) {
       args: [
         destinationChain.chainSelector,
         proposalId,
-        parseUnits(amount, decimals),
+        parseUnits(amountToVote, decimals),
         voteOption,
         tokenAddress,
         isGetPastVotesEnabled,
@@ -381,11 +389,15 @@ export default function VotePage({ params }: VoteProps) {
       const updatedActiveProposal = buildUpdatedProposal(
         activeProposal,
         voteOption,
-        amount,
+        amountToVote,
       );
       setActiveProposal(updatedActiveProposal);
 
-      setStatus(Status.IsStart);
+      setActiveAmountUserVotes(
+        `${Number(activeAmountUserVotes) + Number(amountToVote)}`,
+      );
+
+      setStatus(Status.IsCompleted);
     } catch (error) {
       setStatus(Status.IsRetry);
       console.error(error);
@@ -427,18 +439,20 @@ export default function VotePage({ params }: VoteProps) {
             {activeProposal.title}
           </h1>
           <div className="mb-8">{activeProposal.description}</div>
-          {!!amountUserVotesNumber && (
-            <div className="mb-8 italic">
-              You've voted with {amountUserVotesNumber} token
-              {amountUserVotesNumber !== 1 ? "s" : ""} on this proposal
-            </div>
-          )}
+          {!!activeAmountUserVotes &&
+            activeAmountUserVotes !== ZERO_TOKEN_TEXT && (
+              <div className="mb-8 italic">
+                You've voted with {activeAmountUserVotes} token
+                {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this
+                proposal
+              </div>
+            )}
           <div className="mb-8">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
             <div className="flex flex-row items-center">
               <div>
                 <div className="w-48">
-                  <div className="mb-2">Status</div>
+                  <div className="mb-1">Status</div>
                   <div className="flex flex-row items-center">
                     <div
                       className={`mr-2 w-4 h-4 rounded-full bg-${isActive ? "green" : "stone"}-600`}
@@ -448,11 +462,11 @@ export default function VotePage({ params }: VoteProps) {
                 </div>
               </div>
               <div className="w-60">
-                <div className="mb-2">Start Date</div>
+                <div className="mb-1">Start Date</div>
                 <div>{formatTimestamp(activeProposal.startTimestamp)}</div>
               </div>
               <div className="w-60">
-                <div className="mb-2">End Date</div>
+                <div className="mb-1">End Date</div>
                 <div>{formatTimestamp(activeProposal.endTimestamp)}</div>
               </div>
               <div>
@@ -470,7 +484,7 @@ export default function VotePage({ params }: VoteProps) {
                 </div>
                 <div className="flex sm:flex-row flex-col sm:items-center">
                   {/* <div className="md:mb-0 mb-2 w-40">Voting available on</div> */}
-                  <div className="md:mb-0 mb-2">Voting available on</div>
+                  <div className="md:mb-0 mb-1">Voting available on</div>
                   <div className="flex flex-row">
                     {rearrangedSupportedChains.map((chain) => (
                       <img
@@ -490,21 +504,20 @@ export default function VotePage({ params }: VoteProps) {
             <div className="text-xl font-semibold mb-2">Token Info</div>
             <div className="flex flex-row items-center">
               <div className="w-48">
-                <div className="mb-2">Token Name</div>
+                <div className="mb-1">Token Name</div>
                 <div>{activeProposal.tokenName}</div>
               </div>
               <div className="w-60">
-                <div className="mb-2">Your Token Balance </div>
+                <div className="mb-1">Your Token Balance </div>
                 <div>{formatBalance(userTokenBalance, decimals)}</div>
               </div>
               <div className="w-60">
-                <div className="mb-2">Your Delegated Amount</div>
+                <div className="mb-1">Your Delegated Amount</div>
                 <div>{formatBalance(amountDelegatedTokens, decimals)}</div>
               </div>
               <div>
-                Your Voting Power
+                <div className="mb-1">Your Voting Power</div>
                 {/* <div>{formatBalance(amountUserVotes, decimals)}</div> */}
-                <div>1000.00</div>
               </div>
             </div>
           </div>
@@ -531,8 +544,8 @@ export default function VotePage({ params }: VoteProps) {
         <div>Voting Power: xyz</div>
         <input
           type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={amountToVote}
+          onChange={(e) => setAmountToVote(e.target.value)}
           ref={amountRef}
           className="text-black"
         />
