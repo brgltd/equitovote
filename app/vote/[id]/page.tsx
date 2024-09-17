@@ -270,9 +270,13 @@ export default function VotePage({ params }: VoteProps) {
     setActiveAmountUserVotes(() => formatBalance(amountUserVotes, decimals, 0));
   }, [amountUserVotes, decimals]);
 
-  // useEffect(() => {
-  //   setActiveAmountUserVotes(() => formatBalance(amountUserVotes, decimals, 0));
-  // }, [activeAmountUserVotes]);
+  useEffect(() => {
+    const newVotingPower =
+      Number(activeAmountDelegatedTokens) - Number(activeAmountUserVotes);
+    const safeNewVotingPower = newVotingPower || 0;
+    const formattedNewVotingPower = safeNewVotingPower.toFixed(2);
+    setActiveVotingPower(formattedNewVotingPower);
+  }, [activeAmountUserVotes, activeAmountDelegatedTokens]);
 
   const onClickDelegate = async () => {
     setIsDelegating(true);
