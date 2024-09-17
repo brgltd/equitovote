@@ -23,12 +23,12 @@ import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 
+const PRECISION = 2;
+const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
+
 const equitoVoteAbi = equitoVote.abi;
 const erc20VotesAbi = erc20Votes.abi;
-
 const isGetPastVotesEnabled = verifyIsGetPastVotesEnabled();
-
-const ZERO_TOKEN_TEXT = "N/A";
 
 enum VoteOption {
   Yes = 0,
@@ -64,11 +64,11 @@ function buildUpdatedProposal(
 function formatBalance(
   input: bigint | undefined,
   decimals: number | undefined,
-  precision = 2,
+  precision = PRECISION,
 ) {
   return !input || !decimals
     ? ZERO_TOKEN_TEXT
-    : Number(formatUnits(input, decimals)).toFixed(precision);
+    : Number(formatUnits(input, decimals)).toFixed(PRECISION);
 }
 
 export default function VotePage({ params }: VoteProps) {
@@ -271,7 +271,7 @@ export default function VotePage({ params }: VoteProps) {
     const newVotingPower =
       Number(activeAmountDelegatedTokens) - Number(activeAmountUserVotes);
     const safeNewVotingPower = newVotingPower || 0;
-    const formattedNewVotingPower = safeNewVotingPower.toFixed(2);
+    const formattedNewVotingPower = safeNewVotingPower.toFixed(PRECISION);
     setActiveVotingPower(formattedNewVotingPower);
   }, [activeAmountUserVotes, activeAmountDelegatedTokens]);
 
