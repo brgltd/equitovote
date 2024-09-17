@@ -29,6 +29,7 @@ import ThumbDown from "@mui/icons-material/ThumbDown";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { cn } from "@/utils/cn";
 import { VoteSkeleton } from "@/components/vote-skeleton";
+import Link from "next/link";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -771,10 +772,18 @@ export default function VotePage({ params }: VoteProps) {
 
         {!hasVotingPower &&
           activeAmountUserVotes === ZERO_TOKEN_TEXT &&
-          (!isPendingTokenData || !userAddress) && (
+          (!isPendingTokenData || !userAddress) &&
+          isVotingEnabled && (
             <div className="mt-4 italic">
               You must have voting power in {activeProposal.tokenName} tokens to
-              be able to vote
+              be able to vote. Get tokens from the{" "}
+              <Link
+                href="/faucet"
+                className="underline hover:text-blue-300 transition-colors"
+              >
+                Faucet
+              </Link>
+              .
             </div>
           )}
 
