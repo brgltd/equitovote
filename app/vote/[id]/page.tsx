@@ -5,6 +5,7 @@ import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import {
   buildProposalFromArray,
   formatTimestamp,
+  isValidData,
   placeholderProposal,
   rearrangeChains,
   verifyIsGetPastVotesEnabled,
@@ -312,7 +313,14 @@ export default function VotePage({ params }: VoteProps) {
   const originChainSelector = activeProposal?.originChainSelector;
 
   const balanceMinusDelegation =
-    Number(userTokenBalance) - Number(amountDelegatedTokens);
+    isValidData(userTokenBalance) && isValidData(amountDelegatedTokens)
+      ? // @ts-ignore - checks already made
+        userTokenBalance - amountDelegatedTokens
+      : 0;
+
+  const formattedBalanceMinusDelegation = balanceMinusDelegation
+    ? formatBalance(balanceMinusDelegation, decimals)
+    : 0;
 
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
@@ -658,7 +666,7 @@ export default function VotePage({ params }: VoteProps) {
               title="You must delegate your balance to adquire voting power"
             >
               <div className="mb-2">
-                You have {balanceMinusDelegation} undelegated tokens
+                You have {formattedBalanceMinusDelegation} undelegated tokens
               </div>
             </Tooltip>
             <Button
@@ -776,14 +784,19 @@ export default function VotePage({ params }: VoteProps) {
           isVotingEnabled && (
             <div className="mt-4 italic">
               You must have voting power in {activeProposal.tokenName} tokens to
-              be able to vote. Get tokens from the{" "}
-              <Link
-                href="/faucet"
-                className="underline hover:text-blue-300 transition-colors"
-              >
-                Faucet
-              </Link>
-              .
+              be able to vote.
+              {!userTokenBalance && (
+                <>
+                  Get tokens from the{" "}
+                  <Link
+                    href="/faucet"
+                    className="underline hover:text-blue-300 transition-colors"
+                  >
+                    Faucet
+                  </Link>
+                  .
+                </>
+              )}
             </div>
           )}
 

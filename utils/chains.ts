@@ -232,10 +232,10 @@ export const supportedChains: Chain[] = [
   ethereumChain,
   arbitrumChain,
   optimismChain,
-  // baseChain,
-  // blastChain,
-  // lineaChain,
-  // scrollChain,
+  baseChain,
+  blastChain,
+  lineaChain,
+  scrollChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(
