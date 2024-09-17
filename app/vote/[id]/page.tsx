@@ -21,9 +21,13 @@ import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
-import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
+import {
+  Chain,
+  supportedChains,
+  supportedChainsMapBySelector,
+} from "@/utils/chains";
 import { Button } from "@/components/button";
-import { CircularProgress, TextField, Tooltip } from "@mui/material";
+import { CircularProgress, Skeleton, TextField, Tooltip } from "@mui/material";
 import ThumbUp from "@mui/icons-material/ThumbUp";
 import ThumbDown from "@mui/icons-material/ThumbDown";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
@@ -179,17 +183,21 @@ export default function VotePage({ params }: VoteProps) {
   });
   const clockMode = clockModeData as string | undefined;
 
-  const { data: userTokenBalanceData } = useReadContract({
-    address: tokenAddress,
-    abi: erc20VotesAbi,
-    functionName: "balanceOf",
-    args: [userAddress],
-    chainId: sourceChain?.definition.id,
-    query: { enabled: !!tokenAddress },
-  });
+  const { data: userTokenBalanceData, isPending: isPendingUserTokenBalance } =
+    useReadContract({
+      address: tokenAddress,
+      abi: erc20VotesAbi,
+      functionName: "balanceOf",
+      args: [userAddress],
+      chainId: sourceChain?.definition.id,
+      query: { enabled: !!tokenAddress },
+    });
   const userTokenBalance = userTokenBalanceData as bigint | undefined;
 
-  const { data: amountDelegatedTokensData } = useReadContract({
+  const {
+    data: amountDelegatedTokensData,
+    isPending: isPendingAmountDelegatedTokens,
+  } = useReadContract({
     address: tokenAddress,
     abi: erc20VotesAbi,
     functionName: isGetPastVotesEnabled ? "getPastVotes" : "getVotes",
@@ -550,15 +558,46 @@ export default function VotePage({ params }: VoteProps) {
               </div>
               <div className="w-60">
                 <div className="mb-1">Your Token Balance </div>
-                <div>{formatBalance(userTokenBalance, decimals)}</div>
+                <div>
+                  {isPendingUserTokenBalance && userAddress ? (
+                    <Skeleton
+                      variant="rectangular"
+                      animation="wave"
+                      width={120}
+                      height={16}
+                    />
+                  ) : (
+                    formatBalance(userTokenBalance, decimals)
+                  )}
+                </div>
               </div>
               <div className="w-60">
                 <div className="mb-1">Your Delegated Amount</div>
-                <div>{activeAmountDelegatedTokens}</div>
+                {isPendingAmountDelegatedTokens && userAddress ? (
+                  <Skeleton
+                    variant="rectangular"
+                    animation="wave"
+                    width={120}
+                    height={16}
+                  />
+                ) : (
+                  activeAmountDelegatedTokens
+                )}
               </div>
               <div>
                 <div className="mb-1">Your Voting Power</div>
-                <div>{activeVotingPower}</div>
+                {(isPendingUserTokenBalance ||
+                  isPendingAmountDelegatedTokens) &&
+                userAddress ? (
+                  <Skeleton
+                    variant="rectangular"
+                    animation="wave"
+                    width={120}
+                    height={16}
+                  />
+                ) : (
+                  activeVotingPower
+                )}
               </div>
             </div>
           </div>

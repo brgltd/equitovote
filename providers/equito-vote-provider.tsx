@@ -41,6 +41,11 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
   const { address: userAddress } = useAccount();
 
   const chainId = useChainId();
+  console.log("chainId");
+  console.log(chainId);
+
+  console.log("address");
+  console.log(userAddress);
 
   useEffect(() => {
     setIsClient(true);
