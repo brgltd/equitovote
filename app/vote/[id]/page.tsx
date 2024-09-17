@@ -546,6 +546,7 @@ export default function VotePage({ params }: VoteProps) {
         {/* {balanceMinusDelegation > 0 && ( */}
         {balanceMinusDelegation === 0 && (
           <div className="mb-6 w-max">
+            <div className="text-xl font-semibold mb-2">Delegation Info</div>
             <Tooltip
               placement="right"
               title="You must delegate your balance to adquire voting power"
