@@ -5,7 +5,7 @@ export function Footer() {
         color: "rgb(108, 134, 173)",
         borderTop: "1px solid rgba(156, 163, 175, 0.3)",
       }}
-      className="flex flex-row justify-between text-sm my-12 pt-4"
+      className="flex sm:flex-row flex-col sm:justify-between text-sm my-12 pt-4 gap-6"
     >
       <div>© {new Date().getFullYear()} EquitoVote</div>
       <div>
