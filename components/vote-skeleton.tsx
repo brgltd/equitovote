@@ -25,7 +25,7 @@ export function VoteSkeleton() {
 
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
-            <div className="flex flex-row items-center">
+            <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
               <div>
                 <div className="w-48">
                   <div className="mb-1">Status</div>
@@ -86,7 +86,7 @@ export function VoteSkeleton() {
 
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Token Info</div>
-            <div className="flex flex-row items-center">
+            <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
               <div className="w-48">
                 <div className="mb-1">Token Name</div>
                 <Skeleton
