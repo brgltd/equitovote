@@ -16,21 +16,22 @@ export function Button({
 }) {
   return (
     <div className={cn("w-max", isDisabled ? "cursor-not-allowed" : "")}>
-      <MuiButton
-        onClick={onClick}
-        variant="contained"
-        disabled={isDisabled}
-        sx={{
-          backgroundColor: "rgba(25, 118, 210, 0.5)",
-          color: "white",
-          "&:hover": {
-            bgcolor: lightTheme.palette.primary.dark,
-          },
-          ...styles,
-        }}
-      >
-        {children}
-      </MuiButton>
+      <div className={isDisabled ? "pointer-events-none" : ""}>
+        <MuiButton
+          onClick={onClick}
+          variant="contained"
+          sx={{
+            backgroundColor: "rgba(25, 118, 210, 0.5)",
+            color: "white",
+            "&:hover": {
+              bgcolor: lightTheme.palette.primary.dark,
+            },
+            ...styles,
+          }}
+        >
+          {children}
+        </MuiButton>
+      </div>
     </div>
   );
 }
