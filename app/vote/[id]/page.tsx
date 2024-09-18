@@ -784,7 +784,7 @@ export default function VotePage({ params }: VoteProps) {
           isVotingEnabled && (
             <div className="mt-4 italic">
               You must have voting power in {activeProposal.tokenName} tokens to
-              be able to vote.
+              be able to vote.{" "}
               {!userTokenBalance && (
                 <>
                   Get tokens from the{" "}

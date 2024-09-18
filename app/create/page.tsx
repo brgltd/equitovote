@@ -209,6 +209,19 @@ export default function CreateProposalPage() {
       ? sourceFee + createProposalFee
       : BigInt(0);
 
+  const isPendingData =
+    isPendingSourceFee ||
+    isPendingDestinationFee ||
+    isPendingCreateProposalFee ||
+    isPendingTokenNames;
+
+  const isOperationReady =
+    status === Status.IsStart ||
+    status === Status.IsCompleted ||
+    status === Status.IsRetry;
+
+  const isCreateProposalEnabled = isOperationReady && !isPendingData;
+
   const tokenNamesOption = useMemo(
     () => tokenNames?.map((name) => ({ value: name, label: name })),
     [tokenNames],
@@ -577,12 +590,7 @@ export default function CreateProposalPage() {
           </div>
           <Button
             onClick={onClickCreateProposal}
-            isDisabled={
-              isPendingSourceFee ||
-              isPendingDestinationFee ||
-              isPendingCreateProposalFee ||
-              isPendingTokenNames
-            }
+            isDisabled={!isCreateProposalEnabled}
           >
             SUBMIT PROPOSAL
           </Button>
