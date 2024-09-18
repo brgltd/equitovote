@@ -1,6 +1,7 @@
 import { Button as MuiButton } from "@mui/material";
 import { ReactNode } from "react";
 import { lightTheme } from "@/app/layout";
+import { cn } from "@/utils/cn";
 
 export function Button({
   onClick,
@@ -14,7 +15,7 @@ export function Button({
   styles?: Record<string, string>;
 }) {
   return (
-    <div className={`${isDisabled ? "cursor-not-allowed" : ""} w-max`}>
+    <div className={cn("w-max", isDisabled ? "cursor-not-allowed" : "")}>
       <MuiButton
         onClick={onClick}
         variant="contained"
