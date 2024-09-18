@@ -424,12 +424,11 @@ export default function VotePage({ params }: VoteProps) {
       });
 
       setStatus(Status.IsGeneratingProofOnSourceChain);
-      const { proof: sendMessageProof, timestamp: resultTimestamp } =
-        await approve.execute({
-          messageHash: generateHash(sendMessageResult.message),
-          fromTimestamp: Number(sendMessageTimestamp) * 1000,
-          chainSelector: sourceChain.chainSelector,
-        });
+      const { proof: sendMessageProof } = await approve.execute({
+        messageHash: generateHash(sendMessageResult.message),
+        fromTimestamp: Number(sendMessageTimestamp) * 1000,
+        chainSelector: sourceChain.chainSelector,
+      });
 
       setStatus(Status.IsExecutingMessageOnDestinationChain);
       await deliverMessage.execute(
