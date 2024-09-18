@@ -7,7 +7,7 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
-/// @notice Demonstration token for Equito 2024 hackathon, ERC20Votes compatible
+/// @notice Demonstration token for Equito 2024 hackathon, ERC20Votes compatible.
 contract VoteSphereToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
     uint256 public amountFaucetToMint = 1_000e18;
 

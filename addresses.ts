@@ -27,11 +27,15 @@ export const AddressesPerChain = {
     EquitoVoteV2: "0x191770Db1Fb7833bB09bd6e5c8976b8a417AB3A0" as Address,
 
     VoteSphereToken: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
+
+    Faucet: "0x0000000000000000000000000000000000000000" as Address,
   },
   OptimismSepolia: {
     EquitoVoteV1: "0x0000000000000000000000000000000000000000" as Address, // V1 not deployed to optimism
     EquitoVoteV2: "0x0000000000000000000000000000000000000000" as Address, // TODO: deploy V2 on optimism
 
     VoteSphereToken: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
+
+    Faucet: "0x0000000000000000000000000000000000000000" as Address,
   },
 };
