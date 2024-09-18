@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useReadContract, useSwitchChain, useWriteContract } from "wagmi";
 import {
@@ -20,8 +21,6 @@ import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
 import { useDeliver } from "@/hooks/use-deliver";
 import { FormattedProposal, ProposalDataItem, Status } from "@/types";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
-import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 import { supportedChains } from "@/utils/chains";
 import { Button } from "@/components/button";
 import { CircularProgress, Skeleton, TextField, Tooltip } from "@mui/material";
@@ -30,7 +29,9 @@ import ThumbDown from "@mui/icons-material/ThumbDown";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { cn } from "@/utils/cn";
 import { VoteSkeleton } from "@/components/vote-skeleton";
-import Link from "next/link";
+import { FeeSkeleton } from "@/components/fee-skeleton";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -261,7 +262,7 @@ export default function VotePage({ params }: VoteProps) {
   });
   const decimals = decimalsData as number;
 
-  const { data: sourceFee } = useReadContract({
+  const { data: sourceFee, isPending: isPendingSourceFee } = useReadContract({
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
@@ -270,22 +271,24 @@ export default function VotePage({ params }: VoteProps) {
     chainId: sourceChain?.definition.id,
   });
 
-  const { data: destinationFee } = useReadContract({
-    address: destinationRouterAddress,
-    abi: routerAbi,
-    functionName: "getFee",
-    args: [destinationChain.equitoVoteContractV2 as Address],
-    query: { enabled: !!destinationRouterAddress },
-    chainId: destinationChain.definition.id,
-  });
+  const { data: destinationFee, isPending: isPendingDestinationFee } =
+    useReadContract({
+      address: destinationRouterAddress,
+      abi: routerAbi,
+      functionName: "getFee",
+      args: [destinationChain.equitoVoteContractV2 as Address],
+      query: { enabled: !!destinationRouterAddress },
+      chainId: destinationChain.definition.id,
+    });
 
-  const { data: voteOnProposalFeeData } = useReadContract({
-    address: sourceChain?.equitoVoteContractV2,
-    abi: equitoVoteAbi,
-    functionName: "voteOnProposalFee",
-    query: { enabled: !!sourceRouterAddress },
-    chainId: sourceChain?.definition.id,
-  });
+  const { data: voteOnProposalFeeData, isPending: isPendingVoteOnProposalFee } =
+    useReadContract({
+      address: sourceChain?.equitoVoteContractV2,
+      abi: equitoVoteAbi,
+      functionName: "voteOnProposalFee",
+      query: { enabled: !!sourceRouterAddress },
+      chainId: sourceChain?.definition.id,
+    });
   const voteOnProposalFee = voteOnProposalFeeData as bigint;
 
   const totalVoteOnProposalFee =
@@ -297,11 +300,6 @@ export default function VotePage({ params }: VoteProps) {
 
   const hasVotingPower =
     !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
-
-  // const isVotingEnabled =
-  //   status === Status.IsStart ||
-  //   status === Status.IsCompleted ||
-  //   status === Status.IsRetry;
 
   const isVotingEnabled =
     isProposalActive &&
@@ -316,8 +314,8 @@ export default function VotePage({ params }: VoteProps) {
 
   const balanceMinusDelegation =
     isValidData(userTokenBalance) && isValidData(amountDelegatedTokens)
-      ? // @ts-ignore - checks already made
-        userTokenBalance - amountDelegatedTokens
+      ? // @ts-ignore - checks already made with `isValidData`
+        userTokenBalance - parseUnits(activeAmountDelegatedTokens, decimals)
       : 0;
 
   const formattedBalanceMinusDelegation = balanceMinusDelegation
@@ -328,6 +326,55 @@ export default function VotePage({ params }: VoteProps) {
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
     [originChainSelector],
   );
+
+  const formattedSourceChainFee = !!sourceFee
+    ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
+        sourceChain?.definition?.nativeCurrency?.symbol
+      }`
+    : "Unavailable";
+
+  const formattedDestinationChainFee = !!destinationFee
+    ? `${Number(formatUnits(destinationFee, 18)).toFixed(8)} ${
+        destinationChain.definition?.nativeCurrency?.symbol
+      }`
+    : "Unavailable";
+
+  const formattedCreateProposalFee = !!voteOnProposalFee
+    ? `${Number(formatUnits(voteOnProposalFee, 18)).toFixed(8)} ${
+        sourceChain?.definition?.nativeCurrency?.symbol
+      }`
+    : "Unavailable";
+
+  const formattedTotalUserFee =
+    !!sourceFee && !!destinationFee && !!voteOnProposalFee
+      ? `${Number(formatUnits(sourceFee + destinationFee + voteOnProposalFee, 18)).toFixed(8)} ${
+          sourceChain?.definition?.nativeCurrency?.symbol
+        }`
+      : "Unavailable";
+
+  const shouldRenderDecision = !isProposalActive;
+
+  const shouldRenderLackVotingPower =
+    !hasVotingPower &&
+    activeAmountUserVotes === ZERO_TOKEN_TEXT &&
+    (!isPendingTokenData || !userAddress) &&
+    isProposalActive;
+
+  const shouldRenderExistingVotes =
+    !!activeAmountUserVotes &&
+    activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
+    !isPendingTokenData;
+
+  const hasUserVotedAllHisTokens =
+    shouldRenderExistingVotes &&
+    (!activeVotingPower || activeVotingPower === ZERO_TOKEN_TEXT);
+
+  const shouldRenderFees =
+    !shouldRenderDecision &&
+    !shouldRenderLackVotingPower &&
+    !hasUserVotedAllHisTokens;
+
+  const shouldRenderDelegation = balanceMinusDelegation > 0;
 
   const decision = useMemo(
     () => computeDecision(formattedProposal),
@@ -445,9 +492,18 @@ export default function VotePage({ params }: VoteProps) {
       );
       setActiveProposal(updatedActiveProposal);
 
-      setActiveAmountUserVotes(
-        `${Number(activeAmountUserVotes) || 0 + Number(amountToVote)}`,
+      const newActiveAmountUserVotes =
+        Number(activeAmountUserVotes) + Number(amountToVote);
+      if (newActiveAmountUserVotes) {
+        setActiveAmountUserVotes(newActiveAmountUserVotes.toString());
+      }
+
+      console.log(
+        "Number(activeAmountUserVotes) || 0",
+        Number(activeAmountUserVotes) || 0,
       );
+      console.log("Number(amountToVote)}", Number(amountToVote));
+      console.log("newActiveAmountUserV", newActiveAmountUserVotes);
 
       setStatus(Status.IsCompleted);
     } catch (error) {
@@ -468,7 +524,7 @@ export default function VotePage({ params }: VoteProps) {
     [Status.IsExecutingBaseTxOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
-        <div className="ml-4">Casting votes on source chain</div>
+        <div className="ml-4">Sending votes on source chain</div>
       </div>
     ),
     // Same message as next step since it's executing quickly
@@ -631,34 +687,6 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         </div>
 
-        {balanceMinusDelegation > 0 && (
-          <div className="mb-6 w-max">
-            <div className="text-xl font-semibold mb-2">Delegation Data</div>
-            <Tooltip
-              placement="right"
-              title="You must delegate your balance to adquire voting power"
-            >
-              <div className="mb-2">
-                You have {formattedBalanceMinusDelegation} undelegated tokens
-              </div>
-            </Tooltip>
-            <Button
-              onClick={onClickDelegate}
-              isDisabled={!tokenAddress || isDelegating}
-            >
-              Delegate Balance
-            </Button>
-            {isDelegating && (
-              <div className="flex flex-row items-center mt-2">
-                <div>
-                  <CircularProgress size={20} />
-                </div>
-                <div className="ml-4">Delegation in Progress</div>
-              </div>
-            )}
-          </div>
-        )}
-
         <div>
           <div className="text-xl font-semibold mb-2">Vote Options</div>
           <div className="flex md:flex-row flex-col items-start mt-4 space-y-4 md:space-y-0">
@@ -739,43 +767,123 @@ export default function VotePage({ params }: VoteProps) {
             </Tooltip>
           </div>
         </div>
+
         <div>{statusRenderer[status]}</div>
 
-        {!!activeAmountUserVotes &&
-          activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
-          isVotingEnabled &&
-          !isPendingTokenData && (
-            <div className="mt-4 italic">
-              You have a total of {activeAmountUserVotes} vote
-              {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal
-            </div>
-          )}
+        {shouldRenderFees && (
+          <ul className="space-y-4 text-gray-400 text-sm mt-6 w-max">
+            <li>
+              <Tooltip
+                placement="right"
+                title="Equito Network source chain fee"
+              >
+                <div className="flex flex-row items-center">
+                  <span className="mr-2">Source Chain Fee: </span>
+                  {isPendingSourceFee ? (
+                    <FeeSkeleton />
+                  ) : (
+                    formattedSourceChainFee
+                  )}
+                </div>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip
+                placement="right"
+                title="Equito Network destination chain fee"
+              >
+                <div className="flex flex-row items-center">
+                  <span className="mr-2">Destination Chain Fee:</span>
+                  {isPendingDestinationFee ? (
+                    <FeeSkeleton />
+                  ) : (
+                    formattedDestinationChainFee
+                  )}
+                </div>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip
+                placement="right"
+                title="Equito Vote Protocol fee for voting on proposals"
+              >
+                <div className="flex flex-row items-center">
+                  <span className="mr-2">Equito Voting Fee</span>
+                  {isPendingVoteOnProposalFee ? (
+                    <FeeSkeleton />
+                  ) : (
+                    formattedCreateProposalFee
+                  )}
+                </div>
+              </Tooltip>
+            </li>
+            <li>
+              <Tooltip placement="right" title="Total fee across both chains">
+                <div className="flex flex-row items-center">
+                  <span className="mr-2">Total Cross Chain Fee:</span>
+                  {isPendingSourceFee ||
+                  isPendingDestinationFee ||
+                  isPendingVoteOnProposalFee ? (
+                    <FeeSkeleton />
+                  ) : (
+                    formattedTotalUserFee
+                  )}
+                </div>
+              </Tooltip>
+            </li>
+          </ul>
+        )}
 
-        {!hasVotingPower &&
-          activeAmountUserVotes === ZERO_TOKEN_TEXT &&
-          (!isPendingTokenData || !userAddress) &&
-          isVotingEnabled && (
-            <div className="mt-4 italic">
-              You must have voting power in {activeProposal.tokenName} tokens to
-              be able to vote.{" "}
-              {!userTokenBalance && (
-                <>
-                  Get tokens from the{" "}
-                  <Link
-                    href="/faucet"
-                    className="underline hover:text-blue-300 transition-colors"
-                  >
-                    Faucet
-                  </Link>
-                  .
-                </>
-              )}
-            </div>
-          )}
-
-        {!isProposalActive && (
+        {shouldRenderLackVotingPower && (
           <div className="mt-4 italic">
-            This proposal has concluded. Final decision was: {decision}
+            You must have voting power in {activeProposal.tokenName} tokens to
+            be able to vote.{" "}
+            {!userTokenBalance && (
+              <>
+                Get tokens from the{" "}
+                <Link
+                  href="/faucet"
+                  className="underline hover:text-blue-300 transition-colors"
+                >
+                  Faucet
+                </Link>
+                .
+              </>
+            )}
+            {shouldRenderDelegation && "Please delegate your balance."}
+          </div>
+        )}
+
+        {shouldRenderDelegation && (
+          <div className="mt-4">
+            <Button
+              onClick={onClickDelegate}
+              isDisabled={!tokenAddress || isDelegating}
+            >
+              Delegate Balance
+            </Button>
+            {isDelegating && (
+              <div className="flex flex-row items-center mt-4">
+                <div>
+                  <CircularProgress size={20} />
+                </div>
+                <div className="ml-4">Delegation in Progress</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {shouldRenderDecision && (
+          <div className="mt-4 italic">
+            This proposal has concluded. Final decision was: {decision}.
+          </div>
+        )}
+
+        {shouldRenderExistingVotes && (
+          <div className="mt-4 italic">
+            You've voted with {activeAmountUserVotes} {activeProposal.tokenName}{" "}
+            token
+            {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal!
           </div>
         )}
       </div>

@@ -221,7 +221,7 @@ export default function SetTokenDataPage() {
       {isAddingToken && (
         <div className="flex flex-row items-center mt-3">
           <CircularProgress size={20} />
-          <div className="ml-4">Adding token to contract registry</div>
+          <div className="ml-4">Adding token to registry</div>
         </div>
       )}
 
