@@ -8,6 +8,9 @@ import { Address } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
 import { CircularProgress } from "@mui/material";
+import faucet from "@/out/Faucet.sol/Faucet.json";
+
+const faucetAbi = faucet.abi;
 
 const buttonStyles = {
   width: "350px",
@@ -21,13 +24,14 @@ export default function FaucetPage() {
 
   const { writeContractAsync } = useWriteContract();
 
-  const onClickRequest = async () => {
+  const onClickRequest = async (tokenAddress: Address | undefined) => {
     setIsRequestInProgress(true);
     try {
       const hash = await writeContractAsync({
         address: sourceChain?.faucet as Address,
-        abi: [],
+        abi: faucetAbi,
         functionName: "drip",
+        args: [tokenAddress],
         chainId: sourceChain?.definition?.id,
       });
       await waitForTransactionReceipt(config, {
@@ -54,31 +58,33 @@ export default function FaucetPage() {
       </h1>
       <div className="space-y-8">
         <Button
-          onClick={onClickRequest}
+          onClick={() => onClickRequest(sourceChain?.voteSphere)}
           isDisabled={isRequestInProgress}
           styles={buttonStyles}
         >
           Request 1000 VoteSphere Tokens
         </Button>
         <Button
-          onClick={onClickRequest}
+          onClick={() => onClickRequest(sourceChain?.voteSphere)} // TODO: update this
           isDisabled={isRequestInProgress}
           styles={buttonStyles}
         >
           Request 1000 MetaQuorum Tokens
         </Button>
         <Button
-          onClick={onClickRequest}
+          onClick={() => onClickRequest(sourceChain?.voteSphere)} // TODO: update this
           isDisabled={isRequestInProgress}
           styles={buttonStyles}
         >
-          Request 1000 ChainVote Tokens
+          Request 1000 ChainLight Tokens
         </Button>
       </div>
-      <div className="flex flex-row mt-8">
-        <CircularProgress size={20} />
-        <div className="ml-4">Requesting tokens</div>
-      </div>
+      {isRequestInProgress && (
+        <div className="flex flex-row mt-8">
+          <CircularProgress size={20} />
+          <div className="ml-4">Requesting tokens</div>
+        </div>
+      )}
     </div>
   );
 }

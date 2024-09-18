@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useSwitchChain, useWriteContract } from "wagmi";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
@@ -10,6 +9,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, isAddress, parseUnits } from "viem";
 import { CircularProgress, TextField } from "@mui/material";
 import { Button } from "@/components/button";
+import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
 
 const equitoVoteAbi = equitoVote.abi;
 

@@ -73,7 +73,6 @@ export const ethereumChain = {
   pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
   equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteV1,
   equitoVoteContractV2: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
-  // faucet: Add
 };
 
 export const arbitrumChain = {
@@ -82,9 +81,12 @@ export const arbitrumChain = {
   img: 11841,
   definition: arbitrumSepolia,
   pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
+
   equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteV1,
   equitoVoteContractV2: AddressesPerChain.ArbitrumSepolia.EquitoVoteV2,
+
   faucet: AddressesPerChain.ArbitrumSepolia.Faucet,
+  voteSphere: AddressesPerChain.ArbitrumSepolia.VoteSphereToken,
 };
 
 export const optimismChain = {
@@ -93,9 +95,12 @@ export const optimismChain = {
   img: 11840,
   definition: optimismSepolia,
   pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
+
   equitoVoteContract: AddressesPerChain.OptimismSepolia.EquitoVoteV1,
   equitoVoteContractV2: AddressesPerChain.OptimismSepolia.EquitoVoteV2,
+
   faucet: AddressesPerChain.OptimismSepolia.Faucet,
+  voteSphere: AddressesPerChain.OptimismSepolia.VoteSphereToken,
 };
 
 export const baseChain = {
@@ -261,9 +266,12 @@ export type Chain = {
   img: number;
   definition: Definition;
   pingPongContract: Address;
+
   equitoVoteContract?: Address;
   equitoVoteContractV2?: Address;
+
   faucet?: Address;
+  voteSphere?: Address;
 };
 
 export type SupportedChainsMap = Record<number, Chain>;
