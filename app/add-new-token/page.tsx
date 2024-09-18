@@ -211,13 +211,15 @@ export default function SetTokenDataPage() {
         />
       </div>
 
-      <Button onClick={onClickSetTokenData}>Add Token</Button>
+      <Button isDisabled={isAddingToken} onClick={onClickSetTokenData}>
+        Add Token
+      </Button>
       {isAddingToken && (
-        <div className="flex flex-row items-center mt-2">
+        <div className="flex flex-row items-center mt-3">
           <div>
             <CircularProgress size={20} />
           </div>
-          <div className="ml-4">Delegation in Progress</div>
+          <div className="ml-4">Adding token to contract registry</div>
         </div>
       )}
     </div>
