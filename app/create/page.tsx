@@ -267,24 +267,11 @@ export default function CreateProposalPage() {
       await switchChainAsync({ chainId: sourceChain.definition.id });
       const createProposalReceipt = await createProposal();
 
-      console.log("createProposalReceipt");
-      console.log(createProposalReceipt);
-
       const proposalId =
         createProposalReceipt?.logs?.[createProposalReceipt?.logs?.length - 1]
           ?.topics?.[1];
 
       setProposalId(proposalId || "");
-
-      console.log("proposalId", proposalId);
-
-      const logs = parseEventLogs({
-        abi: routerAbi,
-        logs: createProposalReceipt.logs,
-      });
-
-      console.log("logs");
-      console.log(logs);
 
       const sendMessageResult = parseEventLogs({
         abi: routerAbi,
@@ -292,9 +279,6 @@ export default function CreateProposalPage() {
       }).flatMap(({ eventName, args }) =>
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
-
-      console.log("sendMessageResult");
-      console.log(sendMessageResult);
 
       setStatus(Status.IsRetrievingBlockOnSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
@@ -310,22 +294,13 @@ export default function CreateProposalPage() {
           chainSelector: sourceChain.chainSelector,
         });
 
-      console.log("sendMessageProof");
-      console.log(sendMessageProof);
-
-      console.log("resultTimestamp");
-      console.log(resultTimestamp);
-
       setStatus(Status.IsExecutingMessageOnDestinationChain);
-      const executionReceipt = await deliverMessage.execute(
+      await deliverMessage.execute(
         sendMessageProof,
         sendMessageResult.message,
         sendMessageResult.messageData,
         destinationFee,
       );
-
-      console.log("executionReceipt");
-      console.log(executionReceipt);
 
       setStatus(Status.IsCompleted);
     } catch (error) {

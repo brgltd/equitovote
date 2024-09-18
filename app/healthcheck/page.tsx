@@ -22,7 +22,7 @@ import healthcheckContract from "../../out/Healthcheck.sol/Healthcheck.json";
 
 const healthcheckAbi = healthcheckContract.abi;
 
-export default function Page() {
+export default function HealthcheckPage() {
   const [isClient, setIsClient] = useState(false);
 
   const [message, setMessage] = useState("");
@@ -75,12 +75,6 @@ export default function Page() {
   //     args: [1001],
   //     chainId: arbitrumChain.definition.id,
   //   });
-
-  /* console.log("ethereum peers"); */
-  /* console.log(peers); */
-
-  /* console.log("arbitrum peers"); */
-  /* console.log(arbitrumPeers); */
 
   const deliverMessage = useDeliver({
     equito: {
@@ -149,18 +143,12 @@ export default function Page() {
         logs: sendMessageReceipt.logs,
       });
 
-      console.log("logs");
-      console.log(logs);
-
       const sendMessageResult = parseEventLogs({
         abi: routerAbi,
         logs: sendMessageReceipt.logs,
       }).flatMap(({ eventName, args }) =>
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
-
-      console.log("sendMessageResult");
-      console.log(sendMessageResult);
 
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: ethereumChain.definition.id,
@@ -173,12 +161,6 @@ export default function Page() {
           fromTimestamp: Number(sendMessageTimestamp) * 1000,
           chainSelector: ethereumChain.chainSelector,
         });
-
-      console.log("sendMessageProof");
-      console.log(sendMessageProof);
-
-      console.log("resultTimestamp");
-      console.log(resultTimestamp);
 
       // Go to the `to` chain
       await switchChainAsync({ chainId: arbitrumChain.definition.id });
@@ -195,9 +177,6 @@ export default function Page() {
         sendMessageResult.messageData,
         toFee,
       );
-
-      console.log("executionReceipt");
-      console.log(executionReceipt);
     } catch (error) {
       console.error(error);
     }

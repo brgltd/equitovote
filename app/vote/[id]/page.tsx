@@ -408,26 +408,12 @@ export default function VotePage({ params }: VoteProps) {
 
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
 
-      console.log("voteOnProposalReceipt");
-      console.log(voteOnProposalReceipt);
-
-      const logs = parseEventLogs({
-        abi: routerAbi,
-        logs: voteOnProposalReceipt.logs,
-      });
-
-      console.log("logs");
-      console.log(logs);
-
       const sendMessageResult = parseEventLogs({
         abi: routerAbi,
         logs: voteOnProposalReceipt.logs,
       }).flatMap(({ eventName, args }) =>
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
-
-      console.log("sendMessageResult");
-      console.log(sendMessageResult);
 
       setStatus(Status.IsRetrievingBlockOnSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
@@ -443,22 +429,13 @@ export default function VotePage({ params }: VoteProps) {
           chainSelector: sourceChain.chainSelector,
         });
 
-      console.log("sendMessageProof");
-      console.log(sendMessageProof);
-
-      console.log("resultTimestamp");
-      console.log(resultTimestamp);
-
       setStatus(Status.IsExecutingMessageOnDestinationChain);
-      const executionReceipt = await deliverMessage.execute(
+      await deliverMessage.execute(
         sendMessageProof,
         sendMessageResult.message,
         sendMessageResult.messageData,
         destinationFee,
       );
-
-      console.log("executionReceipt");
-      console.log(executionReceipt);
 
       const updatedActiveProposal = buildUpdatedProposal(
         activeProposal,
