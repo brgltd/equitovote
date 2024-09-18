@@ -142,8 +142,7 @@ export default function VotePage({ params }: VoteProps) {
     userAddress,
     destinationRouter,
     destinationChain,
-    setToastMessage,
-    setIsToastOpen,
+    handleError,
   } = useEquitoVote();
 
   const sourceRouterAddress = sourceRouter?.data;
@@ -419,7 +418,7 @@ export default function VotePage({ params }: VoteProps) {
       });
       setActiveAmountDelegatedTokens(formatBalance(userTokenBalance, decimals));
     } catch (error) {
-      console.error(error);
+      handleError(error);
     }
     setIsDelegating(false);
   };
@@ -498,24 +497,10 @@ export default function VotePage({ params }: VoteProps) {
         setActiveAmountUserVotes(newActiveAmountUserVotes.toString());
       }
 
-      console.log(
-        "Number(activeAmountUserVotes) || 0",
-        Number(activeAmountUserVotes) || 0,
-      );
-      console.log("Number(amountToVote)}", Number(amountToVote));
-      console.log("newActiveAmountUserV", newActiveAmountUserVotes);
-
       setStatus(Status.IsCompleted);
     } catch (error) {
+      handleError(error);
       setStatus(Status.IsRetry);
-      const isUserRejection = error
-        ?.toString()
-        ?.includes("User rejected the request");
-      if (!isUserRejection) {
-        setToastMessage("Error occurred while voting. Please try again.");
-        setIsToastOpen(true);
-      }
-      console.error(error);
     }
   };
 

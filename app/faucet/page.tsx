@@ -21,7 +21,7 @@ export default function FaucetPage() {
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const { sourceChain, setToastMessage, setIsToastOpen } = useEquitoVote();
+  const { sourceChain, handleError } = useEquitoVote();
 
   const { writeContractAsync } = useWriteContract();
 
@@ -42,22 +42,15 @@ export default function FaucetPage() {
       });
       setIsSuccess(true);
     } catch (error) {
-      const isUserRejection = error
-        ?.toString()
-        ?.includes("User rejected the request");
-      if (!isUserRejection) {
-        setToastMessage("Error occurred creating proposal. Please try again.");
-        setIsToastOpen(true);
-      }
-      console.error(error);
+      handleError(error);
     }
     setIsRequestInProgress(false);
   };
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-8">
-        Request testnet tokens for ease of testing
+      <h1 className="text-2xl font-bold mb-8">
+        Request tokens for seamless testing in the Equito Builder Program
       </h1>
       <div className="space-y-8">
         <Button

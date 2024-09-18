@@ -27,6 +27,7 @@ type EquitoVoteContext =
       setIsToastOpen: Dispatch<SetStateAction<boolean>>;
       toastMessage: string;
       setToastMessage: Dispatch<SetStateAction<string>>;
+      handleError: (error: unknown) => void;
     }
   | undefined;
 
@@ -41,6 +42,20 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
   const { address: userAddress } = useAccount();
 
   const chainId = useChainId();
+
+  const handleError = (error: unknown) => {
+    const errorString = error?.toString() || "";
+    if (errorString.includes("User rejected the request")) {
+      return;
+    }
+    if (errorString.includes("Connector not connected")) {
+      setToastMessage("Please connect a wallet to use this dapp.");
+    } else {
+      setToastMessage("Unexected error occurred. Please try again.");
+      console.error(error);
+    }
+    setIsToastOpen(true);
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -70,6 +85,7 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
         setIsToastOpen,
         toastMessage,
         setToastMessage,
+        handleError,
       }}
     >
       {children}

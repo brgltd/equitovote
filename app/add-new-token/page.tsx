@@ -48,7 +48,7 @@ export default function SetTokenDataPage() {
 
   const { switchChainAsync } = useSwitchChain();
 
-  const { destinationChain } = useEquitoVote();
+  const { destinationChain, handleError } = useEquitoVote();
 
   const onClickSetTokenData = async () => {
     const newFormErrors = new Set<FormKeys>();
@@ -102,7 +102,7 @@ export default function SetTokenDataPage() {
       });
       setIsSuccess(true);
     } catch (error) {
-      console.error(error);
+      handleError(error);
     }
     setIsAddingToken(false);
   };

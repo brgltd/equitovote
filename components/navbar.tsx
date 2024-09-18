@@ -6,16 +6,22 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 export function Navbar() {
   return (
     <nav>
-      <ul className="flex md:flex-row flex-col items-center mt-6 mb-8 justify-center">
-        <div className="flex flex-row mb-8 md:mb-0">
+      <ul className="flex lg:flex-row flex-col lg:items-center mt-6 mb-8 justify-center">
+        <div className="flex flex-row flex-wrap mb-8 lg:mb-0 gap-y-6">
           <li className="mr-12 hover-glow">
             <Link href="/">PROPOSALS</Link>
           </li>
-          <li className="hover-glow">
+          <li className="mr-12 hover-glow">
             <Link href="/create">CREATE</Link>
           </li>
+          <li className="mr-12 hover-glow">
+            <Link href="/add-new-token">ADD TOKEN</Link>
+          </li>
+          <li className="hover-glow">
+            <Link href="/faucet">FAUCET</Link>
+          </li>
         </div>
-        <li className="md:ml-auto">
+        <li className="lg:ml-auto">
           <ConnectButton
             chainStatus="full"
             showBalance={false}

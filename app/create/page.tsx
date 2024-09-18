@@ -124,8 +124,7 @@ export default function CreateProposalPage() {
     sourceRouter,
     destinationRouter,
     destinationChain,
-    setIsToastOpen,
-    setToastMessage,
+    handleError,
   } = useEquitoVote();
 
   const sourceRouterAddress = sourceRouter?.data;
@@ -311,15 +310,8 @@ export default function CreateProposalPage() {
 
       setStatus(Status.IsCompleted);
     } catch (error) {
+      handleError(error);
       setStatus(Status.IsRetry);
-      const isUserRejection = error
-        ?.toString()
-        ?.includes("User rejected the request");
-      if (!isUserRejection) {
-        setToastMessage("Error occurred creating proposal. Please try again.");
-        setIsToastOpen(true);
-      }
-      console.error(error);
     }
   };
 
@@ -373,7 +365,7 @@ export default function CreateProposalPage() {
       <div>
         <h1 className="mb-8 text-xl font-semibold">Create New Proposal</h1>
         <div className="flex flex-col md:flex-row mb-8">
-          <div className="mr-12 md:mr-16">
+          <div className="md:mr-16">
             <div className="mb-4 flex flex-row items-center">
               <TextField
                 id={FormKeys.tokenName}

@@ -237,11 +237,11 @@ export const chains: Chain[] = [
 ];
 
 export const supportedChains: Chain[] = [
-  ethereumChain,
   arbitrumChain,
+  ethereumChain,
   optimismChain,
-  baseChain,
-  blastChain,
+  // baseChain,
+  // blastChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(
