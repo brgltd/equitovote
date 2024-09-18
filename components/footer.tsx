@@ -1,15 +1,28 @@
 export function Footer() {
   return (
-    // <footer className="border-t-red-500">
-    // <footer className="border-t-gray-400">
-    // <footer className="border border-t-gray-400">
-    <footer className="border border-t-gray-400 flex flex-row justify-between">
+    <footer
+      style={{
+        color: "rgb(108, 134, 173)",
+        borderTop: "1px solid rgba(156, 163, 175, 0.3)",
+      }}
+      className="flex flex-row justify-between text-sm my-12 pt-4"
+    >
       <div>© {new Date().getFullYear()} EquitoVote</div>
       <div>
-        <a href="https://github.com/brgltd/equitovote" target="_blank">
+        <a
+          href="https://github.com/brgltd/equitovote"
+          target="_blank"
+          className="underline mr-8"
+        >
           Source Code
         </a>
-        <a href="">Powered by Equito Network</a>
+        <a
+          href="https://www.equito.network"
+          target="_blank"
+          className="underline"
+        >
+          Powered by Equito Network
+        </a>
       </div>
     </footer>
   );
