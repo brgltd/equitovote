@@ -19,6 +19,7 @@ import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { Toast } from "@/components/toast";
+import { Footer } from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -65,6 +66,7 @@ export default function RootLayout({
                           <div className="mx-12" style={{ width: "1200px" }}>
                             <Navbar />
                             {children}
+                            <Footer />
                           </div>
                         </div>
                         <Toast />
