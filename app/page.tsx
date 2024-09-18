@@ -113,7 +113,8 @@ export default function HomePage() {
           const endDate = formatTimestamp(item.endTimestamp);
           // Rendering origin chain as the first one available.
           // Should not result in a performance hit since there can be
-          // only `PAGINATION_SIZE` items at a time and ~20 chains maximum for each.
+          // only `PAGINATION_SIZE` items at a time and ~20 chains
+          // maximum for each item.
           const rearrangedSupportedChains = rearrangeChains(
             supportedChains,
             item.originChainSelector,

@@ -6,10 +6,12 @@ export function Button({
   onClick,
   children,
   isDisabled = false,
+  styles = {},
 }: {
   onClick: <T>(...args: T[]) => void | Promise<void>;
   children: ReactNode;
   isDisabled?: boolean;
+  styles?: Record<string, string>;
 }) {
   return (
     <div className={`${isDisabled ? "cursor-not-allowed" : ""} w-max`}>
@@ -23,6 +25,7 @@ export function Button({
           "&:hover": {
             bgcolor: lightTheme.palette.primary.dark,
           },
+          ...styles,
         }}
       >
         {children}
