@@ -662,7 +662,7 @@ export default function VotePage({ params }: VoteProps) {
 
         <div>
           <div className="text-xl font-semibold mb-2">Vote Options</div>
-          <div className="flex flex-row items-start mt-4">
+          <div className="flex md:flex-row flex-col items-start mt-4 space-y-4 md:space-y-0">
             <TextField
               id="amountToVote"
               label="Amount"
@@ -688,7 +688,7 @@ export default function VotePage({ params }: VoteProps) {
             <Tooltip placement="top" title="Vote for YES">
               <button
                 onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
-                className="mx-4"
+                className="md:ml-4 ml-0 mr-4"
                 disabled={!isVotingEnabled}
               >
                 <div
