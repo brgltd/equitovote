@@ -3,10 +3,7 @@ pragma solidity ^0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-
-interface IToken {
-    function mintFromFaucet(address to) external;
-}
+import {IToken} from "./IToken.sol";
 
 contract Faucet is ReentrancyGuard, Ownable {
     uint256 private constant COOLDOWN = 1 hours;
