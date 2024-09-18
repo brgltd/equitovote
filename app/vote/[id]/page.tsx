@@ -515,19 +515,17 @@ export default function VotePage({ params }: VoteProps) {
 
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Proposal Info</div>
-            <div className="flex flex-row items-center">
-              <div>
-                <div className="w-48">
-                  <div className="mb-1">Status</div>
-                  <div className="flex flex-row items-center">
-                    <div
-                      className={cn(
-                        "mr-2 w-4 h-4 rounded-full",
-                        isProposalActive ? "bg-green-600" : "bg-stone-600",
-                      )}
-                    />{" "}
-                    {isProposalActive ? "Live" : "Completed"}
-                  </div>
+            <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
+              <div className="w-48">
+                <div className="mb-1">Status</div>
+                <div className="flex flex-row items-center">
+                  <div
+                    className={cn(
+                      "mr-2 w-4 h-4 rounded-full",
+                      isProposalActive ? "bg-green-600" : "bg-stone-600",
+                    )}
+                  />{" "}
+                  {isProposalActive ? "Live" : "Completed"}
                 </div>
               </div>
               <div className="w-60">
@@ -560,7 +558,7 @@ export default function VotePage({ params }: VoteProps) {
 
           <div className="mb-6">
             <div className="text-xl font-semibold mb-2">Token Info</div>
-            <div className="flex flex-row items-center">
+            <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
               <div className="w-48">
                 <div className="mb-1">Token Name</div>
                 <div>{activeProposal.tokenName}</div>
