@@ -141,6 +141,8 @@ export default function VotePage({ params }: VoteProps) {
     userAddress,
     destinationRouter,
     destinationChain,
+    setToastMessage,
+    setIsToastOpen,
   } = useEquitoVote();
 
   const sourceRouterAddress = sourceRouter?.data;
@@ -451,6 +453,13 @@ export default function VotePage({ params }: VoteProps) {
       setStatus(Status.IsCompleted);
     } catch (error) {
       setStatus(Status.IsRetry);
+      const isUserRejection = error
+        ?.toString()
+        ?.includes("User rejected the request");
+      if (!isUserRejection) {
+        setToastMessage("Error occurred while voting. Please try again.");
+        setIsToastOpen(true);
+      }
       console.error(error);
     }
   };
