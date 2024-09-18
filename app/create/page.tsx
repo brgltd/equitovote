@@ -327,16 +327,6 @@ export default function CreateProposalPage() {
       console.log("executionReceipt");
       console.log(executionReceipt);
 
-      const executionMessage = parseEventLogs({
-        abi: routerAbi,
-        logs: executionReceipt.logs,
-      }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : [],
-      )[0];
-
-      console.log("executionMessage");
-      console.log(executionMessage);
-
       setStatus(Status.IsCompleted);
     } catch (error) {
       setStatus(Status.IsRetry);

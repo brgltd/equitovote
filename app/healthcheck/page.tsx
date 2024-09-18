@@ -198,16 +198,6 @@ export default function Page() {
 
       console.log("executionReceipt");
       console.log(executionReceipt);
-
-      const executionMessage = parseEventLogs({
-        abi: routerAbi,
-        logs: executionReceipt.logs,
-      }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : [],
-      )[0];
-
-      console.log("executionMessage");
-      console.log(executionMessage);
     } catch (error) {
       console.error(error);
     }

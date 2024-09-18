@@ -203,16 +203,6 @@ export default function HomePage() {
       console.log("executionReceipt");
       console.log(executionReceipt);
 
-      const executionMessage = parseEventLogs({
-        abi: routerAbi,
-        logs: executionReceipt.logs,
-      }).flatMap(({ eventName, args }) =>
-        eventName === "MessageSendRequested" ? [args] : [],
-      )[0];
-
-      console.log("executionMessage");
-      console.log(executionMessage);
-
       setStatus(Status.IsStart);
     } catch (error) {
       setStatus(Status.IsRetry);
