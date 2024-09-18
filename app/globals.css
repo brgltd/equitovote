@@ -18,7 +18,7 @@ body {
     @apply hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300;
   }
 
-  .text-balance {
-    text-wrap: balance;
+  .proposal-link {
+    @apply border rounded-lg border-gray-400 hover:border-blue-500 transition-all flex md:flex-row md:justify-between flex-col p-4 mb-10;
   }
 }

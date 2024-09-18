@@ -113,7 +113,7 @@ export default function HomePage() {
           const endDate = formatTimestamp(item.endTimestamp);
           // Rendering origin chain as the first one available.
           // Should not result in a performance hit since there can be
-          // ~20 chains maximum.
+          // only `PAGINATION_SIZE` items at a time and ~20 chains maximum for each.
           const rearrangedSupportedChains = rearrangeChains(
             supportedChains,
             item.originChainSelector,
@@ -125,7 +125,7 @@ export default function HomePage() {
                 className="flex flex-row justify-center"
               >
                 <div
-                  className="border rounded-lg border-gray-400 hover:border-white shadow-md hover:shadow-blue-500/50 transition-all flex md:flex-row md:justify-between flex-col p-4 mb-10"
+                  className="proposal-link"
                   style={{ width: "100%", maxWidth: "1200px" }}
                 >
                   <div>
