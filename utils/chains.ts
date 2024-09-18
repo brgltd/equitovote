@@ -95,20 +95,20 @@ export const optimismChain = {
   equitoVoteContractV2: AddressesPerChain.OptimismSepolia.EquitoVoteV2,
 };
 
-export const blastChain = {
-  chainSelector: 1018,
-  name: "Blast Sepolia",
-  img: 28480,
-  definition: blastSepolia,
-  pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
-};
-
 export const baseChain = {
   chainSelector: 1007,
   name: "Base Sepolia",
   img: 9195,
   definition: baseSepolia,
   pingPongContract: "0xbC2ca9a5364DBd68d2c8Fb091E662Da952697B50" as Address,
+};
+
+export const blastChain = {
+  chainSelector: 1018,
+  name: "Blast Sepolia",
+  img: 28480,
+  definition: blastSepolia,
+  pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
 };
 
 export const lineaChain = {
@@ -234,8 +234,6 @@ export const supportedChains: Chain[] = [
   optimismChain,
   baseChain,
   blastChain,
-  lineaChain,
-  scrollChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(

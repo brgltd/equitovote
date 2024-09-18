@@ -125,19 +125,19 @@ export default function HomePage() {
                 className="flex flex-row justify-center"
               >
                 <div
-                  className="proposal-link"
+                  className="proposal-link-item"
                   style={{ width: "100%", maxWidth: "1200px" }}
                 >
                   <div>
                     <div
-                      className="text-xl font-semibold mb-2"
-                      style={{ width: "100%", maxWidth: "800px" }}
+                      className="text-xl font-semibold mb-2 line-clamp-1"
+                      style={{ width: "100%", maxWidth: "700px" }}
                     >
                       {item.title}
                     </div>
                     <div
-                      className="mb-2"
-                      style={{ width: "100%", maxWidth: "800px" }}
+                      className="mb-2 line-clamp-1"
+                      style={{ width: "100%", maxWidth: "700px" }}
                     >
                       {item.description}
                     </div>
@@ -157,7 +157,7 @@ export default function HomePage() {
                   </div>
                   <div className="flex flex-col justify-between">
                     <div>
-                      <div className="flex flex-row items-center md:justify-end mb-4 md:mt-0 mt-4">
+                      <div className="proposal-link-item__chain">
                         Proposal Created on
                         <img
                           src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}

@@ -17,8 +17,42 @@ body {
   .hover-glow {
     @apply hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300;
   }
+}
 
-  .proposal-link {
-    @apply border rounded-lg border-gray-400 hover:border-blue-500 transition-all flex md:flex-row md:justify-between flex-col p-4 mb-10;
+.proposal-link-item {
+  border: 1px solid #cbd5e0; /* gray-400 */
+  border-radius: 0.5rem; /* rounded-lg */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1rem; /* p-4 */
+  margin-bottom: 2.5rem; /* mb-10 */
+  transition: all 0.2s ease-in-out;
+}
+
+.proposal-link-item:hover {
+  border-color: #3b82f6; /* blue-500 */
+}
+
+@media (min-width: 1150px) {
+  .proposal-link-item {
+    flex-direction: row; /* md:flex-row */
+    justify-content: space-between; /* md:justify-between */
+  }
+}
+
+.proposal-link-item__chain {
+  display: flex;
+  flex-direction: row; /* flex-row */
+  align-items: center; /* items-center */
+  justify-content: flex-start; /* Default justify */
+  margin-bottom: 1rem; /* mb-4 */
+  margin-top: 1rem; /* mt-4 */
+}
+
+@media (min-width: 1150px) {
+  .proposal-link-item__chain {
+    justify-content: flex-end; /* md:justify-end */
+    margin-top: 0; /* md:mt-0 */
   }
 }
