@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useSwitchChain, useWriteContract } from "wagmi";
 import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
@@ -42,6 +42,7 @@ export default function SetTokenDataPage() {
   const [formData, setFormData] = useState(defaultFormData);
   const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
   const [isAddingToken, setIsAddingToken] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { writeContractAsync } = useWriteContract();
 
@@ -73,6 +74,7 @@ export default function SetTokenDataPage() {
       return;
     }
     setIsAddingToken(true);
+    setIsSuccess(false);
     try {
       await switchChainAsync({ chainId: destinationChain.definition.id });
       const hash = await writeContractAsync({
@@ -98,6 +100,7 @@ export default function SetTokenDataPage() {
         hash,
         chainId: destinationChain.definition.id,
       });
+      setIsSuccess(true);
     } catch (error) {
       console.error(error);
     }
@@ -214,12 +217,15 @@ export default function SetTokenDataPage() {
       <Button isDisabled={isAddingToken} onClick={onClickSetTokenData}>
         Add Token
       </Button>
+
       {isAddingToken && (
         <div className="flex flex-row items-center mt-3">
           <CircularProgress size={20} />
           <div className="ml-4">Adding token to contract registry</div>
         </div>
       )}
+
+      {isSuccess && <div className="mt-3">Token added successfully!</div>}
     </div>
   );
 }

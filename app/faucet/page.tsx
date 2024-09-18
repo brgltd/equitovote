@@ -19,6 +19,7 @@ const buttonStyles = {
 
 export default function FaucetPage() {
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { sourceChain, setToastMessage, setIsToastOpen } = useEquitoVote();
 
@@ -26,6 +27,7 @@ export default function FaucetPage() {
 
   const onClickRequest = async (tokenAddress: Address | undefined) => {
     setIsRequestInProgress(true);
+    setIsSuccess(false);
     try {
       const hash = await writeContractAsync({
         address: sourceChain?.faucet as Address,
@@ -38,6 +40,7 @@ export default function FaucetPage() {
         hash,
         chainId: sourceChain?.definition?.id,
       });
+      setIsSuccess(true);
     } catch (error) {
       const isUserRejection = error
         ?.toString()
@@ -79,12 +82,15 @@ export default function FaucetPage() {
           Request 1000 ChainLight Tokens
         </Button>
       </div>
+
       {isRequestInProgress && (
         <div className="flex flex-row mt-8">
           <CircularProgress size={20} />
           <div className="ml-4">Requesting tokens</div>
         </div>
       )}
+
+      {isSuccess && <div className="mt-8">Tokens added to your account!</div>}
     </div>
   );
 }
