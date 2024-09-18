@@ -513,7 +513,7 @@ export default function VotePage({ params }: VoteProps) {
           <div className="mb-8">{activeProposal.description}</div>
 
           <div className="mb-6">
-            <div className="text-xl font-semibold mb-2">Proposal Info</div>
+            <div className="text-xl font-semibold mb-2">Proposal Details</div>
             <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
               <div className="w-48">
                 <div className="mb-1">Status</div>
@@ -556,7 +556,7 @@ export default function VotePage({ params }: VoteProps) {
           </div>
 
           <div className="mb-6">
-            <div className="text-xl font-semibold mb-2">Token Info</div>
+            <div className="text-xl font-semibold mb-2">Token Information</div>
             <div className="flex lg:flex-row flex-col lg:items-center lg:space-y-0 space-y-4">
               <div className="w-48">
                 <div className="mb-1">Token Name</div>
@@ -633,7 +633,7 @@ export default function VotePage({ params }: VoteProps) {
 
         {balanceMinusDelegation > 0 && (
           <div className="mb-6 w-max">
-            <div className="text-xl font-semibold mb-2">Delegation Info</div>
+            <div className="text-xl font-semibold mb-2">Delegation Data</div>
             <Tooltip
               placement="right"
               title="You must delegate your balance to adquire voting power"
