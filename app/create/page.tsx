@@ -93,6 +93,14 @@ function buildCreateProposalArgs(
   };
 }
 
+function buildSlicedTokenNamesArgs(tokenNamesLength: bigint) {
+  const max = 10;
+  const tokenNamesLengthNumber = Number(tokenNamesLength);
+  return tokenNamesLengthNumber <= max
+    ? [0, tokenNamesLengthNumber]
+    : [tokenNamesLengthNumber - max, tokenNamesLengthNumber];
+}
+
 function SelectEmpty() {
   return (
     <MenuItem key="token-names-empty" value="token-names-empty">
@@ -173,7 +181,7 @@ export default function CreateProposalPage() {
       address: destinationChain.equitoVoteContractV2,
       abi: equitoVoteAbi,
       functionName: "getTokenNamesSlice",
-      args: [0, tokenNamesLength],
+      args: buildSlicedTokenNamesArgs(tokenNamesLength as bigint),
       query: { enabled: isValidData(tokenNamesLength) },
       chainId: destinationChain.definition.id,
     });
