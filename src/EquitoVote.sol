@@ -81,37 +81,65 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- events ---
 
+    /// @notice Emitted when a proposal creation message is sent to another chain.
+    /// @param proposalId ID of the proposal being created.
+    /// @param destinationChainSelector The destination chain where the message is being sent.
+    /// @param messageHash Hash of the message sent for proposal creation.
     event CreateProposalMessageSent(
         bytes32 indexed proposalId,
         uint256 indexed destinationChainSelector,
         bytes32 messageHash
     );
 
+    /// @notice Emitted when a vote message on a proposal is sent to another chain.
+    /// @param destinationChainSelector The destination chain where the vote message is being sent.
+    /// @param messageHash Hash of the message sent for voting.
     event VoteOnProposalMessageSent(
         uint256 indexed destinationChainSelector,
         bytes32 messageHash
     );
 
+    /// @notice Emitted when a proposal creation message is received from another chain.
+    /// @param proposalId ID of the received proposal.
     event CreateProposalMessageReceived(bytes32 proposalId);
 
+    /// @notice Emitted when a vote message on a proposal is received from another chain.
+    /// @param proposalId ID of the proposal being voted on.
+    /// @param numVotes Number of votes received.
+    /// @param voteOption The voting option selected.
     event VoteOnProposalMessageReceived(
         bytes32 indexed proposalId,
         uint256 numVotes,
         VoteOption voteOption
     );
 
+    /// @notice Emitted when the fee for creating a proposal is updated.
+    /// @param newCreateProposaFee The updated fee for creating a proposal.
     event CreateProposalFeeUpdated(uint256 newCreateProposaFee);
 
+    /// @notice Emitted when the fee for voting on a proposal is updated.
+    /// @param newVoteOnProposalFee The updated fee for voting on a proposal.
     event VoteOnProposalFeeUpdated(uint256 newVoteOnProposalFee);
 
+    /// @notice Emitted when token data is updated across multiple chains.
+    /// @param tokenName Name of the token being updated.
+    /// @param chainSelectors The chain selectors for the updated token data.
+    /// @param tokenAddresses The addresses of the tokens on respective chains.
     event TokenDataUpdated(
         string indexed tokenName,
         uint256[] chainSelectors,
         address[] tokenAddresses
     );
 
+    /// @notice Emitted when token data is deleted across multiple chains.
+    /// @param tokenName Name of the token whose data is being deleted.
+    /// @param chainSelectors The chain selectors for the deleted token data.
     event TokenDataDeleted(string tokenName, uint256[] chainSelectors);
 
+    /// @notice Emitted when token data is updated for a specific chain.
+    /// @param tokenName Name of the token being updated.
+    /// @param chainSelector The chain selector for the updated token data.
+    /// @param tokenAddress The address of the token on the specified chain.
     event TokenDataUpdated(
         string tokenName,
         uint256 chainSelector,
