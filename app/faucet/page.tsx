@@ -61,14 +61,14 @@ export default function FaucetPage() {
           Request 1000 VoteSphere Tokens
         </Button>
         <Button
-          onClick={() => onClickRequest(sourceChain?.voteSphere)} // TODO: update this
+          onClick={() => onClickRequest(sourceChain?.metaQuorum)}
           isDisabled={isRequestInProgress}
           styles={buttonStyles}
         >
           Request 1000 MetaQuorum Tokens
         </Button>
         <Button
-          onClick={() => onClickRequest(sourceChain?.voteSphere)} // TODO: update this
+          onClick={() => onClickRequest(sourceChain?.chainLight)}
           isDisabled={isRequestInProgress}
           styles={buttonStyles}
         >

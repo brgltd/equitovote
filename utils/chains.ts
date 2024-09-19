@@ -71,8 +71,14 @@ export const ethereumChain = {
   img: 1027,
   definition: sepolia,
   pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
+
   equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteV1,
   equitoVoteContractV2: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
+
+  faucet: AddressesPerChain.EthereumSepolia.Faucet,
+  voteSphere: AddressesPerChain.EthereumSepolia.VoteSphereToken,
+  metaQuorum: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
+  chainLight: AddressesPerChain.EthereumSepolia.ChainLightToken,
 };
 
 export const arbitrumChain = {
@@ -87,6 +93,8 @@ export const arbitrumChain = {
 
   faucet: AddressesPerChain.ArbitrumSepolia.Faucet,
   voteSphere: AddressesPerChain.ArbitrumSepolia.VoteSphereToken,
+  metaQuorum: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
+  chainLight: AddressesPerChain.ArbitrumSepolia.ChainLightToken,
 };
 
 export const optimismChain = {
@@ -101,6 +109,8 @@ export const optimismChain = {
 
   faucet: AddressesPerChain.OptimismSepolia.Faucet,
   voteSphere: AddressesPerChain.OptimismSepolia.VoteSphereToken,
+  metaQuorum: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
+  chainLight: AddressesPerChain.OptimismSepolia.ChainLightToken,
 };
 
 export const baseChain = {
@@ -114,6 +124,8 @@ export const baseChain = {
 
   faucet: AddressesPerChain.BaseSepolia.Faucet,
   voteSphere: AddressesPerChain.BaseSepolia.VoteSphereToken,
+  metaQuorum: AddressesPerChain.BaseSepolia.MetaQuorumToken,
+  chainLight: AddressesPerChain.BaseSepolia.ChainLightToken,
 };
 
 export const blastChain = {
@@ -127,6 +139,8 @@ export const blastChain = {
 
   faucet: AddressesPerChain.BlastSepolia.Faucet,
   voteSphere: AddressesPerChain.BlastSepolia.VoteSphereToken,
+  metaQuorum: AddressesPerChain.BlastSepolia.MetaQuorumToken,
+  chainLight: AddressesPerChain.BlastSepolia.ChainLightToken,
 };
 
 export const lineaChain = {
@@ -282,6 +296,8 @@ export type Chain = {
 
   faucet?: Address;
   voteSphere?: Address;
+  metaQuorum?: Address;
+  chainLight?: Address;
 };
 
 export type SupportedChainsMap = Record<number, Chain>;
