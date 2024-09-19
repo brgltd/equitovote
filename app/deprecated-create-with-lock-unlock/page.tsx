@@ -287,6 +287,7 @@ export default function HomePage() {
         proposal creation)
       </div>
 
+      {/* @ts-ignore */}
       {statusRenderer[status]}
     </div>
   );

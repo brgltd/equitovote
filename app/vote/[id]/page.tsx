@@ -708,57 +708,63 @@ export default function VotePage({ params }: VoteProps) {
               }}
             />
             <Tooltip placement="top" title="Vote for YES">
-              <button
-                onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
-                className="md:ml-4 ml-0 mr-4"
-                disabled={!isVotingEnabled}
-              >
-                <div
-                  className={cn(
-                    "flex flex-row items-center justify-center w-14 h-14 bg-green-500 rounded-lg",
-                    hasVotingPower && isVotingEnabled
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed",
-                  )}
+              <div>
+                <button
+                  onClick={() => onClickVoteOnProposal(VoteOption.Yes)}
+                  className="md:ml-4 ml-0 mr-4"
+                  disabled={!isVotingEnabled}
                 >
-                  <ThumbUp fontSize="large" />
-                </div>
-              </button>
+                  <div
+                    className={cn(
+                      "flex flex-row items-center justify-center w-14 h-14 bg-green-500 rounded-lg",
+                      hasVotingPower && isVotingEnabled
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed",
+                    )}
+                  >
+                    <ThumbUp fontSize="large" />
+                  </div>
+                </button>
+              </div>
             </Tooltip>
             <Tooltip placement="top" title="Vote for NO">
-              <button
-                onClick={() => onClickVoteOnProposal(VoteOption.No)}
-                className="mr-4"
-                disabled={!isVotingEnabled}
-              >
-                <div
-                  className={cn(
-                    "flex flex-row items-center justify-center w-14 h-14 bg-red-500 rounded-lg",
-                    hasVotingPower && isVotingEnabled
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed",
-                  )}
+              <div>
+                <button
+                  onClick={() => onClickVoteOnProposal(VoteOption.No)}
+                  className="mr-4"
+                  disabled={!isVotingEnabled}
                 >
-                  <ThumbDown fontSize="large" />
-                </div>
-              </button>
+                  <div
+                    className={cn(
+                      "flex flex-row items-center justify-center w-14 h-14 bg-red-500 rounded-lg",
+                      hasVotingPower && isVotingEnabled
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed",
+                    )}
+                  >
+                    <ThumbDown fontSize="large" />
+                  </div>
+                </button>
+              </div>
             </Tooltip>
             <Tooltip placement="top" title="Vote for ABSTAIN">
-              <button
-                onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
-                disabled={!isVotingEnabled}
-              >
-                <div
-                  className={cn(
-                    "flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 rounded-lg",
-                    hasVotingPower && isVotingEnabled
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed",
-                  )}
+              <div>
+                <button
+                  onClick={() => onClickVoteOnProposal(VoteOption.Abstain)}
+                  disabled={!isVotingEnabled}
                 >
-                  <AcUnitIcon fontSize="large" />
-                </div>
-              </button>
+                  <div
+                    className={cn(
+                      "flex flex-row items-center justify-center w-14 h-14 bg-yellow-400 rounded-lg",
+                      hasVotingPower && isVotingEnabled
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed",
+                    )}
+                  >
+                    <AcUnitIcon fontSize="large" />
+                  </div>
+                </button>
+              </div>
             </Tooltip>
           </div>
         </div>

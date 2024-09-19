@@ -391,6 +391,7 @@ export default function Vote({ params }: VoteProps) {
           >
             Abstain
           </button>
+          {/* @ts-ignore */}
           <div>{statusRenderer[status]}</div>
           <div>
             {amountLockedTokens ? (

@@ -127,7 +127,9 @@ export default function SetTokenDataPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-8">Add new DAO Token</h1>
+      <h1 className="text-xl font-bold mb-8">
+        We support any ERC20Votes compatible token
+      </h1>
       <div className="mb-8">
         <TextField
           id="token-name"

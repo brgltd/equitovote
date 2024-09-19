@@ -25,16 +25,6 @@ const inter = Inter({ subsets: ["latin"] });
 
 const queryClient = new QueryClient();
 
-// export const metadata: Metadata = {
-//   title: "Equito Vote",
-//   description: "Multichain DAO voting protocol",
-// };
-
-// export const metadata: Metadata = {
-//   title: "title",
-//   description: "descript",
-// };
-
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -58,12 +48,8 @@ export function AppLayout({
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider theme={rainbowDarkTheme()}>
-              {/* EquitoProvider and PingPongProvider used for testing and healthcheck */}
-              {/* route /pingpong = test contracts deployed from equito team */}
-              {/* route /healthcheck = test a healthcheck contract that makes a crosschain call */}
               <EquitoProvider>
                 <PingPongProvider>
-                  {/* EquitoVoteProvider holds global data, e.g. connected address, user source chain etc */}
                   <EquitoVoteProvider>
                     <AppRouterCacheProvider>
                       <ThemeProvider theme={darkTheme}>
