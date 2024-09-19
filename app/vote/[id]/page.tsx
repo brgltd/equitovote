@@ -295,36 +295,11 @@ export default function VotePage({ params }: VoteProps) {
       ? sourceFee + voteOnProposalFee
       : BigInt(0);
 
-  const isProposalActive = verifyIsProposalActive(activeProposal);
-
-  const hasVotingPower =
-    !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
-
-  const isVotingEnabled =
-    isProposalActive &&
-    (status === Status.IsStart ||
-      status === Status.IsCompleted ||
-      status === Status.IsRetry);
-
-  const isPendingTokenData =
-    isPendingAmountDelegatedTokens || isPendingUserTokenBalance;
-
-  const originChainSelector = activeProposal?.originChainSelector;
-
   const balanceMinusDelegation =
     isValidData(userTokenBalance) && isValidData(amountDelegatedTokens)
       ? // @ts-ignore - checks already made with `isValidData`
         userTokenBalance - parseUnits(activeAmountDelegatedTokens, decimals)
       : 0;
-
-  const formattedBalanceMinusDelegation = balanceMinusDelegation
-    ? formatBalance(balanceMinusDelegation, decimals)
-    : 0;
-
-  const rearrangedSupportedChains = useMemo(
-    () => rearrangeChains(supportedChains, originChainSelector as number, true),
-    [originChainSelector],
-  );
 
   const formattedSourceChainFee = !!sourceFee
     ? `${Number(formatUnits(sourceFee, 18)).toFixed(8)} ${
@@ -351,6 +326,22 @@ export default function VotePage({ params }: VoteProps) {
         }`
       : "Unavailable";
 
+  const isProposalActive = verifyIsProposalActive(activeProposal);
+
+  const hasVotingPower =
+    !!activeVotingPower && activeVotingPower !== ZERO_TOKEN_TEXT;
+
+  const isVotingEnabled =
+    isProposalActive &&
+    (status === Status.IsStart ||
+      status === Status.IsCompleted ||
+      status === Status.IsRetry);
+
+  const isPendingTokenData =
+    isPendingAmountDelegatedTokens || isPendingUserTokenBalance;
+
+  const originChainSelector = activeProposal?.originChainSelector;
+
   const shouldRenderDecision = !isProposalActive;
 
   const shouldRenderLackVotingPower =
@@ -374,6 +365,11 @@ export default function VotePage({ params }: VoteProps) {
     !hasUserVotedAllHisTokens;
 
   const shouldRenderDelegation = balanceMinusDelegation > 0;
+
+  const rearrangedSupportedChains = useMemo(
+    () => rearrangeChains(supportedChains, originChainSelector as number, true),
+    [originChainSelector],
+  );
 
   const decision = useMemo(
     () => computeDecision(formattedProposal),
@@ -868,7 +864,7 @@ export default function VotePage({ params }: VoteProps) {
           <div className="mt-4 italic">
             You've voted with {activeAmountUserVotes} {activeProposal.tokenName}{" "}
             token
-            {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal!
+            {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal.
           </div>
         )}
       </div>

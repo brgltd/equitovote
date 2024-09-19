@@ -240,8 +240,8 @@ export const supportedChains: Chain[] = [
   arbitrumChain,
   ethereumChain,
   optimismChain,
-  // baseChain,
-  // blastChain,
+  baseChain,
+  blastChain,
 ];
 
 export const supportedChainsMap = supportedChains.reduce(
