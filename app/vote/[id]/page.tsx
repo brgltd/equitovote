@@ -333,6 +333,9 @@ export default function VotePage({ params }: VoteProps) {
 
   const isVotingEnabled =
     isProposalActive &&
+    !isPendingSourceFee &&
+    !isPendingDestinationFee &&
+    !isPendingVoteOnProposalFee &&
     (status === Status.IsStart ||
       status === Status.IsCompleted ||
       status === Status.IsRetry);
