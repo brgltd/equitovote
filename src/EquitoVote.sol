@@ -148,22 +148,42 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- errors ---
 
+    /// @notice Error emitted when attempting to interact with a proposal that is not yet finished.
+    /// @param proposalId The ID of the proposal.
+    /// @param endTimestamp The timestamp when the proposal will finish.
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
 
+    /// @notice Error emitted when interacting with an invalid proposal.
+    /// @param proposalId The ID of the invalid proposal.
     error InvalidProposal(bytes32 proposalId);
 
+    /// @notice Error emitted when calling a contract or calling an EOA with
+    ///         `.call` fails.
+    /// @param destination The address where the call failed.
     error CallFailed(address destination);
 
+    /// @notice Error emitted when an invalid token is provided for an operation.
+    /// @param tokenName The name of the invalid token.
+    /// @param sourceChainSelector The chain selector where the invalid token is located.
+    /// @param tokenAddress The address of the invalid token.
     error InvalidToken(
         string tokenName,
         uint256 sourceChainSelector,
         address tokenAddress
     );
 
+    /// @notice Error emitted when two arrays provided in an operation have mismatched lengths.
+    /// @param firstArray Length of the first array.
+    /// @param secondArray Length of the second array.
     error LengthMismatch(uint256 firstArray, uint256 secondArray);
 
+    /// @notice Error emitted when trying to set token data that is already set.
+    /// @param tokenName The name of the token that is already set.
     error TokenAlreadySet(string tokenName);
 
+    /// @notice Error emitted when the user does not have enough delegated tokens to vote.
+    /// @param numberUserVotes The number of votes the user has.
+    /// @param numberUserDelegatedTokens The number of tokens delegated to the user.
     error NotEnoughDelegatedTokens(
         uint256 numberUserVotes,
         uint256 numberUserDelegatedTokens
