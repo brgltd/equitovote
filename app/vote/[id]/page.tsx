@@ -498,9 +498,9 @@ export default function VotePage({ params }: VoteProps) {
         setActiveAmountUserVotes(newActiveAmountUserVotes.toString());
       }
 
-      await switchChainAsync({ chainId: initialChain?.definition?.id });
-
       setStatus(Status.IsCompleted);
+
+      await switchChainAsync({ chainId: initialChain?.definition?.id });
     } catch (error) {
       handleError(error);
       setStatus(Status.IsRetry);

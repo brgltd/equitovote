@@ -310,9 +310,9 @@ export default function CreateProposalPage() {
         destinationFee,
       );
 
-      await switchChainAsync({ chainId: initialChain?.definition?.id });
-
       setStatus(Status.IsCompleted);
+
+      await switchChainAsync({ chainId: initialChain?.definition?.id });
     } catch (error) {
       handleError(error);
       setStatus(Status.IsRetry);
