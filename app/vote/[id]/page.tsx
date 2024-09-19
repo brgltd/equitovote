@@ -415,6 +415,7 @@ export default function VotePage({ params }: VoteProps) {
         hash,
         chainId: sourceChain?.definition.id,
       });
+      setInputErrorMessage("");
       setAmountToVote("");
       setActiveAmountDelegatedTokens(formatBalance(userTokenBalance, decimals));
     } catch (error) {
@@ -501,6 +502,7 @@ export default function VotePage({ params }: VoteProps) {
 
       setStatus(Status.IsCompleted);
 
+      setInputErrorMessage("");
       setAmountToVote("");
 
       await switchChainAsync({ chainId: initialChain?.definition?.id });
