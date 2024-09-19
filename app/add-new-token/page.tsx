@@ -299,14 +299,12 @@ export default function SetTokenDataPage() {
         <div className="mt-3">
           Token added successfully.{" "}
           {txLink && (
-            <a
-              href={txLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-link"
-            >
-              Open Transaction.
-            </a>
+            <>
+              <a href={txLink} target="_blank" className="inline-link">
+                Open Transaction.
+              </a>
+              .
+            </>
           )}
         </div>
       )}

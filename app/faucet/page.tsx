@@ -90,14 +90,12 @@ export default function FaucetPage() {
         <div className="mt-8">
           Tokens added to your account.{" "}
           {txLink && (
-            <a
-              href={txLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-link"
-            >
-              Open Transaction.
-            </a>
+            <>
+              <a href={txLink} target="_blank" className="inline-link">
+                Open Transaction
+              </a>
+              .
+            </>
           )}
         </div>
       )}

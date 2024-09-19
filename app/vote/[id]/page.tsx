@@ -15,7 +15,7 @@ import {
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
 import { config } from "@/utils/wagmi";
-import { getBlock, switchChain, waitForTransactionReceipt } from "@wagmi/core";
+import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
