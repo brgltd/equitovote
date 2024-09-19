@@ -17,6 +17,10 @@ body {
   .hover-glow {
     @apply hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition-all duration-300;
   }
+
+  .inline-link {
+    @apply underline hover:text-blue-300 transition-colors;
+  }
 }
 
 .proposal-link-item {

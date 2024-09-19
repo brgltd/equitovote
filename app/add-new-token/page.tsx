@@ -15,6 +15,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, isAddress, parseUnits, zeroAddress } from "viem";
 import { CircularProgress, TextField } from "@mui/material";
 import { Button } from "@/components/button";
+import { buildTxLink } from "@/utils/helpers";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
@@ -46,6 +47,7 @@ export default function SetTokenDataPage() {
   const [formErrors, setFormErrors] = useState<Set<FormKeys>>(new Set());
   const [isAddingToken, setIsAddingToken] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [txLink, setTxLink] = useState("");
 
   const { writeContractAsync } = useWriteContract();
 
@@ -85,7 +87,6 @@ export default function SetTokenDataPage() {
       return;
     }
     setIsAddingToken(true);
-    setIsSuccess(false);
     try {
       await switchChainAsync({ chainId: destinationChain.definition.id });
       const hash = await writeContractAsync({
@@ -116,8 +117,10 @@ export default function SetTokenDataPage() {
         chainId: destinationChain.definition.id,
       });
       setIsSuccess(true);
+      setTxLink(buildTxLink(destinationChain, hash));
     } catch (error) {
       handleError(error);
+      setIsSuccess(false);
     }
     setIsAddingToken(false);
   };
@@ -292,7 +295,21 @@ export default function SetTokenDataPage() {
         </div>
       )}
 
-      {isSuccess && <div className="mt-3">Token added successfully!</div>}
+      {isSuccess && (
+        <div className="mt-3">
+          Token added successfully.{" "}
+          {txLink && (
+            <a
+              href={txLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              Open Transaction.
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }

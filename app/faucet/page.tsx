@@ -8,6 +8,7 @@ import { Address } from "viem";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
 import { CircularProgress } from "@mui/material";
+import { buildTxLink } from "@/utils/helpers";
 import faucet from "@/out/Faucet.sol/Faucet.json";
 
 const faucetAbi = faucet.abi;
@@ -20,6 +21,7 @@ const buttonStyles = {
 export default function FaucetPage() {
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [txLink, setTxLink] = useState("");
 
   const { sourceChain, handleError } = useEquitoVote();
 
@@ -41,6 +43,7 @@ export default function FaucetPage() {
         chainId: sourceChain?.definition?.id,
       });
       setIsSuccess(true);
+      setTxLink(buildTxLink(sourceChain, hash));
     } catch (error) {
       handleError(error);
     }
@@ -83,7 +86,21 @@ export default function FaucetPage() {
         </div>
       )}
 
-      {isSuccess && <div className="mt-8">Tokens added to your account!</div>}
+      {isSuccess && (
+        <div className="mt-8">
+          Tokens added to your account.{" "}
+          {txLink && (
+            <a
+              href={txLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-link"
+            >
+              Open Transaction.
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }

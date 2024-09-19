@@ -33,6 +33,14 @@ export const placeholderProposalV2: FormattedProposal = {
   originChainSelector: 0,
 };
 
+export function isValidData<T>(data: T) {
+  return !!data || data === 0 || data === BigInt(0);
+}
+
+export function isArrayNotEmpty<T>(data: T[]) {
+  return Array.isArray(data) && !!data.length;
+}
+
 export function formatProposalItem(data: ProposalDataItem) {
   return typeof data === "bigint" ? Number(data) : data;
 }
@@ -120,10 +128,7 @@ export function rearrangeChains(
   return [target, ...filteredChains];
 }
 
-export function isValidData<T>(data: T) {
-  return !!data || data === 0 || data === BigInt(0);
-}
-
-export function isArrayNotEmpty<T>(data: T[]) {
-  return Array.isArray(data) && !!data.length;
+export function buildTxLink(chain: Chain, hash: string) {
+  const blockExplorerUrl = chain?.definition?.blockExplorers?.default?.url;
+  return blockExplorerUrl ? `${blockExplorerUrl}/tx/${hash}` : "";
 }
