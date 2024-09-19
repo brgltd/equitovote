@@ -9,20 +9,25 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+/// @title EquitoVote
+/// @notice Multichain DAO voting developed on Equito Network.
 contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- types ----
 
+    /// @notice Options for voting.
     enum VoteOption {
         Yes,
         No,
         Abstain
     }
 
+    /// @notice Cross-chain operation type.
     enum OperationType {
         CreateProposal,
         VoteOnProposal
     }
 
+    /// @notice Main data structure to hold proposa data.
     struct Proposal {
         // When proposal was created.
         uint256 startTimestamp;
@@ -42,6 +47,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         bytes32 id;
         // Name of the DAO token being used for this proposal.
         string tokenName;
+        // Block number when the proposal was created.
         // ERC20Votes uses block.number by default for snapshots.
         uint256 startBlockNumber;
         // Chain where the proposal was created.
@@ -50,24 +56,27 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
-    // Protocol fee for creating proposals, very small value to simulate on
-    // the EquitoBuilderProgram.
+    /// @notice Protocol fee for creating proposals, small value to simulate on Equito Builder Program.
     uint256 public createProposalFee = 0.000001e18;
 
-    // Protocol fee for voting on proposals, very small value to simulate on
-    // the EquitoBuilderProgram.
+    /// @notice Protocol fee for voting on proposals, small value to simulate on Equito Builder Program.
     uint256 public voteOnProposalFee = 0.0000001e18;
 
+    /// @notice List of proposal ids.
     bytes32[] public proposalIds;
 
+    /// @notice Proposal mapped by id.
     mapping(bytes32 id => Proposal) public proposals;
 
+    /// @notice Amount of user votes for each proposal.
     mapping(address user => mapping(bytes32 proposalId => uint256 votes))
         public userVotes;
 
+    /// @notice Token data used as a security mechanism.
     mapping(string tokenName => mapping(uint256 chainSelector => address tokenAddress))
         public tokenData;
 
+    /// @notice List of all token names.
     string[] public tokenNames;
 
     // --- events ---
