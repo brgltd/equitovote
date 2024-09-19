@@ -10,7 +10,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title EquitoVote
-/// @notice Multichain DAO voting developed on Equito Network.
+/// @notice Multichain DAO voting developed on the Equito Network.
 contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- types ----
 
@@ -56,10 +56,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- state variables ---
 
-    /// @notice Protocol fee for creating proposals, small value to simulate on Equito Builder Program.
+    /// @notice Protocol fee for creating proposals,
+    ///         small value to simulate on Equito Builder Program.
     uint256 public createProposalFee = 0.000001e18;
 
-    /// @notice Protocol fee for voting on proposals, small value to simulate on Equito Builder Program.
+    /// @notice Protocol fee for voting on proposals,
+    ///         small value to simulate on Equito Builder Program.
     uint256 public voteOnProposalFee = 0.0000001e18;
 
     /// @notice List of proposal ids.
@@ -191,6 +193,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- init function ---
 
+    /// @notice Contract constructor.
+    /// @param _router The address of the Equito router used for cross-chain messaging.
     constructor(address _router) EquitoApp(_router) {}
 
     // --- receive function ---
@@ -200,6 +204,13 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- external mutative user functions ---
 
+    /// @notice Create a cross chain proposal.
+    /// @param destinationChainSelector The chain selector where the proposal is being sent.
+    /// @param originChainSelector The chain selector where the proposal originates.
+    /// @param endTimestamp The timestamp when the proposal will end.
+    /// @param title The title of the proposal.
+    /// @param description The description of the proposal.
+    /// @param tokenName The name of the token used for voting.
     /// @dev Naming in the contracts and FE:
     ///      `sourceChain` = the chain the user is currently connected.
     ///      `originChain` = the chain a proposal was created, can be different from `sourceChain` at FE runtime.
@@ -248,6 +259,12 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
     }
 
+    /// @notice Votes on an existing proposal.
+    /// @param destinationChainSelector The chain selector where the vote is being sent.
+    /// @param proposalId The ID of the proposal being voted on.
+    /// @param numVotes The number of votes to cast.
+    /// @param voteOption The vote option (Yes, No, Abstain).
+    /// @param tokenAddress The address of the token used for voting.
     /// @dev `tokenAddress` will be validated in `_receiveMessageFromPeers._voteOnProposal` and
     ///      votes will only be counted if it's valid.
     function voteOnProposal(
@@ -297,6 +314,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     }
 
     /// @notice Set token data to be used in proposals.
+    /// @param tokenName The name of the token.
+    /// @param chainSelectors An array of chain selectors for the token.
+    /// @param tokenAddresses An array of addresses for the token.
     /// @dev Will be queried during voting to ensure the provided token matches
     ///		 the proposal token across different chains.
     function setTokenData(
@@ -327,6 +347,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- external mutative admin functions ---
 
+    /// @notice Sets the creation fee for a proposal.
+    /// @param newCreateProposalFee The new creation fee value, in wei.
     function setCreateProposalFee(
         uint256 newCreateProposalFee
     ) external onlyOwner {
@@ -334,6 +356,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit CreateProposalFeeUpdated(newCreateProposalFee);
     }
 
+    /// @notice Sets the fee for voting on a proposal.
+    /// @param newVoteOnProposalFee The new vote-on-proposal fee value, in wei.
     function setVoteOnProposalFee(
         uint256 newVoteOnProposalFee
     ) external onlyOwner {
@@ -341,6 +365,10 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit VoteOnProposalFeeUpdated(newVoteOnProposalFee);
     }
 
+    /// @notice Updates the token data for a given token.
+    /// @param tokenName The name of the token to update.
+    /// @param chainSelector The chain selector for the token data.
+    /// @param tokenAddress The address associated with the token.
     function updateTokenData(
         string calldata tokenName,
         uint256 chainSelector,
@@ -350,6 +378,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit TokenDataUpdated(tokenName, chainSelector, tokenAddress);
     }
 
+    /// @notice Deletes the token data for a given token.
+    /// @param tokenName The name of the token to delete.
+    /// @param chainSelectors An array of chain selectors associated with the token data.
     function deleteTokenData(
         string calldata tokenName,
         uint256[] memory chainSelectors
@@ -372,6 +403,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         emit TokenDataDeleted(tokenName, chainSelectors);
     }
 
+    /// @notice Deletes a proposal by its ID.
+    /// @param proposalId The ID of the proposal to delete.
     /// @dev If there are too many proposals, this function can run out of gas.
     ///      In that case, call `deleteProposalByIndexOptimized` which will
     ///      run more efficiently but it will not maintain the array order.
@@ -394,6 +427,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
     }
 
+    /// @notice Deletes a proposal at a specified index.
+    /// @param proposalIndex The index of the proposal to delete.
     /// @dev If there are too many proposals, this function can run out of gas.
     ///      In that case, call `deleteProposalByIndexOptimized` which will
     ///      run more efficiently but it will not maintain the array order.
@@ -408,6 +443,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
     }
 
+    /// @notice Deletes a proposal at a specified index.
+    /// @param proposalIndex The index of the proposal to delete.
+    /// @dev Does not maintain the original array order.
     function deleteProposalByIndexOptimized(
         uint256 proposalIndex
     ) external onlyOwner {
@@ -422,6 +460,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     }
 
     /// @notice Move the native token stored in this contract.
+    /// @param destination The address to receive the native token.
     function transferFee(address destination) external onlyOwner {
         (bool success, ) = destination.call{value: address(this).balance}("");
         if (!success) {
@@ -431,16 +470,24 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- public view user functions ---
 
+    /// @notice Get the length of all proposals.
     function getProposalIdsLength() public view returns (uint256) {
         return proposalIds.length;
     }
 
+    /// @notice Get the length of all tokens.
     function getTokenNamesLength() public view returns (uint256) {
         return tokenNames.length;
     }
 
     // --- private view functions ---
 
+    /// @notice Returns the amount of tokens delegated to a user at a specific proposal.
+    /// @param user The address of the user.
+    /// @param token The address of the token.
+    /// @param proposalId The ID of the proposal.
+    /// @param isGetPastVotesEnabled A flag indicating whether to get past votes or current votes.
+    /// @return uint256 The amount of tokens delegated.
     /// @dev We use `isGetPastVotesEnabled` to control wheather we want to retrive a past voting power
     //       or the current one. For hackathon demonstrations on testnets, we want to enable the current
     //       voting power so that users/judges are able to vote of proposals even if they delegate tokens
@@ -504,6 +551,9 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         return slicedProposals;
     }
 
+    /// @notice The the tokens name via pagination.
+    /// @param startIndex Starting index, inclusive.
+    /// @param endIndex End index, non-inclusive.
     function getSlicedTokenNames(
         uint256 startIndex,
         uint256 endIndex
@@ -523,6 +573,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- internal mutative functions ---
 
     /// @notice Receive the cross chain message on the destination chain.
+    /// @param message Equito message.
+    /// @param messageData The data being sent.
     function _receiveMessageFromPeer(
         EquitoMessage calldata message,
         bytes calldata messageData
@@ -563,12 +615,20 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- private mutative functions ---
 
+    /// @notice Stores a new proposal.
+    /// @param newProposal New proposal being created.
     function _createProposal(Proposal memory newProposal) private {
         bytes32 proposalId = newProposal.id;
         proposalIds.push(proposalId);
         proposals[proposalId] = newProposal;
     }
 
+    /// @notice Updates the vote count for a proposal.
+    /// @param proposalId The ID of the proposal to update.
+    /// @param numVotes The number of votes to add.
+    /// @param voteOption The option of the vote (Yes, No, or Abstain).
+    /// @param tokenAddress The address of the token associated with the proposal.
+    /// @param sourceChainSelector The selector for the source chain.
     function _voteOnProposal(
         bytes32 proposalId,
         uint256 numVotes,
@@ -592,11 +652,17 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         }
     }
 
+    /// @notice Deletes proposal from the active mapping.
+    /// @param proposalIdToDelete ID target to delete a proposal from.
     function _deleteProposalFromMapping(bytes32 proposalIdToDelete) private {
         Proposal memory emptyProposal;
         proposals[proposalIdToDelete] = emptyProposal;
     }
 
+    /// @notice Delete a proposal by index.
+    /// @param proposalIndex The Index to delete.
+    /// @param proposalIdsLength The length of the proposals list.
+    /// @param proposalIdsCopy  The copy of the proposal ids.
     function _deleteProposalFromListByIndex(
         uint256 proposalIndex,
         uint256 proposalIdsLength,
