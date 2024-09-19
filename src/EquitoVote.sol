@@ -57,17 +57,17 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- state variables ---
 
     /// @notice Protocol fee for creating proposals,
-    ///         small value to simulate on Equito Builder Program.
+    ///         small value for us to simulate on Equito Builder Program.
     uint256 public createProposalFee = 0.000001e18;
 
     /// @notice Protocol fee for voting on proposals,
-    ///         small value to simulate on Equito Builder Program.
+    ///         small value for us to simulate on Equito Builder Program.
     uint256 public voteOnProposalFee = 0.0000001e18;
 
-    /// @notice List of proposal ids.
+    /// @notice List of proposal IDs.
     bytes32[] public proposalIds;
 
-    /// @notice Proposal mapped by id.
+    /// @notice Proposal mapped by ID.
     mapping(bytes32 id => Proposal) public proposals;
 
     /// @notice Amount of user votes for each proposal.
