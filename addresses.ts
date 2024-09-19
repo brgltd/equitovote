@@ -65,14 +65,16 @@ export const AddressesPerChain = {
   },
 
   BlastSepolia: {
+    // Blast uses same addresses from base.
+
     EquitoVoteV1: "" as Address,
 
     EquitoVoteV2: "" as Address,
 
-    VoteSphereToken: "" as Address,
-    MetaQuorumToken: "" as Address,
-    ChainLightToken: "" as Address,
+    VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
+    MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,
+    ChainLightToken: "0x7B1E2d74D82Ac57d86f783f8Abbd1D255206929e" as Address,
 
-    Faucet: "" as Address,
+    Faucet: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
   },
 };
