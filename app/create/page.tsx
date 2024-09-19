@@ -271,7 +271,9 @@ export default function CreateProposalPage() {
     }
     setStatus(Status.IsExecutingBaseTxOnSourceChain);
     try {
-      await switchChainAsync({ chainId: sourceChain.definition.id });
+      const initialChain = sourceChain;
+
+      await switchChainAsync({ chainId: sourceChain?.definition?.id });
       const createProposalReceipt = await createProposal();
 
       const proposalId =
@@ -307,6 +309,8 @@ export default function CreateProposalPage() {
         sendMessageResult.messageData,
         destinationFee,
       );
+
+      await switchChainAsync({ chainId: initialChain?.definition?.id });
 
       setStatus(Status.IsCompleted);
     } catch (error) {

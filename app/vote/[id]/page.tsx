@@ -15,7 +15,7 @@ import {
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, formatUnits, parseEventLogs, parseUnits } from "viem";
 import { config } from "@/utils/wagmi";
-import { getBlock, waitForTransactionReceipt } from "@wagmi/core";
+import { getBlock, switchChain, waitForTransactionReceipt } from "@wagmi/core";
 import { routerAbi } from "@equito-sdk/evm";
 import { generateHash } from "@equito-sdk/viem";
 import { useApprove } from "@/hooks/use-approve";
@@ -449,8 +449,10 @@ export default function VotePage({ params }: VoteProps) {
       setInputErrorMessage("Please enter input amount");
       return;
     }
+    setStatus(Status.IsExecutingBaseTxOnSourceChain);
     try {
-      setStatus(Status.IsExecutingBaseTxOnSourceChain);
+      const initialChain = sourceChain;
+
       await switchChainAsync({ chainId: sourceChain?.definition.id });
 
       const voteOnProposalReceipt = await voteOnProposal(voteOption);
@@ -495,6 +497,8 @@ export default function VotePage({ params }: VoteProps) {
       if (newActiveAmountUserVotes) {
         setActiveAmountUserVotes(newActiveAmountUserVotes.toString());
       }
+
+      await switchChainAsync({ chainId: initialChain?.definition?.id });
 
       setStatus(Status.IsCompleted);
     } catch (error) {
