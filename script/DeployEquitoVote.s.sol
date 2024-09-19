@@ -6,7 +6,7 @@ import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
 import {ChainNames} from "./ChainNames.sol";
 import {EquitoVote} from "../src/EquitoVote.sol";
 
-contract DeployEquitoVoteV2 is Script {
+contract DeployEquitoVote is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
@@ -14,8 +14,8 @@ contract DeployEquitoVoteV2 is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        EquitoVote equitoVoteV2 = new EquitoVote(routerAddress);
-        console.log("deployed EquitoVote to", address(equitoVoteV2));
+        EquitoVote equitoVote = new EquitoVote(routerAddress);
+        console.log("deployed EquitoVote to", address(equitoVote));
 
         vm.stopBroadcast();
     }

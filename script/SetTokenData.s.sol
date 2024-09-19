@@ -7,11 +7,11 @@ import {EquitoVote} from "../src/EquitoVote.sol";
 contract SetTokenData is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address payable equitoVoteV2Address = payable(
+        address payable equitoVoteAddress = payable(
             vm.envAddress("EQUITO_VOTE_OPTIMISM_SEPOLIA")
         );
 
-        EquitoVote equitoVoteV2 = EquitoVote(equitoVoteV2Address);
+        EquitoVote equitoVote = EquitoVote(equitoVoteAddress);
 
         string memory tokenName = "VoteSphere";
 
@@ -26,7 +26,7 @@ contract SetTokenData is Script {
         addresses[2] = 0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e;
 
         vm.startBroadcast(deployerPrivateKey);
-        equitoVoteV2.setTokenData(tokenName, chainSelectors, addresses);
+        equitoVote.setTokenData(tokenName, chainSelectors, addresses);
         vm.stopBroadcast();
 
         vm.stopBroadcast();
