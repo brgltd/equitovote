@@ -17,9 +17,9 @@ export const Addresses = {
 
 export const AddressesPerChain = {
   EthereumSepolia: {
-    EquitoVoteV1: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
+    EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: "" as Address, // V2 not deployed on ethereum
+    EquitoVoteV2: "0xC0540EfA6a3a925166d7EC15ABD25c8d9b55E1fD" as Address,
 
     VoteSphereToken: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
     MetaQuorumToken: "0x61009c81b50E0Fa52DCa913D7aC3F81744Dd4063" as Address,
@@ -29,9 +29,9 @@ export const AddressesPerChain = {
   },
 
   ArbitrumSepolia: {
-    EquitoVoteV1: "0x45e0ce44717dbeeF610FCC2B45aaea40901AcB26" as Address,
+    EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: "0x191770Db1Fb7833bB09bd6e5c8976b8a417AB3A0" as Address,
+    EquitoVoteV2: "0xbB77f2fD1635937130F61f874Df651705197eB82" as Address,
 
     VoteSphereToken: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
     MetaQuorumToken: "0xe4f6Da5ceB777ade0937dAb8994FF9483494319E" as Address,
@@ -41,9 +41,9 @@ export const AddressesPerChain = {
   },
 
   OptimismSepolia: {
-    EquitoVoteV1: zeroAddress as Address, // V1 not deployed to optimism
+    EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: "" as Address, // TODO: deploy V2 on optimism
+    EquitoVoteV2: "0xb3B24205EAC66459ed10f267c9449e1040505C1a" as Address,
 
     VoteSphereToken: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
     MetaQuorumToken: "0xD39A5C47207F658dc0Ed09c77c08efa30562383F" as Address,
@@ -55,7 +55,7 @@ export const AddressesPerChain = {
   BaseSepolia: {
     EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: "" as Address,
+    EquitoVoteV2: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
 
     VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
     MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,
@@ -65,11 +65,11 @@ export const AddressesPerChain = {
   },
 
   BlastSepolia: {
-    // Blast uses same addresses from base.
+    // Blast addresses are the same from base.
 
     EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: "" as Address,
+    EquitoVoteV2: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
 
     VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
     MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,
