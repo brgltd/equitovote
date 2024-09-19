@@ -356,6 +356,7 @@ export default function CreateProposalPage() {
         >
           Open Proposal{proposalId ? "" : "s"}
         </Link>
+        .
       </div>
     ),
   };

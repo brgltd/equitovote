@@ -109,6 +109,11 @@ export const baseChain = {
   img: 9195,
   definition: baseSepolia,
   pingPongContract: "0xbC2ca9a5364DBd68d2c8Fb091E662Da952697B50" as Address,
+
+  equitoVoteContractV2: AddressesPerChain.BaseSepolia.EquitoVoteV2,
+
+  faucet: AddressesPerChain.BaseSepolia.Faucet,
+  voteSphere: AddressesPerChain.BaseSepolia.VoteSphereToken,
 };
 
 export const blastChain = {
@@ -117,6 +122,11 @@ export const blastChain = {
   img: 28480,
   definition: blastSepolia,
   pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
+
+  equitoVoteContractV2: AddressesPerChain.BlastSepolia.EquitoVoteV2,
+
+  faucet: AddressesPerChain.BlastSepolia.Faucet,
+  voteSphere: AddressesPerChain.BlastSepolia.VoteSphereToken,
 };
 
 export const lineaChain = {
