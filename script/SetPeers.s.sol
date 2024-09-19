@@ -6,7 +6,7 @@ import {EquitoVote} from "../src/EquitoVote.sol";
 import {EquitoMessageLibrary, bytes64} from "equito/src/libraries/EquitoMessageLibrary.sol";
 import {ChainNames} from "./ChainNames.sol";
 
-contract SetPeersEquitoVote is Script {
+contract SetPeers is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
