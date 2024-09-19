@@ -416,7 +416,6 @@ export default function VotePage({ params }: VoteProps) {
         chainId: sourceChain?.definition.id,
       });
       setInputErrorMessage("");
-      setAmountToVote("");
       setActiveAmountDelegatedTokens(formatBalance(userTokenBalance, decimals));
     } catch (error) {
       handleError(error);
