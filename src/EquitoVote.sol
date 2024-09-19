@@ -24,18 +24,27 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     }
 
     struct Proposal {
+        // When proposal was created.
         uint256 startTimestamp;
+        // When proposal will end.
         uint256 endTimestamp;
+        // Total number of Yes votes.
         uint256 numVotesYes;
+        // Total number of No votes.
         uint256 numVotesNo;
+        // Total number of Abstain votes.
         uint256 numVotesAbstain;
+        // Proposal title.
         string title;
+        // Proposal description.
         string description;
+        // ID of a proposal.
         bytes32 id;
+        // Name of the DAO token being used for this proposal.
         string tokenName;
-        // ERC20Votes uses block.number by default for snapshots
+        // ERC20Votes uses block.number by default for snapshots.
         uint256 startBlockNumber;
-        // Chain where the proposal was created
+        // Chain where the proposal was created.
         uint256 originChainSelector;
     }
 
