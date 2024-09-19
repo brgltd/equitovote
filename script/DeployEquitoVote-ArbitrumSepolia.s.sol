@@ -3,7 +3,7 @@ pragma solidity ^0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
 import {EquitoVote} from "../src/EquitoVote.sol";
-import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses.sol";
+import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
 
 contract DeployEquitoVoteArbitrumSepolia is Script {
     function run() external {

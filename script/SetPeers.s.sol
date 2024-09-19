@@ -4,14 +4,9 @@ pragma solidity ^0.8.23;
 import {Script} from "forge-std/Script.sol";
 import {EquitoVote} from "../src/EquitoVote.sol";
 import {EquitoMessageLibrary, bytes64} from "equito/src/libraries/EquitoMessageLibrary.sol";
+import {ChainNames} from "./ChainNames.sol";
 
 contract SetPeersEquitoVote is Script {
-    string constant DEPLOYED_TO_ETHEREUM_SEPOLIA = "ETHEREUM_SEPOLIA";
-
-    string constant DEPLOYED_TO_ARBITRUM_SEPOLIA = "ARBITRUM_SEPOLIA";
-
-    string constant DEPLOYED_TO_OPTIMISM_SEPOLIA = "OPTIMISM_SEPOLIA";
-
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
@@ -66,17 +61,17 @@ contract SetPeersEquitoVote is Script {
         string memory deployedTo = vm.envString("DEPLOYED_TO");
         if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_ETHEREUM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ETHEREUM_SEPOLIA))
         ) {
             return equitoVoteEthereumSepolia;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_ARBITRUM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ARBITRUM_SEPOLIA))
         ) {
             return equitoVoteArbitrumSepolia;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_OPTIMISM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_OPTIMISM_SEPOLIA))
         ) {
             return equitoVoteOptimismSepolia;
         }

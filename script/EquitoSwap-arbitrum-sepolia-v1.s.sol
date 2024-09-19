@@ -4,21 +4,23 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 
 import {EquitoSwap} from "../src/EquitoSwap.sol";
-import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses.sol";
+import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
 
 contract DeployEquitoSwap is Script {
-	function run() external {
-		uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-		vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast(deployerPrivateKey);
 
-		console.log("deploying EquitoSwap");
-		EquitoSwap equitoSwap = new EquitoSwap(
-			RouterTestnetAddresses.ARBITRUM_SEPOLIA
-		);
-		console.log("deployed EquitoSwap to arbitrum sepolia", address(equitoSwap));
+        console.log("deploying EquitoSwap");
+        EquitoSwap equitoSwap = new EquitoSwap(
+            RouterTestnetAddresses.ARBITRUM_SEPOLIA
+        );
+        console.log(
+            "deployed EquitoSwap to arbitrum sepolia",
+            address(equitoSwap)
+        );
 
-		vm.stopBroadcast();
-	}
+        vm.stopBroadcast();
+    }
 }
-

@@ -2,16 +2,11 @@
 pragma solidity ^0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
-import {RouterTestnetAddresses} from "../src/RouterTestnetAddresses.sol";
+import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
+import {ChainNames} from "./ChainNames.sol";
 import {EquitoVoteV2} from "../src/EquitoVoteV2.sol";
 
 contract DeployEquitoVoteV2 is Script {
-    string constant DEPLOYED_TO_ETHEREUM_SEPOLIA = "ETHEREUM_SEPOLIA";
-
-    string constant DEPLOYED_TO_ARBITRUM_SEPOLIA = "ARBITRUM_SEPOLIA";
-
-    string constant DEPLOYED_TO_OPTIMISM_SEPOLIA = "OPTIMISM_SEPOLIA";
-
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
@@ -30,17 +25,17 @@ contract DeployEquitoVoteV2 is Script {
         string memory deployedTo = vm.envString("DEPLOYED_TO");
         if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_ETHEREUM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ETHEREUM_SEPOLIA))
         ) {
             return RouterTestnetAddresses.ETHEREUM_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_ARBITRUM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ARBITRUM_SEPOLIA))
         ) {
             return RouterTestnetAddresses.ARBITRUM_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
-            keccak256(abi.encodePacked(DEPLOYED_TO_OPTIMISM_SEPOLIA))
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_OPTIMISM_SEPOLIA))
         ) {
             return RouterTestnetAddresses.OPTIMISM_SEPOLIA;
         }
