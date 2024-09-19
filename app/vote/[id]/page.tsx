@@ -349,9 +349,10 @@ export default function VotePage({ params }: VoteProps) {
 
   const shouldRenderLackVotingPower =
     !hasVotingPower &&
-    activeAmountUserVotes === ZERO_TOKEN_TEXT &&
+    (!activeAmountUserVotes || activeAmountUserVotes === ZERO_TOKEN_TEXT) &&
     (!isPendingTokenData || !userAddress) &&
-    isProposalActive;
+    isProposalActive &&
+    (status === Status.IsStart || status === Status.IsRetry);
 
   const shouldRenderExistingVotes =
     !!activeAmountUserVotes &&
@@ -367,7 +368,9 @@ export default function VotePage({ params }: VoteProps) {
     !shouldRenderLackVotingPower &&
     !hasUserVotedAllHisTokens;
 
-  const shouldRenderDelegation = balanceMinusDelegation > 0;
+  const shouldRenderDelegation =
+    balanceMinusDelegation > 0 &&
+    (status === Status.IsStart || status === Status.IsRetry);
 
   const rearrangedSupportedChains = useMemo(
     () => rearrangeChains(supportedChains, originChainSelector as number, true),
