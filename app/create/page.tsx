@@ -179,7 +179,7 @@ export default function CreateProposalPage() {
     useReadContract({
       address: destinationChain.equitoVoteContractV2,
       abi: equitoVoteAbi,
-      functionName: "getTokenNamesSlice",
+      functionName: "getSlicedTokenNames",
       args: buildSlicedTokenNamesArgs(tokenNamesLength as bigint),
       query: { enabled: isValidData(tokenNamesLength) },
       chainId: destinationChain.definition.id,

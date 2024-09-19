@@ -430,7 +430,7 @@ contract EquitoVoteV2 is EquitoApp, ReentrancyGuard {
         return slicedProposals;
     }
 
-    function getTokenNamesSlice(
+    function getSlicedTokenNames(
         uint256 startIndex,
         uint256 endIndex
     ) external view returns (string[] memory) {

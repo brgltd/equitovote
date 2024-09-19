@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { useSwitchChain, useWriteContract } from "wagmi";
-import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
+import {
+  arbitrumChain,
+  baseChain,
+  blastChain,
+  ethereumChain,
+  optimismChain,
+} from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
@@ -18,6 +24,8 @@ const defaultFormData = {
   ethereumAddress: "",
   arbitrumAddress: "",
   optimismAddress: "",
+  baseAddress: "",
+  blastAddress: "",
 };
 
 enum FormKeys {
@@ -25,6 +33,8 @@ enum FormKeys {
   ethereumAddress = "ethereumAddress",
   arbitrumAddress = "arbitrumAddress",
   optimismAddress = "optimismAddress",
+  baseAddress = "baseAddress",
+  blastAddress = "blastAddress",
 }
 
 function isOnlyAlphanumeric(text: string) {
@@ -62,6 +72,14 @@ export default function SetTokenDataPage() {
       newFormErrors.add(FormKeys.optimismAddress);
       isFormDataValid = false;
     }
+    if (!isAddress(formData.baseAddress)) {
+      newFormErrors.add(FormKeys.baseAddress);
+      isFormDataValid = false;
+    }
+    if (!isAddress(formData.blastAddress)) {
+      newFormErrors.add(FormKeys.blastAddress);
+      isFormDataValid = false;
+    }
     setFormErrors(newFormErrors);
     if (!isFormDataValid) {
       return;
@@ -80,11 +98,15 @@ export default function SetTokenDataPage() {
             ethereumChain.chainSelector,
             arbitrumChain.chainSelector,
             optimismChain.chainSelector,
+            baseChain.chainSelector,
+            blastChain.chainSelector,
           ],
           [
             formData.ethereumAddress,
             formData.arbitrumAddress,
             formData.optimismAddress,
+            formData.baseAddress,
+            formData.blastAddress,
           ],
         ],
         chainId: destinationChain.definition.id,
@@ -200,6 +222,58 @@ export default function SetTokenDataPage() {
           error={formErrors.has(FormKeys.optimismAddress)}
           helperText={
             formErrors.has(FormKeys.optimismAddress)
+              ? "Please enter a valid address"
+              : ""
+          }
+          sx={{ width: 350 }}
+        />
+      </div>
+
+      <div className="mb-8">
+        <TextField
+          id={FormKeys.baseAddress}
+          label="Base Address"
+          value={formData.baseAddress}
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (!isAddress(value)) {
+              newFormErrors.add(FormKeys.baseAddress);
+            } else {
+              newFormErrors.delete(FormKeys.baseAddress);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, baseAddress: value });
+          }}
+          error={formErrors.has(FormKeys.baseAddress)}
+          helperText={
+            formErrors.has(FormKeys.baseAddress)
+              ? "Please enter a valid address"
+              : ""
+          }
+          sx={{ width: 350 }}
+        />
+      </div>
+
+      <div className="mb-8">
+        <TextField
+          id={FormKeys.blastAddress}
+          label="Blast Address"
+          value={formData.blastAddress}
+          onChange={(e) => {
+            const value = e.target.value;
+            const newFormErrors = new Set(formErrors);
+            if (!isAddress(value)) {
+              newFormErrors.add(FormKeys.blastAddress);
+            } else {
+              newFormErrors.delete(FormKeys.blastAddress);
+            }
+            setFormErrors(newFormErrors);
+            setFormData({ ...formData, blastAddress: value });
+          }}
+          error={formErrors.has(FormKeys.blastAddress)}
+          helperText={
+            formErrors.has(FormKeys.blastAddress)
               ? "Please enter a valid address"
               : ""
           }
