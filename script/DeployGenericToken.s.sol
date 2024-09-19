@@ -10,14 +10,14 @@ contract DeployGenericToken is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        console.log("deploying GenericToken");
-
         GenericToken genericToken = new GenericToken(
             vm.envString("TOKEN_NAME"),
             vm.envString("TOKEN_SYMBOL")
         );
-
         console.log("GenericToken deployed to", address(genericToken));
+
+        genericToken.setFaucet(vm.envAddress("FAUCET"));
+        console.log("Successfuly set faucet for token");
 
         vm.stopBroadcast();
     }
