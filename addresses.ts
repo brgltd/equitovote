@@ -19,7 +19,7 @@ export const AddressesPerChain = {
   EthereumSepolia: {
     EquitoVoteV1: "0xEACAcDd65bbbDd15E7AcA41eF5311a33A8B9178c" as Address,
 
-    EquitoVoteV2: zeroAddress as Address, // V2 not deployed on ethereum
+    EquitoVoteV2: "" as Address, // V2 not deployed on ethereum
 
     VoteSphereToken: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
     MetaQuorumToken: "0x61009c81b50E0Fa52DCa913D7aC3F81744Dd4063" as Address,
@@ -43,7 +43,7 @@ export const AddressesPerChain = {
   OptimismSepolia: {
     EquitoVoteV1: zeroAddress as Address, // V1 not deployed to optimism
 
-    EquitoVoteV2: zeroAddress as Address, // TODO: deploy V2 on optimism
+    EquitoVoteV2: "" as Address, // TODO: deploy V2 on optimism
 
     VoteSphereToken: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
     MetaQuorumToken: "0xD39A5C47207F658dc0Ed09c77c08efa30562383F" as Address,
@@ -53,26 +53,26 @@ export const AddressesPerChain = {
   },
 
   BaseSepolia: {
-    EquitoVoteV1: zeroAddress as Address,
+    EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: zeroAddress as Address,
+    EquitoVoteV2: "" as Address,
 
-    VoteSphereToken: "" as Address,
-    MetaQuorumToken: "" as Address,
-    ChainLightToken: "" as Address,
+    VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
+    MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,
+    ChainLightToken: "0x7B1E2d74D82Ac57d86f783f8Abbd1D255206929e" as Address,
 
-    Faucet: zeroAddress as Address,
+    Faucet: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
   },
 
   BlastSepolia: {
-    EquitoVoteV1: zeroAddress as Address,
+    EquitoVoteV1: "" as Address,
 
-    EquitoVoteV2: zeroAddress as Address,
+    EquitoVoteV2: "" as Address,
 
     VoteSphereToken: "" as Address,
     MetaQuorumToken: "" as Address,
     ChainLightToken: "" as Address,
 
-    Faucet: zeroAddress as Address,
+    Faucet: "" as Address,
   },
 };

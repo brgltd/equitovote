@@ -14,7 +14,6 @@ contract DeployEquitoVoteV2 is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        console.log("deploying EquitoVote");
         EquitoVoteV2 equitoVoteV2 = new EquitoVoteV2(routerAddress);
         console.log("EquitoVote deployed to", address(equitoVoteV2));
 

@@ -8,16 +8,16 @@ contract DeployGenericToken is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
+        string memory tokenName = vm.envString("TOKEN_NAME");
+        string memory tokenSymbol = vm.envString("TOKEN_SYMBOL");
+
         vm.startBroadcast(deployerPrivateKey);
 
-        GenericToken genericToken = new GenericToken(
-            vm.envString("TOKEN_NAME"),
-            vm.envString("TOKEN_SYMBOL")
-        );
-        console.log("GenericToken deployed to", address(genericToken));
+        GenericToken genericToken = new GenericToken(tokenName, tokenSymbol);
+        console.log("deployed", tokenName, "to", address(genericToken));
 
         genericToken.setFaucet(vm.envAddress("FAUCET"));
-        console.log("Successfuly set faucet for token");
+        console.log("added faucet for", tokenName);
 
         vm.stopBroadcast();
     }
