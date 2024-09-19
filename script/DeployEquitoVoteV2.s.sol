@@ -38,6 +38,16 @@ contract DeployEquitoVoteV2 is Script {
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_OPTIMISM_SEPOLIA))
         ) {
             return RouterTestnetAddresses.OPTIMISM_SEPOLIA;
+        } else if (
+            keccak256(abi.encodePacked(deployedTo)) ==
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_BASE_SEPOLIA))
+        ) {
+            return RouterTestnetAddresses.BASE_SEPOLIA;
+        } else if (
+            keccak256(abi.encodePacked(deployedTo)) ==
+            keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_BLAST_SEPOLIA))
+        ) {
+            return RouterTestnetAddresses.BLAST_SEPOLIA;
         }
         revert("Invalid DEPLOYED_TO");
     }

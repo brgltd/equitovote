@@ -7,4 +7,8 @@ library ChainNames {
     string public constant DEPLOYED_TO_ARBITRUM_SEPOLIA = "ARBITRUM_SEPOLIA";
 
     string public constant DEPLOYED_TO_OPTIMISM_SEPOLIA = "OPTIMISM_SEPOLIA";
+
+    string public constant DEPLOYED_TO_BASE_SEPOLIA = "BASE_SEPOLIA";
+
+    string public constant DEPLOYED_TO_BLAST_SEPOLIA = "BLAST_SEPOLIA";
 }
