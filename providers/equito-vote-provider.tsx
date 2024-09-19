@@ -1,6 +1,7 @@
+"use client";
+
 import { useRouter } from "@/hooks/use-router";
 import { Chain, destinationChain, supportedChainsMap } from "@/utils/chains";
-import { config } from "@/utils/wagmi";
 import { UseQueryResult } from "@tanstack/react-query";
 import {
   createContext,

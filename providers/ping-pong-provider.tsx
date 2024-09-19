@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dispatch,
   PropsWithChildren,
@@ -58,7 +60,7 @@ export const PingPongProvider = ({ children }: PropsWithChildren<object>) => {
       pingFee,
       pongFee,
     }),
-    [pingMessage, pingFee, pongMessage, pongFee, status]
+    [pingMessage, pingFee, pongMessage, pongFee, status],
   );
 
   return <pingContext.Provider value={value}>{children}</pingContext.Provider>;
@@ -73,4 +75,3 @@ export const usePingPong = () => {
 
   return context;
 };
-

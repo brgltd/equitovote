@@ -1,6 +1,6 @@
 import { Button as MuiButton } from "@mui/material";
 import { ReactNode } from "react";
-import { lightTheme } from "@/app/layout";
+import { lightTheme } from "./app-layout";
 import { cn } from "@/utils/cn";
 
 export function Button({

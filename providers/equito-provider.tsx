@@ -1,3 +1,5 @@
+"use client";
+
 import { Chain } from "../utils/chains";
 import {
   Dispatch,
@@ -61,7 +63,7 @@ export const EquitoProvider = ({ children }: PropsWithChildren<object>) => {
         setToChain(undefined);
       },
     }),
-    [fromChain, fromRouter, toChain, toRouter]
+    [fromChain, fromRouter, toChain, toRouter],
   );
 
   return (
@@ -77,4 +79,3 @@ export const useEquito = () => {
 
   return context;
 };
-

@@ -10,33 +10,8 @@ import { Address, isAddress, parseUnits, zeroAddress } from "viem";
 import { CircularProgress, TextField } from "@mui/material";
 import { Button } from "@/components/button";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
-// import { AddressesPerChain } from "@/addresses";
 
 const equitoVoteAbi = equitoVote.abi;
-
-// VoteSphere
-// const defaultFormData = {
-//   tokenName: "VoteSphere",
-//   ethereumAddress: "0x2ee891078cc2a08c31e494f19E36F772806b1613",
-//   arbitrumAddress: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA",
-//   optimismAddress: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e",
-// };
-
-// // MetaQuorum
-// const defaultFormData = {
-//   tokenName: "MetaQuorum",
-//   ethereumAddress: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
-//   arbitrumAddress: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
-//   optimismAddress: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
-// };
-
-// // MetaQuorum
-// const defaultFormData = {
-//   tokenName: "ChainLight",
-//   ethereumAddress: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
-//   arbitrumAddress: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
-//   optimismAddress: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
-// };
 
 const defaultFormData = {
   tokenName: "",
