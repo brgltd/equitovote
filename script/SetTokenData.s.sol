@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
-import {EquitoVoteV2} from "../src/EquitoVoteV2.sol";
+import {EquitoVote} from "../src/EquitoVote.sol";
 
 contract SetTokenData is Script {
     function run() external {
@@ -11,7 +11,7 @@ contract SetTokenData is Script {
             vm.envAddress("EQUITO_VOTE_OPTIMISM_SEPOLIA")
         );
 
-        EquitoVoteV2 equitoVoteV2 = EquitoVoteV2(equitoVoteV2Address);
+        EquitoVote equitoVoteV2 = EquitoVote(equitoVoteV2Address);
 
         string memory tokenName = "VoteSphere";
 

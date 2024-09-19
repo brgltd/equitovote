@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 import {Script, console} from "forge-std/Script.sol";
 import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
 import {ChainNames} from "./ChainNames.sol";
-import {EquitoVoteV2} from "../src/EquitoVoteV2.sol";
+import {EquitoVote} from "../src/EquitoVote.sol";
 
 contract DeployEquitoVoteV2 is Script {
     function run() external {
@@ -14,8 +14,8 @@ contract DeployEquitoVoteV2 is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        EquitoVoteV2 equitoVoteV2 = new EquitoVoteV2(routerAddress);
-        console.log("EquitoVote deployed to", address(equitoVoteV2));
+        EquitoVote equitoVoteV2 = new EquitoVote(routerAddress);
+        console.log("deployed EquitoVote to", address(equitoVoteV2));
 
         vm.stopBroadcast();
     }

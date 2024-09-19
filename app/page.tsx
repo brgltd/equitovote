@@ -12,7 +12,7 @@ import {
   verifyIsProposalActive,
 } from "@/utils/helpers";
 import { FormattedProposal, ProposalResponse } from "@/types";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { supportedChains, supportedChainsMapBySelector } from "@/utils/chains";
 import { Pagination } from "@mui/material";

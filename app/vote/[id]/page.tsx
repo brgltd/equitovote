@@ -30,7 +30,7 @@ import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { cn } from "@/utils/cn";
 import { VoteSkeleton } from "@/components/vote-skeleton";
 import { FeeSkeleton } from "@/components/fee-skeleton";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
 
 const PRECISION = 2;

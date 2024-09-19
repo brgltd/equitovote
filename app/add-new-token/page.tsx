@@ -15,7 +15,7 @@ import { useEquitoVote } from "@/providers/equito-vote-provider";
 import { Address, isAddress, parseUnits, zeroAddress } from "viem";
 import { CircularProgress, TextField } from "@mui/material";
 import { Button } from "@/components/button";
-import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 
 const equitoVoteAbi = equitoVote.abi;
 

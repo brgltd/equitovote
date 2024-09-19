@@ -2,8 +2,8 @@
 pragma solidity ^0.8.23;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Router} from "equito/src/Router.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {MockVerifier} from "equito/test/mock/MockVerifier.sol";
 import {MockEquitoFees} from "equito/test/mock/MockEquitoFees.sol";
 import {bytes64, EquitoMessage, EquitoMessageLibrary} from "equito/src/libraries/EquitoMessageLibrary.sol";
@@ -47,17 +47,40 @@ contract EquitoVoteTest is Test {
         vm.deal(address(sender), 10 ether);
     }
 
+    function testSetTokenData() public {
+        string memory tokenName = "VoteSphere";
+
+        uint256[] memory chainSelectors = new uint256[](3);
+        chainSelectors[0] = 1001;
+        chainSelectors[1] = 1004;
+        chainSelectors[2] = 1006;
+
+        address[] memory addresses = new address[](3);
+        addresses[0] = 0x2ee891078cc2a08c31e494f19E36F772806b1613;
+        addresses[1] = 0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA;
+        addresses[2] = 0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e;
+
+        equitoVote.setTokenData(tokenName, chainSelectors, addresses);
+
+        for (uint256 i = 0; i < addresses.length; ++i) {
+            assertEq(
+                equitoVote.tokenData(tokenName, chainSelectors[i]),
+                addresses[i]
+            );
+        }
+    }
+
     function testCreateProposal() public {
         string memory titleInput = generateTitle(0);
         createProposalAndExecuteMessage(0, titleInput);
         bytes32 proposalId = equitoVote.proposalIds(0);
-        (, , , , , , , string memory titleResult, , ) = equitoVote.proposals(
+        (, , , , , string memory titleResult, , , , , ) = equitoVote.proposals(
             proposalId
         );
         assertEq(titleResult, titleInput);
     }
 
-    function testGetProposalsSlice() public {
+    function testGetSlicedProposals() public {
         uint256 numOfProposals = 5;
         string[] memory titles = new string[](numOfProposals);
         for (uint256 i = 0; i < numOfProposals; ++i) {
@@ -67,10 +90,18 @@ contract EquitoVoteTest is Test {
         uint256 proposalsLength = equitoVote.getProposalIdsLength();
         assertEq(proposalsLength, numOfProposals);
         EquitoVote.Proposal[] memory slicedProposals = equitoVote
-            .getProposalsSlice(0, proposalsLength);
+            .getSlicedProposals(0, proposalsLength);
         for (uint256 i = 0; i < proposalsLength; ++i) {
             assertEq(slicedProposals[i].title, titles[i]);
         }
+    }
+
+    function testGetSlicedReversedProposals() public {
+        string memory titleInput = generateTitle(0);
+        createProposalAndExecuteMessage(0, titleInput);
+        EquitoVote.Proposal[] memory proposals = equitoVote
+            .getSlicedReversedProposals(0, -1);
+        assertEq(proposals[0].title, titleInput);
     }
 
     function createProposalAndExecuteMessage(
@@ -83,16 +114,19 @@ contract EquitoVoteTest is Test {
         uint256 destinationChainSelector = 2;
 
         uint256 endTimestampInput = block.timestamp + 3600;
-        address erc20Input = 0x779877A7B0D9E8603169DdbD7836e478b4624789;
         string memory descriptionInput = "description0";
         bytes32 proposalId = keccak256(abi.encode(msg.sender, block.timestamp));
+
+        string memory tokenName = "token name";
+        uint256 originChainSelector = 1001;
 
         equitoVote.createProposal{value: fee + 0.1e18}(
             destinationChainSelector,
             endTimestampInput,
-            erc20Input,
             titleInput,
-            descriptionInput
+            descriptionInput,
+            tokenName,
+            originChainSelector
         );
 
         EquitoVote.Proposal memory newProposal = EquitoVote.Proposal({
@@ -101,18 +135,16 @@ contract EquitoVoteTest is Test {
             numVotesYes: 0,
             numVotesNo: 0,
             numVotesAbstain: 0,
-            erc20: erc20Input,
-            creator: msg.sender,
             title: titleInput,
             description: descriptionInput,
-            id: proposalId
+            id: proposalId,
+            tokenName: tokenName,
+            startBlockNumber: 0,
+            originChainSelector: originChainSelector
         });
 
         bytes memory messageData = abi.encode(
             EquitoVote.OperationType.CreateProposal,
-            bytes32(0),
-            0,
-            EquitoVote.VoteOption.Abstain,
             newProposal
         );
 
