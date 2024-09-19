@@ -42,11 +42,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- state variables ---
 
     // Protocol fee for creating proposals, very small value to simulate on
-    // the hackathon.
+    // the EquitoBuilderProgram.
     uint256 public createProposalFee = 0.000001e18;
 
     // Protocol fee for voting on proposals, very small value to simulate on
-    // the hackathon.
+    // the EquitoBuilderProgram.
     uint256 public voteOnProposalFee = 0.0000001e18;
 
     bytes32[] public proposalIds;
@@ -104,7 +104,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     error ProposalNotFinished(bytes32 proposalId, uint256 endTimestamp);
 
-    error ProposalInvalid(bytes32 proposalId);
+    error InvalidProposal(bytes32 proposalId);
 
     error CallFailed(address destination);
 
@@ -114,10 +114,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         address tokenAddress
     );
 
-    error LengthMismatch(
-        uint256 chainSelectorsLength,
-        uint256 tokenAddressesLength
-    );
+    error LengthMismatch(uint256 firstArray, uint256 secondArray);
 
     error TokenAlreadySet(string tokenName);
 
@@ -137,13 +134,17 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     // --- external mutative user functions ---
 
+    /// @dev Naming in the contracts and FE:
+    ///      `sourceChain` = the chain the user is currently connected.
+    ///      `originChain` = the chain a proposal was created, can be different from `sourceChain` at FE runtime.
+    ///      `destinationChain` = the chain where `_receiveMessageFromPeers` gets called.
     function createProposal(
         uint256 destinationChainSelector,
+        uint256 originChainSelector,
         uint256 endTimestamp,
         string calldata title,
         string calldata description,
-        string calldata tokenName,
-        uint256 originChainSelector
+        string calldata tokenName
     ) external payable nonReentrant {
         bytes32 id = keccak256(abi.encode(msg.sender, block.timestamp));
 
@@ -181,6 +182,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
     }
 
+    /// @dev `tokenAddress` will be validated in `_receiveMessageFromPeers._voteOnProposal` and
+    ///      votes will only be counted if it's valid.
     function voteOnProposal(
         uint256 destinationChainSelector,
         bytes32 proposalId,
@@ -235,8 +238,8 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256[] memory chainSelectors,
         address[] memory tokenAddresses
     ) external {
-        uint256 tokenNamesLength = tokenNames.length;
-        for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
+        uint256 tokenNamesLength = getTokenNamesLength();
+        for (uint256 i = 0; i < tokenNamesLength; i = _uncheckedInc(i)) {
             if (
                 keccak256(abi.encode(tokenName)) ==
                 keccak256(abi.encode(tokenNames[i]))
@@ -249,7 +252,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         if (chainSelectorsLength != tokenAddressesLength) {
             revert LengthMismatch(chainSelectorsLength, tokenAddressesLength);
         }
-        for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < chainSelectorsLength; i = _uncheckedInc(i)) {
             tokenData[tokenName][chainSelectors[i]] = tokenAddresses[i];
         }
         tokenNames.push(tokenName);
@@ -286,11 +289,11 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256[] memory chainSelectors
     ) external onlyOwner {
         uint256 chainSelectorsLength = chainSelectors.length;
-        for (uint256 i = 0; i < chainSelectorsLength; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < chainSelectorsLength; i = _uncheckedInc(i)) {
             tokenData[tokenName][chainSelectors[i]] = address(0);
         }
-        uint256 tokenNamesLength = tokenNames.length;
-        for (uint256 i = 0; i < tokenNamesLength; i = uncheckedInc(i)) {
+        uint256 tokenNamesLength = getTokenNamesLength();
+        for (uint256 i = 0; i < tokenNamesLength; i = _uncheckedInc(i)) {
             if (
                 keccak256(abi.encode(tokenName)) ==
                 keccak256(abi.encode(tokenNames[i]))
@@ -312,7 +315,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         uint256 proposalIdIndex = 0;
         uint256 proposalIdsLength = getProposalIdsLength();
         bytes32[] memory proposalIdsCopy = proposalIds;
-        for (uint256 i = 0; i < proposalIdsLength; i = uncheckedInc(i)) {
+        for (uint256 i = 0; i < proposalIdsLength; i = _uncheckedInc(i)) {
             if (proposalId == proposalIdsCopy[i]) {
                 proposalIdIndex = i;
                 break;
@@ -352,6 +355,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         proposalIds.pop();
     }
 
+    /// @notice Move the native token stored in this contract.
     function transferFee(address destination) external onlyOwner {
         (bool success, ) = destination.call{value: address(this).balance}("");
         if (!success) {
@@ -363,6 +367,10 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     function getProposalIdsLength() public view returns (uint256) {
         return proposalIds.length;
+    }
+
+    function getTokenNamesLength() public view returns (uint256) {
+        return tokenNames.length;
     }
 
     // --- private view functions ---
@@ -401,7 +409,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             endIndex - startIndex
         );
         bytes32[] memory proposalIdsCopy = proposalIds;
-        for (uint256 i = startIndex; i < endIndex; i = uncheckedInc(i)) {
+        for (uint256 i = startIndex; i < endIndex; i = _uncheckedInc(i)) {
             slicedProposals[i] = proposals[proposalIdsCopy[i]];
         }
         return slicedProposals;
@@ -421,7 +429,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         );
         bytes32[] memory proposalIdsCopy = proposalIds;
         uint256 i;
-        for (int256 j = startIndex; j > endIndex; j = uncheckedDec(j)) {
+        for (int256 j = startIndex; j > endIndex; j = _uncheckedDec(j)) {
             slicedProposals[i] = proposals[proposalIdsCopy[uint256(j)]];
             unchecked {
                 ++i;
@@ -437,17 +445,13 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
         string[] memory slicedTokenNames = new string[](endIndex - startIndex);
         string[] memory tokenNamesCopy = tokenNames;
         uint256 i;
-        for (uint256 j = startIndex; j < endIndex; j = uncheckedInc(j)) {
+        for (uint256 j = startIndex; j < endIndex; j = _uncheckedInc(j)) {
             slicedTokenNames[i] = tokenNamesCopy[j];
             unchecked {
                 ++i;
             }
         }
         return slicedTokenNames;
-    }
-
-    function getTokenNamesLength() external view returns (uint256) {
-        return tokenNames.length;
     }
 
     // --- internal mutative functions ---
@@ -536,7 +540,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
             for (
                 uint256 i = proposalIndex;
                 i < proposalIdsLength - 1;
-                i = uncheckedInc(i)
+                i = _uncheckedInc(i)
             ) {
                 proposalIds[i] = proposalIdsCopy[i + 1];
             }
@@ -551,7 +555,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     ///         a target length, which is bound to be smaller than 2**256 - 1.
     /// @param i The value to be incremented.
     /// @return The incremeneted value.
-    function uncheckedInc(uint256 i) private pure returns (uint256) {
+    function _uncheckedInc(uint256 i) private pure returns (uint256) {
         unchecked {
             return ++i;
         }
@@ -560,7 +564,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     /// @notice Unchecked decrement to save gas in for loops.
     /// @param i The value to be decremented.
     /// @return The decremented value.
-    function uncheckedDec(int256 i) private pure returns (int256) {
+    function _uncheckedDec(int256 i) private pure returns (int256) {
         unchecked {
             return --i;
         }

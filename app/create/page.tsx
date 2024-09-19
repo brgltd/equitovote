@@ -85,11 +85,11 @@ function buildCreateProposalArgs(
   );
   return {
     destinationChainSelector: destinationChain.chainSelector,
+    originChainSelector: sourceChain.chainSelector,
     endTimestamp: endTimestamp,
     title: formData.title,
     description: formData.description,
     tokenName: formData.tokenName,
-    originChainSelector: sourceChain.chainSelector,
   };
 }
 
