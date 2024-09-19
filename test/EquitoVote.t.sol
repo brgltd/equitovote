@@ -122,11 +122,11 @@ contract EquitoVoteTest is Test {
 
         equitoVote.createProposal{value: fee + 0.1e18}(
             destinationChainSelector,
+            originChainSelector,
             endTimestampInput,
             titleInput,
             descriptionInput,
-            tokenName,
-            originChainSelector
+            tokenName
         );
 
         EquitoVote.Proposal memory newProposal = EquitoVote.Proposal({
