@@ -3,7 +3,7 @@ pragma solidity ^0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IToken} from "./IToken.sol";
+import {IGenericToken} from "./IGenericToken.sol";
 
 contract Faucet is ReentrancyGuard, Ownable {
     uint256 private constant COOLDOWN = 1 hours;
@@ -23,7 +23,7 @@ contract Faucet is ReentrancyGuard, Ownable {
         if (isCooldownEnabled && block.timestamp <= userTimestamp + COOLDOWN) {
             revert CooldownNotFinished(userTimestamp);
         }
-        IToken(token).mintFromFaucet(msg.sender);
+        IGenericToken(token).mintFromFaucet(msg.sender);
         timestamps[msg.sender] = block.timestamp;
     }
 

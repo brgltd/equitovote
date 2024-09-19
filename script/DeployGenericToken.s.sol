@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 import {Script, console} from "forge-std/Script.sol";
 import {GenericToken} from "../src/GenericToken.sol";
 
-contract DeployVoteSphereToken is Script {
+contract DeployGenericToken is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 

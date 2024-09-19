@@ -1,18 +1,20 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import { useSwitchChain, useWriteContract } from "wagmi";
 import { arbitrumChain, ethereumChain, optimismChain } from "@/utils/chains";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "@/utils/wagmi";
 import { useEquitoVote } from "@/providers/equito-vote-provider";
-import { Address, isAddress, parseUnits } from "viem";
+import { Address, isAddress, parseUnits, zeroAddress } from "viem";
 import { CircularProgress, TextField } from "@mui/material";
 import { Button } from "@/components/button";
 import equitoVote from "@/out/EquitoVoteV2.sol/EquitoVoteV2.json";
+// import { AddressesPerChain } from "@/addresses";
 
 const equitoVoteAbi = equitoVote.abi;
 
+// VoteSphere
 // const defaultFormData = {
 //   tokenName: "VoteSphere",
 //   ethereumAddress: "0x2ee891078cc2a08c31e494f19E36F772806b1613",
@@ -20,12 +22,21 @@ const equitoVoteAbi = equitoVote.abi;
 //   optimismAddress: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e",
 // };
 
-enum FormKeys {
-  tokenName = "tokenName",
-  ethereumAddress = "ethereumAddress",
-  arbitrumAddress = "arbitrumAddress",
-  optimismAddress = "optimismAddress",
-}
+// // MetaQuorum
+// const defaultFormData = {
+//   tokenName: "MetaQuorum",
+//   ethereumAddress: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
+//   arbitrumAddress: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
+//   optimismAddress: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
+// };
+
+// // MetaQuorum
+// const defaultFormData = {
+//   tokenName: "ChainLight",
+//   ethereumAddress: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
+//   arbitrumAddress: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
+//   optimismAddress: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
+// };
 
 const defaultFormData = {
   tokenName: "",
@@ -33,6 +44,13 @@ const defaultFormData = {
   arbitrumAddress: "",
   optimismAddress: "",
 };
+
+enum FormKeys {
+  tokenName = "tokenName",
+  ethereumAddress = "ethereumAddress",
+  arbitrumAddress = "arbitrumAddress",
+  optimismAddress = "optimismAddress",
+}
 
 function isOnlyAlphanumeric(text: string) {
   return /^[a-zA-Z0-9]+$/.test(text);

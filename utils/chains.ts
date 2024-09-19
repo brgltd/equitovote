@@ -237,8 +237,8 @@ export const chains: Chain[] = [
 ];
 
 export const supportedChains: Chain[] = [
-  arbitrumChain,
   ethereumChain,
+  arbitrumChain,
   optimismChain,
   baseChain,
   blastChain,
