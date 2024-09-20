@@ -11,7 +11,6 @@
 
 # next.js
 /.next/
-/out/
 
 # production
 /build
@@ -44,3 +43,8 @@ cache/
 # broadcast
 broadcast/
 
+# Include target ABIs to work on website deployment
+out/*
+!out/EquitoVote.sol/
+!out/Faucet.sol/
+!out/ERC20Votes.sol/
