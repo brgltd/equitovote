@@ -167,7 +167,7 @@ export default function VotePage({ params }: VoteProps) {
     isError: isErrorFetchingProposals,
     error: errorFetchingProposals,
   } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "proposals",
     args: [proposalId],
@@ -188,7 +188,7 @@ export default function VotePage({ params }: VoteProps) {
 
   // Token address for the chain that the user is currently connected
   const { data: tokenAddressData } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "tokenData",
     args: [formattedProposal?.tokenName, sourceChain?.chainSelector],
@@ -243,7 +243,7 @@ export default function VotePage({ params }: VoteProps) {
   const amountDelegatedTokens = amountDelegatedTokensData as bigint | undefined;
 
   const { data: amountUserVotesData } = useReadContract({
-    address: sourceChain?.equitoVoteContractV2,
+    address: sourceChain?.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "userVotes",
     args: [userAddress, formattedProposal?.id],
@@ -265,7 +265,7 @@ export default function VotePage({ params }: VoteProps) {
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [sourceChain?.equitoVoteContractV2 as Address],
+    args: [sourceChain?.equitoVoteContract as Address],
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
@@ -275,14 +275,14 @@ export default function VotePage({ params }: VoteProps) {
       address: destinationRouterAddress,
       abi: routerAbi,
       functionName: "getFee",
-      args: [destinationChain.equitoVoteContractV2 as Address],
+      args: [destinationChain.equitoVoteContract as Address],
       query: { enabled: !!destinationRouterAddress },
       chainId: destinationChain.definition.id,
     });
 
   const { data: voteOnProposalFeeData, isPending: isPendingVoteOnProposalFee } =
     useReadContract({
-      address: sourceChain?.equitoVoteContractV2,
+      address: sourceChain?.equitoVoteContract,
       abi: equitoVoteAbi,
       functionName: "voteOnProposalFee",
       query: { enabled: !!sourceRouterAddress },
@@ -428,7 +428,7 @@ export default function VotePage({ params }: VoteProps) {
 
   const voteOnProposal = async (voteOption: VoteOption) => {
     const hash = await writeContractAsync({
-      address: sourceChain?.equitoVoteContractV2 as Address,
+      address: sourceChain?.equitoVoteContract as Address,
       abi: equitoVoteAbi,
       functionName: "voteOnProposal",
       args: [

@@ -143,7 +143,7 @@ export default function CreateProposalPage() {
     address: sourceRouterAddress,
     abi: routerAbi,
     functionName: "getFee",
-    args: [sourceChain?.equitoVoteContractV2 as Address],
+    args: [sourceChain?.equitoVoteContract as Address],
     query: { enabled: !!sourceRouterAddress },
     chainId: sourceChain?.definition.id,
   });
@@ -153,14 +153,14 @@ export default function CreateProposalPage() {
       address: destinationRouterAddress,
       abi: routerAbi,
       functionName: "getFee",
-      args: [destinationChain.equitoVoteContractV2 as Address],
+      args: [destinationChain.equitoVoteContract as Address],
       query: { enabled: !!destinationRouterAddress },
       chainId: destinationChain.definition.id,
     });
 
   const { data: createProposalFeeData, isPending: isPendingCreateProposalFee } =
     useReadContract({
-      address: sourceChain?.equitoVoteContractV2,
+      address: sourceChain?.equitoVoteContract,
       abi: equitoVoteAbi,
       functionName: "createProposalFee",
       query: { enabled: !!sourceRouterAddress },
@@ -169,7 +169,7 @@ export default function CreateProposalPage() {
   const createProposalFee = createProposalFeeData as bigint;
 
   const { data: tokenNamesLength } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getTokenNamesLength",
     chainId: destinationChain.definition.id,
@@ -177,7 +177,7 @@ export default function CreateProposalPage() {
 
   const { data: tokenNamesData, isPending: isPendingTokenNames } =
     useReadContract({
-      address: destinationChain.equitoVoteContractV2,
+      address: destinationChain.equitoVoteContract,
       abi: equitoVoteAbi,
       functionName: "getSlicedTokenNames",
       args: buildSlicedTokenNamesArgs(tokenNamesLength as bigint),
@@ -236,7 +236,7 @@ export default function CreateProposalPage() {
 
   const createProposal = async () => {
     const hash = await writeContractAsync({
-      address: sourceChain.equitoVoteContractV2 as Address,
+      address: sourceChain.equitoVoteContract as Address,
       abi: equitoVoteAbi,
       functionName: "createProposal",
       args: Object.values(

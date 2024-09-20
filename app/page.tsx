@@ -48,7 +48,7 @@ export default function HomePage() {
   const { destinationChain } = useEquitoVote();
 
   const { data: proposalsLengthData } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getProposalIdsLength",
     chainId: destinationChain.definition.id,
@@ -67,7 +67,7 @@ export default function HomePage() {
     isRefetching: isRefetchingProposals,
     isRefetchError: isErrorRefetchingProposals,
   } = useReadContract({
-    address: destinationChain.equitoVoteContractV2,
+    address: destinationChain.equitoVoteContract,
     abi: equitoVoteAbi,
     functionName: "getSlicedReversedProposals",
     args: buildProposalRetrievalArgs(pageNumber, proposalsLengthNumber),

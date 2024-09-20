@@ -2,7 +2,7 @@ import { Address, zeroAddress } from "viem";
 
 export const Addresses = {
   EthereumSepolia: {
-    EquitoVoteV2: "0xC0540EfA6a3a925166d7EC15ABD25c8d9b55E1fD" as Address,
+    EquitoVote: "0xC0540EfA6a3a925166d7EC15ABD25c8d9b55E1fD" as Address,
 
     VoteSphereToken: "0x2ee891078cc2a08c31e494f19E36F772806b1613" as Address,
     MetaQuorumToken: "0x61009c81b50E0Fa52DCa913D7aC3F81744Dd4063" as Address,
@@ -12,7 +12,7 @@ export const Addresses = {
   },
 
   ArbitrumSepolia: {
-    EquitoVoteV2: "0xbB77f2fD1635937130F61f874Df651705197eB82" as Address,
+    EquitoVote: "0xbB77f2fD1635937130F61f874Df651705197eB82" as Address,
 
     VoteSphereToken: "0xC175b8abba483e57d36b7EBd9b4d3fBf630FECCA" as Address,
     MetaQuorumToken: "0xe4f6Da5ceB777ade0937dAb8994FF9483494319E" as Address,
@@ -22,7 +22,7 @@ export const Addresses = {
   },
 
   OptimismSepolia: {
-    EquitoVoteV2: "0xb3B24205EAC66459ed10f267c9449e1040505C1a" as Address,
+    EquitoVote: "0xb3B24205EAC66459ed10f267c9449e1040505C1a" as Address,
 
     VoteSphereToken: "0x1C04808EE9d755f7B3b2d7fe7933F4Aec8D8Ee0e" as Address,
     MetaQuorumToken: "0xD39A5C47207F658dc0Ed09c77c08efa30562383F" as Address,
@@ -32,7 +32,7 @@ export const Addresses = {
   },
 
   BaseSepolia: {
-    EquitoVoteV2: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
+    EquitoVote: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
 
     VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
     MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,
@@ -43,7 +43,7 @@ export const Addresses = {
 
   // Blast addresses are the same from base.
   BlastSepolia: {
-    EquitoVoteV2: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
+    EquitoVote: "0xCD7949891D3075EF8681b9624746Ea78a5C27aa4" as Address,
 
     VoteSphereToken: "0xBF640425d199D33b84E150DAc80D2d961F63AD51" as Address,
     MetaQuorumToken: "0x57BF31E4364B76D9440Ba8744EE2643504De0f7A" as Address,

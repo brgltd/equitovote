@@ -13,7 +13,7 @@ export type Chain = {
   name: string;
   img: number;
   definition: Definition;
-  equitoVoteContractV2: Address;
+  equitoVoteContract: Address;
   faucet: Address;
   voteSphere: Address;
   metaQuorum: Address;
@@ -27,7 +27,7 @@ export const ethereumChain = {
   name: "Ethereum Sepolia",
   img: 1027,
   definition: sepolia,
-  equitoVoteContractV2: Addresses.EthereumSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.EthereumSepolia.EquitoVote,
   faucet: Addresses.EthereumSepolia.Faucet,
   voteSphere: Addresses.EthereumSepolia.VoteSphereToken,
   metaQuorum: Addresses.EthereumSepolia.MetaQuorumToken,
@@ -39,7 +39,7 @@ export const arbitrumChain = {
   name: "Arbitrum Sepolia",
   img: 11841,
   definition: arbitrumSepolia,
-  equitoVoteContractV2: Addresses.ArbitrumSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.ArbitrumSepolia.EquitoVote,
   faucet: Addresses.ArbitrumSepolia.Faucet,
   voteSphere: Addresses.ArbitrumSepolia.VoteSphereToken,
   metaQuorum: Addresses.ArbitrumSepolia.MetaQuorumToken,
@@ -51,7 +51,7 @@ export const optimismChain = {
   name: "Optimism Sepolia",
   img: 11840,
   definition: optimismSepolia,
-  equitoVoteContractV2: Addresses.OptimismSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.OptimismSepolia.EquitoVote,
   faucet: Addresses.OptimismSepolia.Faucet,
   voteSphere: Addresses.OptimismSepolia.VoteSphereToken,
   metaQuorum: Addresses.OptimismSepolia.MetaQuorumToken,
@@ -63,7 +63,7 @@ export const baseChain = {
   name: "Base Sepolia",
   img: 9195,
   definition: baseSepolia,
-  equitoVoteContractV2: Addresses.BaseSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.BaseSepolia.EquitoVote,
   faucet: Addresses.BaseSepolia.Faucet,
   voteSphere: Addresses.BaseSepolia.VoteSphereToken,
   metaQuorum: Addresses.BaseSepolia.MetaQuorumToken,
@@ -75,7 +75,7 @@ export const blastChain = {
   name: "Blast Sepolia",
   img: 28480,
   definition: blastSepolia,
-  equitoVoteContractV2: Addresses.BlastSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.BlastSepolia.EquitoVote,
   faucet: Addresses.BlastSepolia.Faucet,
   voteSphere: Addresses.BlastSepolia.VoteSphereToken,
   metaQuorum: Addresses.BlastSepolia.MetaQuorumToken,

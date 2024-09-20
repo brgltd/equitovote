@@ -90,7 +90,7 @@ export default function SetTokenDataPage() {
     try {
       await switchChainAsync({ chainId: destinationChain.definition.id });
       const hash = await writeContractAsync({
-        address: destinationChain.equitoVoteContractV2 as Address,
+        address: destinationChain.equitoVoteContract as Address,
         abi: equitoVoteAbi,
         functionName: "setTokenData",
         args: [
