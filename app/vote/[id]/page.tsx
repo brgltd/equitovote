@@ -177,7 +177,7 @@ export default function VotePage({ params }: VoteProps) {
 
   //@ts-ignore
   const formattedProposal: FormattedProposal = useMemo(
-    () => buildProposalFromArray(proposal, true),
+    () => buildProposalFromArray(proposal),
     [proposal],
   );
 
@@ -541,8 +541,11 @@ export default function VotePage({ params }: VoteProps) {
         <div className="ml-4">Executing Message on Destination Chain</div>
       </div>
     ),
+    // Toast will be displayed on errors.
     [Status.IsRetry]: <></>,
-    [Status.IsCompleted]: <></>,
+    [Status.IsCompleted]: (
+      <div className="mt-4">Votes Counted Succesfully!</div>
+    ),
   };
 
   if (isPendingProposal) {
@@ -771,8 +774,16 @@ export default function VotePage({ params }: VoteProps) {
 
         <div>{statusRenderer[status]}</div>
 
+        {shouldRenderExistingVotes && (
+          <div className="mt-4 italic">
+            You've voted with {activeAmountUserVotes} {activeProposal.tokenName}{" "}
+            token
+            {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal.
+          </div>
+        )}
+
         {shouldRenderFees && (
-          <ul className="space-y-4 text-gray-400 text-sm mt-6 w-max">
+          <ul className="space-y-4 text-gray-400 text-sm mt-4 w-max">
             <li>
               <Tooltip
                 placement="right"
@@ -877,14 +888,6 @@ export default function VotePage({ params }: VoteProps) {
         {shouldRenderDecision && (
           <div className="mt-4 italic">
             This proposal has concluded. Final decision was: {decision}.
-          </div>
-        )}
-
-        {shouldRenderExistingVotes && (
-          <div className="mt-4 italic">
-            You've voted with {activeAmountUserVotes} {activeProposal.tokenName}{" "}
-            token
-            {Number(activeAmountUserVotes) !== 1 ? "s" : ""} on this proposal.
           </div>
         )}
       </div>

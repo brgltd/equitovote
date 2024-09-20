@@ -346,6 +346,7 @@ export default function CreateProposalPage() {
         <div className="ml-4">Executing Message on Destination Chain</div>
       </div>
     ),
+    // Toast will be displayed on errors.
     [Status.IsRetry]: <></>,
     [Status.IsCompleted]: (
       <div className="mt-4">
