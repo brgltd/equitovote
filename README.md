@@ -22,7 +22,9 @@ This project proposes a solution to solve this issue by using the Equito SDKs an
 
 During the Equito Builder Program, we've deployed on ethereum, arbitrum, optimism, base and blast.
 
-Also note the proposal data effectivly gets saved on arbitrum (arbitrum is used as the destination chain and it stores the number of votes and other metadata).
+The proposal data effectivly gets saved on arbitrum (arbitrum is used as the destination chain and it stores the number of votes and other metadata).
+
+We are using the ERC20Votes extension to allow snapshot voting. The app is meant to be used with these tokens. Popular DeFi protocols used these tokens for governance, e.g. uniswap, aave, ens, yearn etc. Since some of these tokens are difficult to find on testnets, we've created 3 tokens (VoteSphere, MetaQuorum and ChainLight) and a faucet, to allow anyone to create proposals and vote on proposals without hassle during the hackathon testing period.
 
 Main contract is located at: https://github.com/brgltd/equitovote/blob/main/src/EquitoVote.sol
 
