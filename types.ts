@@ -7,13 +7,9 @@ export interface ProposalResponse {
   title: string;
   description: string;
   id: string;
-  // v1
-  erc20?: string;
-  creator?: string;
-  // v2
-  startBlockNumber?: number;
-  tokenName?: string;
-  originChainSelector?: number;
+  startBlockNumber: number;
+  tokenName: string;
+  originChainSelector: number;
 }
 
 type BigintToNumber<T> = {

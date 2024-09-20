@@ -11,20 +11,6 @@ export const placeholderProposal: FormattedProposal = {
   numVotesYes: 0,
   numVotesNo: 0,
   numVotesAbstain: 0,
-  erc20: "",
-  creator: "",
-  title: "",
-  description: "",
-  id: "",
-};
-
-// Order is important for this object
-export const placeholderProposalV2: FormattedProposal = {
-  startTimestamp: 0,
-  endTimestamp: 0,
-  numVotesYes: 0,
-  numVotesNo: 0,
-  numVotesAbstain: 0,
   title: "",
   description: "",
   id: "",
@@ -65,11 +51,10 @@ export function formatProposals(proposals: ProposalResponse[]) {
 
 export function buildProposalFromArray(
   proposalArrayData: Array<ProposalDataItem>,
-  isV2 = false,
 ) {
   return !Array.isArray(proposalArrayData)
     ? {}
-    : Object.keys(isV2 ? placeholderProposalV2 : placeholderProposal).reduce(
+    : Object.keys(placeholderProposal).reduce(
         (acc, key, index) => {
           acc[key] = formatProposalItem(proposalArrayData[index]);
           return acc;
