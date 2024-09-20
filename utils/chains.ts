@@ -18,7 +18,7 @@ import {
   scrollSepolia,
 } from "wagmi/chains";
 import { Address, type Chain as Definition } from "viem";
-import { AddressesPerChain } from "@/addresses";
+import { AddressesPerChain } from "@/utils/addresses";
 
 const seiEvmAtlantic: Definition = {
   id: 1328,
