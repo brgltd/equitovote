@@ -4,6 +4,10 @@
 
 https://equitovote.vercel.app/
 
+## Video
+
+https://drive.google.com/file/d/1EukNBSQMFP46ySoMWVzJadlqoFKa05S2/view
+
 ## Overview
 
 A significant issue in DAO voting today is that bridges do not transfer governance votes tied to tokens utilizing the ERC20Votes extension. As highlighted in the [Tally documentation](https://docs.tally.xyz/user-guides/bridge-providers), this limitation poses challenges for DAO users and prevents user adoption.
