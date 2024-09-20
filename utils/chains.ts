@@ -13,8 +13,7 @@ export type Chain = {
   name: string;
   img: number;
   definition: Definition;
-  equitoVoteContract?: Address;
-  equitoVoteContractV2?: Address;
+  equitoVoteContractV2: Address;
   faucet: Address;
   voteSphere: Address;
   metaQuorum: Address;
@@ -28,7 +27,6 @@ export const ethereumChain = {
   name: "Ethereum Sepolia",
   img: 1027,
   definition: sepolia,
-  equitoVoteContract: Addresses.EthereumSepolia.EquitoVoteV1,
   equitoVoteContractV2: Addresses.EthereumSepolia.EquitoVoteV2,
   faucet: Addresses.EthereumSepolia.Faucet,
   voteSphere: Addresses.EthereumSepolia.VoteSphereToken,
@@ -41,7 +39,6 @@ export const arbitrumChain = {
   name: "Arbitrum Sepolia",
   img: 11841,
   definition: arbitrumSepolia,
-  equitoVoteContract: Addresses.ArbitrumSepolia.EquitoVoteV1,
   equitoVoteContractV2: Addresses.ArbitrumSepolia.EquitoVoteV2,
   faucet: Addresses.ArbitrumSepolia.Faucet,
   voteSphere: Addresses.ArbitrumSepolia.VoteSphereToken,
@@ -54,7 +51,6 @@ export const optimismChain = {
   name: "Optimism Sepolia",
   img: 11840,
   definition: optimismSepolia,
-  equitoVoteContract: Addresses.OptimismSepolia.EquitoVoteV1,
   equitoVoteContractV2: Addresses.OptimismSepolia.EquitoVoteV2,
   faucet: Addresses.OptimismSepolia.Faucet,
   voteSphere: Addresses.OptimismSepolia.VoteSphereToken,
