@@ -23,7 +23,7 @@ export const getChainTrasports = () =>
 
 export const wagmiConfig = (() => {
   return getDefaultConfig({
-    appName: "EquitoSwap",
+    appName: "equitovote",
     projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
     wallets: [
       ...getDefaultWallets().wallets,
