@@ -157,16 +157,14 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex flex-col justify-between">
-                    <div>
-                      <div className="proposal-link-item__chain">
-                        Proposal Created on
-                        <img
-                          src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
-                          width={32}
-                          height={32}
-                          className="rounded-full ml-2"
-                        />
-                      </div>
+                    <div className="proposal-link-item__chain">
+                      Proposal Created on
+                      <img
+                        src={`https://s2.coinmarketcap.com/static/img/coins/64x64/${originChainImg}.png`}
+                        width={32}
+                        height={32}
+                        className="rounded-full ml-2"
+                      />
                     </div>
                     <div className="flex sm:flex-row flex-col sm:items-center">
                       <div className="md:mb-0 mb-2">Voting available on</div>
