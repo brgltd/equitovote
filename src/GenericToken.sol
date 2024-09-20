@@ -29,7 +29,8 @@ contract GenericToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         _;
     }
 
-    /// @notice Initializes the GenericToken contract with a name and symbol, mints initial supply to the deployer.
+    /// @notice Initializes the GenericToken contract with a name and symbol.
+    ///         Mints initial supply to the deployer.
     /// @param name The name of the token.
     /// @param symbol The symbol of the token.
     constructor(

@@ -574,7 +574,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
 
     /// @notice Receive the cross chain message on the destination chain.
     /// @param message Equito message.
-    /// @param messageData The data being sent.
+    /// @param messageData The data being received, where the proposal data is included.
     function _receiveMessageFromPeer(
         EquitoMessage calldata message,
         bytes calldata messageData
