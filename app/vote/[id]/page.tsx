@@ -341,6 +341,7 @@ export default function VotePage({ params }: VoteProps) {
     !isPendingSourceFee &&
     !isPendingDestinationFee &&
     !isPendingVoteOnProposalFee &&
+    hasVotingPower &&
     (status === Status.IsStart ||
       status === Status.IsCompleted ||
       status === Status.IsRetry);

@@ -265,6 +265,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     /// @param numVotes The number of votes to cast.
     /// @param voteOption The vote option (Yes, No, Abstain).
     /// @param tokenAddress The address of the token used for voting.
+    /// @param isGetPastVotesEnabled Flag to controler wheather we want past or current voting power.
     /// @dev `tokenAddress` will be validated in `_receiveMessageFromPeers._voteOnProposal` and
     ///      votes will only be counted if it's valid.
     function voteOnProposal(
@@ -683,7 +684,7 @@ contract EquitoVote is EquitoApp, ReentrancyGuard {
     // --- private pure functions ---
 
     /// @notice Unchecked increment to save gas. Should be used primarily on
-    ///			`for` loops, since the value of `i` will be smaller than the
+    ///         `for` loops, since the value of `i` will be smaller than the
     ///         a target length, which is bound to be smaller than 2**256 - 1.
     /// @param i The value to be incremented.
     /// @return The incremeneted value.
