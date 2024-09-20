@@ -12,8 +12,6 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { wagmiConfig } from "../utils/wagmi";
-import { EquitoProvider } from "../providers/equito-provider";
-import { PingPongProvider } from "../providers/ping-pong-provider";
 import { Navbar } from "@/components/navbar";
 import { EquitoVoteProvider } from "@/providers/equito-vote-provider";
 import { Toast } from "@/components/toast";
@@ -48,25 +46,21 @@ export function AppLayout({
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider theme={rainbowDarkTheme()}>
-              <EquitoProvider>
-                <PingPongProvider>
-                  <EquitoVoteProvider>
-                    <AppRouterCacheProvider>
-                      <ThemeProvider theme={darkTheme}>
-                        <CssBaseline />
-                        <div className="flex flex-row justify-center">
-                          <div className="mx-12" style={{ width: "1200px" }}>
-                            <Navbar />
-                            {children}
-                            <Footer />
-                          </div>
-                        </div>
-                        <Toast />
-                      </ThemeProvider>
-                    </AppRouterCacheProvider>
-                  </EquitoVoteProvider>
-                </PingPongProvider>
-              </EquitoProvider>
+              <EquitoVoteProvider>
+                <AppRouterCacheProvider>
+                  <ThemeProvider theme={darkTheme}>
+                    <CssBaseline />
+                    <div className="flex flex-row justify-center">
+                      <div className="mx-12" style={{ width: "1200px" }}>
+                        <Navbar />
+                        {children}
+                        <Footer />
+                      </div>
+                    </div>
+                    <Toast />
+                  </ThemeProvider>
+                </AppRouterCacheProvider>
+              </EquitoVoteProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
         </WagmiProvider>

@@ -7,7 +7,9 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
-/// @notice Generic token to create demonstration tokens for the Equito Builder Program. Compatible with ERC20Votes to allow snapshot voting.
+/// @title GenericToken
+/// @notice Generic token to create demonstration tokens for the Equito Builder Program.
+///         Compatible with ERC20Votes to allow snapshot voting.
 contract GenericToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
     uint256 public amountFaucetToMint = 1_000e18;
 
