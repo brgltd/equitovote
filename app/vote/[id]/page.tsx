@@ -136,6 +136,11 @@ export default function VotePage({ params }: VoteProps) {
   const [activeAmountDelegatedTokens, setActiveAmountDelegatedTokens] =
     useState("");
 
+  // Sometimes we want to control voting state outside of `status`.
+  // Since `status` is set to change before `switchChainAsync` and
+  // `isVotingInProgress` is set to change after `switchChainAsync`.
+  const [isVotingInProgress, setIsVotingInProgress] = useState(false);
+
   const {
     sourceChain,
     sourceRouter,
@@ -357,7 +362,8 @@ export default function VotePage({ params }: VoteProps) {
   const shouldRenderExistingVotes =
     !!activeAmountUserVotes &&
     activeAmountUserVotes !== ZERO_TOKEN_TEXT &&
-    !isPendingTokenData;
+    !isPendingTokenData &&
+    !isVotingInProgress;
 
   const hasUserVotedAllHisTokens =
     shouldRenderExistingVotes &&
@@ -454,6 +460,7 @@ export default function VotePage({ params }: VoteProps) {
       return;
     }
     setStatus(Status.IsExecutingBaseTxOnSourceChain);
+    setIsVotingInProgress(true);
     try {
       const initialChain = sourceChain;
 
@@ -502,6 +509,7 @@ export default function VotePage({ params }: VoteProps) {
         setActiveAmountUserVotes(newActiveAmountUserVotes.toString());
       }
 
+      // Update before `switchChainAsync`
       setStatus(Status.IsCompleted);
 
       setInputErrorMessage("");
@@ -512,6 +520,9 @@ export default function VotePage({ params }: VoteProps) {
       handleError(error);
       setStatus(Status.IsRetry);
     }
+
+    // Update after `switchChainAsync`
+    setIsVotingInProgress(false);
   };
 
   const statusRenderer = {
