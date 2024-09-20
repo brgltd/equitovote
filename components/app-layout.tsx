@@ -53,7 +53,7 @@ export function AppLayout({
                     <div className="flex flex-row justify-center">
                       <div className="mx-12" style={{ width: "1200px" }}>
                         <Navbar />
-                        {children}
+                        <main>{children}</main>
                         <Footer />
                       </div>
                     </div>
