@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 /// @notice Equito router testnet addresses.
-library RouterTestnetAddresses {
+library AddressesTestnetRouters {
     address public constant ETHEREUM_SEPOLIA =
         0x35D899517F07b1026e36F6418c53BC1305dCA5a5;
 

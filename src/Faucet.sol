@@ -5,6 +5,9 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IGenericToken} from "./IGenericToken.sol";
 
+/// @title Faucet
+/// @notice Faucet to drip tokens during the Equito Builder Program to
+///         facilitate testing.
 contract Faucet is ReentrancyGuard, Ownable {
     uint256 private constant COOLDOWN = 1 hours;
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
+/// @notice Chain names that are used to avoid dupplication during deployment.
 library ChainNames {
     string public constant DEPLOYED_TO_ETHEREUM_SEPOLIA = "ETHEREUM_SEPOLIA";
 

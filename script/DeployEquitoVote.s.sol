@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
-import {RouterTestnetAddresses} from "./RouterTestnetAddresses.sol";
+import {AddressesTestnetRouters} from "./AddressesTestnetRouters.sol";
 import {ChainNames} from "./ChainNames.sol";
 import {EquitoVote} from "../src/EquitoVote.sol";
 
@@ -26,27 +26,27 @@ contract DeployEquitoVote is Script {
             keccak256(abi.encodePacked(deployedTo)) ==
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ETHEREUM_SEPOLIA))
         ) {
-            return RouterTestnetAddresses.ETHEREUM_SEPOLIA;
+            return AddressesTestnetRouters.ETHEREUM_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_ARBITRUM_SEPOLIA))
         ) {
-            return RouterTestnetAddresses.ARBITRUM_SEPOLIA;
+            return AddressesTestnetRouters.ARBITRUM_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_OPTIMISM_SEPOLIA))
         ) {
-            return RouterTestnetAddresses.OPTIMISM_SEPOLIA;
+            return AddressesTestnetRouters.OPTIMISM_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_BASE_SEPOLIA))
         ) {
-            return RouterTestnetAddresses.BASE_SEPOLIA;
+            return AddressesTestnetRouters.BASE_SEPOLIA;
         } else if (
             keccak256(abi.encodePacked(deployedTo)) ==
             keccak256(abi.encodePacked(ChainNames.DEPLOYED_TO_BLAST_SEPOLIA))
         ) {
-            return RouterTestnetAddresses.BLAST_SEPOLIA;
+            return AddressesTestnetRouters.BLAST_SEPOLIA;
         }
         revert("Invalid DEPLOYED_TO");
     }
