@@ -18,7 +18,7 @@ import {
   scrollSepolia,
 } from "wagmi/chains";
 import { Address, type Chain as Definition } from "viem";
-import { AddressesPerChain } from "@/utils/addresses";
+import { Addresses } from "@/utils/addresses";
 
 const seiEvmAtlantic: Definition = {
   id: 1328,
@@ -72,13 +72,13 @@ export const ethereumChain = {
   definition: sepolia,
   pingPongContract: "0x2BA6E972739670dA840F1393F321f524D24DA079" as Address,
 
-  equitoVoteContract: AddressesPerChain.EthereumSepolia.EquitoVoteV1,
-  equitoVoteContractV2: AddressesPerChain.EthereumSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.EthereumSepolia.EquitoVoteV1,
+  equitoVoteContractV2: Addresses.EthereumSepolia.EquitoVoteV2,
 
-  faucet: AddressesPerChain.EthereumSepolia.Faucet,
-  voteSphere: AddressesPerChain.EthereumSepolia.VoteSphereToken,
-  metaQuorum: AddressesPerChain.EthereumSepolia.MetaQuorumToken,
-  chainLight: AddressesPerChain.EthereumSepolia.ChainLightToken,
+  faucet: Addresses.EthereumSepolia.Faucet,
+  voteSphere: Addresses.EthereumSepolia.VoteSphereToken,
+  metaQuorum: Addresses.EthereumSepolia.MetaQuorumToken,
+  chainLight: Addresses.EthereumSepolia.ChainLightToken,
 };
 
 export const arbitrumChain = {
@@ -88,13 +88,13 @@ export const arbitrumChain = {
   definition: arbitrumSepolia,
   pingPongContract: "0x420475cA23aA49c3d4DdA42D609f7bE142a82Ad9" as Address,
 
-  equitoVoteContract: AddressesPerChain.ArbitrumSepolia.EquitoVoteV1,
-  equitoVoteContractV2: AddressesPerChain.ArbitrumSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.ArbitrumSepolia.EquitoVoteV1,
+  equitoVoteContractV2: Addresses.ArbitrumSepolia.EquitoVoteV2,
 
-  faucet: AddressesPerChain.ArbitrumSepolia.Faucet,
-  voteSphere: AddressesPerChain.ArbitrumSepolia.VoteSphereToken,
-  metaQuorum: AddressesPerChain.ArbitrumSepolia.MetaQuorumToken,
-  chainLight: AddressesPerChain.ArbitrumSepolia.ChainLightToken,
+  faucet: Addresses.ArbitrumSepolia.Faucet,
+  voteSphere: Addresses.ArbitrumSepolia.VoteSphereToken,
+  metaQuorum: Addresses.ArbitrumSepolia.MetaQuorumToken,
+  chainLight: Addresses.ArbitrumSepolia.ChainLightToken,
 };
 
 export const optimismChain = {
@@ -104,13 +104,13 @@ export const optimismChain = {
   definition: optimismSepolia,
   pingPongContract: "0x757676a6a14271389E3496cFb11eEE86210502B4" as Address,
 
-  equitoVoteContract: AddressesPerChain.OptimismSepolia.EquitoVoteV1,
-  equitoVoteContractV2: AddressesPerChain.OptimismSepolia.EquitoVoteV2,
+  equitoVoteContract: Addresses.OptimismSepolia.EquitoVoteV1,
+  equitoVoteContractV2: Addresses.OptimismSepolia.EquitoVoteV2,
 
-  faucet: AddressesPerChain.OptimismSepolia.Faucet,
-  voteSphere: AddressesPerChain.OptimismSepolia.VoteSphereToken,
-  metaQuorum: AddressesPerChain.OptimismSepolia.MetaQuorumToken,
-  chainLight: AddressesPerChain.OptimismSepolia.ChainLightToken,
+  faucet: Addresses.OptimismSepolia.Faucet,
+  voteSphere: Addresses.OptimismSepolia.VoteSphereToken,
+  metaQuorum: Addresses.OptimismSepolia.MetaQuorumToken,
+  chainLight: Addresses.OptimismSepolia.ChainLightToken,
 };
 
 export const baseChain = {
@@ -120,12 +120,12 @@ export const baseChain = {
   definition: baseSepolia,
   pingPongContract: "0xbC2ca9a5364DBd68d2c8Fb091E662Da952697B50" as Address,
 
-  equitoVoteContractV2: AddressesPerChain.BaseSepolia.EquitoVoteV2,
+  equitoVoteContractV2: Addresses.BaseSepolia.EquitoVoteV2,
 
-  faucet: AddressesPerChain.BaseSepolia.Faucet,
-  voteSphere: AddressesPerChain.BaseSepolia.VoteSphereToken,
-  metaQuorum: AddressesPerChain.BaseSepolia.MetaQuorumToken,
-  chainLight: AddressesPerChain.BaseSepolia.ChainLightToken,
+  faucet: Addresses.BaseSepolia.Faucet,
+  voteSphere: Addresses.BaseSepolia.VoteSphereToken,
+  metaQuorum: Addresses.BaseSepolia.MetaQuorumToken,
+  chainLight: Addresses.BaseSepolia.ChainLightToken,
 };
 
 export const blastChain = {
@@ -135,12 +135,12 @@ export const blastChain = {
   definition: blastSepolia,
   pingPongContract: "0xc97c952D2ec7cF359F4848bFD4eb90303F5Fe631" as Address,
 
-  equitoVoteContractV2: AddressesPerChain.BlastSepolia.EquitoVoteV2,
+  equitoVoteContractV2: Addresses.BlastSepolia.EquitoVoteV2,
 
-  faucet: AddressesPerChain.BlastSepolia.Faucet,
-  voteSphere: AddressesPerChain.BlastSepolia.VoteSphereToken,
-  metaQuorum: AddressesPerChain.BlastSepolia.MetaQuorumToken,
-  chainLight: AddressesPerChain.BlastSepolia.ChainLightToken,
+  faucet: Addresses.BlastSepolia.Faucet,
+  voteSphere: Addresses.BlastSepolia.VoteSphereToken,
+  metaQuorum: Addresses.BlastSepolia.MetaQuorumToken,
+  chainLight: Addresses.BlastSepolia.ChainLightToken,
 };
 
 export const lineaChain = {
