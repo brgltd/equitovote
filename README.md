@@ -36,12 +36,30 @@ Main contract is located at: https://github.com/brgltd/equitovote/blob/main/src/
 
 ```bash
 curl -L https://foundry.paradigm.xyz | bash
+```
 
+```bash
 forge build
+```
 
+```bash
 npm install
+```
 
+```bash
 npm run dev
+```
+
+## How to deploy a contract via the scripts
+
+```bash
+cp .env.example .env
+# Then, fill the values in .env
+```
+
+```bash
+# Example deploy EquitoVote to ethereum sepolia
+forge script script/EquitoVote.s.sol:EquitoVote --rpc-url $ETHEREUM_SEPOLIA_RPC_URL --broadcast -vvvv
 ```
 
 ## Contact
