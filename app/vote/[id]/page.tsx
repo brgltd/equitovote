@@ -32,6 +32,7 @@ import { VoteSkeleton } from "@/components/vote-skeleton";
 import { FeeSkeleton } from "@/components/fee-skeleton";
 import equitoVote from "@/out/EquitoVote.sol/EquitoVote.json";
 import erc20Votes from "@/out/ERC20Votes.sol/ERC20Votes.json";
+import { TransactionModal } from "@/components/transaction-modal";
 
 const PRECISION = 2;
 const ZERO_TOKEN_TEXT = Number(0).toFixed(PRECISION);
@@ -128,6 +129,7 @@ export default function VotePage({ params }: VoteProps) {
   const [amountToVote, setAmountToVote] = useState("");
   const [isDelegating, setIsDelegating] = useState(false);
   const [inputErrorMessage, setInputErrorMessage] = useState("");
+  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
 
   const [activeProposal, setActiveProposal] =
     useState<FormattedProposal>(placeholderProposal);
@@ -462,6 +464,7 @@ export default function VotePage({ params }: VoteProps) {
     }
     setStatus(Status.IsExecutingBaseTxOnSourceChain);
     setIsVotingInProgress(true);
+    setIsTxModalOpen(true);
     try {
       const initialChain = sourceChain;
 
@@ -784,7 +787,12 @@ export default function VotePage({ params }: VoteProps) {
           </div>
         </div>
 
-        <div>{statusRenderer[status]}</div>
+        {/* <div>{statusRenderer[status]}</div> */}
+
+        <TransactionModal
+          isOpen={isTxModalOpen}
+          onClose={() => setIsTxModalOpen(false)}
+        />
 
         {shouldRenderExistingVotes && (
           <div className="mt-4 italic">

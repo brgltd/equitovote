@@ -71,10 +71,6 @@ export default function HomePage() {
     abi: equitoVoteAbi,
     functionName: "getSlicedReversedProposals",
     args: buildProposalRetrievalArgs(pageNumber, proposalsLengthNumber),
-    // functionName: "getSlicedReversedProposals",
-    // args: [0, 0],
-    // functionName: "getProposalsSlice",
-    // args: [0, 1],
     query: { enabled: isValidData(proposalsLength) },
     chainId: destinationChain.definition.id,
   });

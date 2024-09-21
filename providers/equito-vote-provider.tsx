@@ -52,7 +52,7 @@ export const EquitoVoteProvider = ({ children }: PropsWithChildren<object>) => {
     if (errorString.includes("Connector not connected")) {
       setToastMessage("Please connect a wallet");
     } else {
-      setToastMessage("Unexected error. Please contract support");
+      setToastMessage("Unexected error. Please try again");
       console.error(error);
     }
     setIsToastOpen(true);
