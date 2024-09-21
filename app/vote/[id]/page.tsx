@@ -320,7 +320,7 @@ export default function VotePage({ params }: VoteProps) {
       }`
     : "Unavailable";
 
-  const formattedCreateProposalFee = !!voteOnProposalFee
+  const formattedVoteOnProposalFee = !!voteOnProposalFee
     ? `${Number(formatUnits(voteOnProposalFee, 18)).toFixed(8)} ${
         sourceChain?.definition?.nativeCurrency?.symbol
       }`
@@ -479,7 +479,7 @@ export default function VotePage({ params }: VoteProps) {
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
-      setStatus(Status.IsRetrievingBlockOnSourceChain);
+      // setStatus(Status.IsRetrievingBlockOnSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: sourceChain?.definition.id,
         blockNumber: voteOnProposalReceipt.blockNumber,
@@ -538,12 +538,12 @@ export default function VotePage({ params }: VoteProps) {
       </div>
     ),
     // Same message as next step since it's executing quickly
-    [Status.IsRetrievingBlockOnSourceChain]: (
-      <div className="flex flex-row items-center mt-4">
-        <CircularProgress size={20} />
-        <div className="ml-4">Generating Proof on Source Chain</div>
-      </div>
-    ),
+    // [Status.IsRetrievingBlockOnSourceChain]: (
+    //   <div className="flex flex-row items-center mt-4">
+    //     <CircularProgress size={20} />
+    //     <div className="ml-4">Generating Proof on Source Chain</div>
+    //   </div>
+    // ),
     [Status.IsGeneratingProofOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
@@ -792,6 +792,18 @@ export default function VotePage({ params }: VoteProps) {
         <TransactionModal
           isOpen={isTxModalOpen}
           onClose={() => setIsTxModalOpen(false)}
+          fees={{
+            formattedSourceChainFee,
+            formattedDestinationChainFee,
+            formattedOperationFee: formattedVoteOnProposalFee,
+            formattedTotalUserFee,
+          }}
+          text={{
+            operationFeeTitle: "Equito Voting Fee",
+            detailsTitle: `Count ${amountToVote} votes from ${sourceChain?.name}`,
+            initialStepTitle: "Sending Votes on Source Chain",
+            successfulTitle: "Votes Counted Successfuly!",
+          }}
         />
 
         {shouldRenderExistingVotes && (
@@ -844,7 +856,7 @@ export default function VotePage({ params }: VoteProps) {
                   {isPendingVoteOnProposalFee ? (
                     <FeeSkeleton />
                   ) : (
-                    formattedCreateProposalFee
+                    formattedVoteOnProposalFee
                   )}
                 </div>
               </Tooltip>

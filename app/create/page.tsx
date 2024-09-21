@@ -289,7 +289,7 @@ export default function CreateProposalPage() {
         eventName === "MessageSendRequested" ? [args] : [],
       )[0];
 
-      setStatus(Status.IsRetrievingBlockOnSourceChain);
+      // setStatus(Status.IsRetrievingBlockOnSourceChain);
       const { timestamp: sendMessageTimestamp } = await getBlock(config, {
         chainId: sourceChain?.definition.id,
         blockNumber: createProposalReceipt.blockNumber,
@@ -328,12 +328,12 @@ export default function CreateProposalPage() {
       </div>
     ),
     // Same message as next step since it's executing quickly
-    [Status.IsRetrievingBlockOnSourceChain]: (
-      <div className="flex flex-row items-center mt-4">
-        <CircularProgress size={20} />
-        <div className="ml-4">Generating Proof on Source Chain</div>
-      </div>
-    ),
+    // [Status.IsRetrievingBlockOnSourceChain]: (
+    //   <div className="flex flex-row items-center mt-4">
+    //     <CircularProgress size={20} />
+    //     <div className="ml-4">Generating Proof on Source Chain</div>
+    //   </div>
+    // ),
     [Status.IsGeneratingProofOnSourceChain]: (
       <div className="flex flex-row items-center mt-4">
         <CircularProgress size={20} />
@@ -563,6 +563,7 @@ export default function CreateProposalPage() {
         >
           SUBMIT PROPOSAL
         </Button>
+        {/* @ts-ignore */}
         {statusRenderer[status]}
       </div>
     </div>
