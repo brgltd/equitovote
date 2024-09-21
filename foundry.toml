@@ -7,5 +7,9 @@ libs = ["lib"]
 via_ir = true
 
 [rpc_endpoints]
-sepolia = "${SEPOLIA_RPC_URL}"
+ethereum_sepolia = "${SEPOLIA_RPC_URL}"
 arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"
+optimism_sepolia = "${OPTIMISM_SEPOLIA_RPC_URL}"
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+blast_sepolia = "${BLAST_SEPOLIA_RPC_URL}" 
+
