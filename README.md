@@ -59,7 +59,10 @@ cp .env.example .env
 
 ```bash
 # Example deploy EquitoVote to ethereum sepolia
-forge script script/EquitoVote.s.sol:EquitoVote --rpc-url $ETHEREUM_SEPOLIA_RPC_URL --broadcast -vvvv
+forge script script/EquitoVote.s.sol:EquitoVote \
+  --rpc-url $ETHEREUM_SEPOLIA_RPC_URL \
+  --broadcast \
+  -vvvv
 ```
 
 ## Contact
